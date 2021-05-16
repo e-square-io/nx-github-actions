@@ -1,6 +1,6 @@
-# Contributing to @e-square/{{NAME}}
+# Contributing to nx-github-actions
 
-🙏 We would ❤️ for you to contribute to @e-square/{{NAME}} and help make it even better than it is today!
+🙏 We would ❤️ for you to contribute to nx-github-actions and help make it even better than it is today!
 
 # Developing
 

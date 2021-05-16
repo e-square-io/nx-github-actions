@@ -1,4 +1,4 @@
-# @e-square/name
+# Github NX Actions
 
 [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)]()
 [![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)]()
@@ -7,16 +7,25 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
 
 
-> The Library Slogan
+> A set of Github Actions for NX workspaces 
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid assumenda atque blanditiis cum delectus eligendi ipsam iste iure, maxime modi molestiae nihil obcaecati odit officiis pariatur quibusdam suscipit temporibus unde.
-Accusantium aliquid corporis cupiditate dolores eum exercitationem illo iure laborum minus nihil numquam odit officiis possimus quas quasi quos similique, temporibus veritatis? Exercitationem, iure magni nulla quo sapiente soluta. Esse?
+| project | version | description |
+|:-------:|:-------:|:-------:|
+| [@e-square/nx-affected-matrix] | [![GitHub Marketplace][monorepo-version-badge]][nx-affected-matrix-link] | Uses NX's affected utils to calculate the changes.  Outputs a matrix of the distributed tasks |
+| [@e-square/nx-distributed-task] | [![GitHub Marketplace][monorepo-version-badge]][nx-distributed-task-link] | Execute each distributed task from the matrix generated from nx-affected-matrix action |
+
+[monorepo-version-badge]: https://img.shields.io/github/package-json/v/e-square-io/nx-github-actions?color=light-green&label=Marketplace&logo=github&style=flat-square
+[@e-square/nx-affected-matrix]: https://github.com/e-square-io/nx-github-actions/tree/main/packages/nx-affected-matrix
+[nx-affected-matrix-link]: https://github.com/marketplace/actions/nx-affected-matrix
+[@e-square/nx-distributed-task]: https://github.com/e-square-io/nx-github-actions/tree/main/packages/nx-distributed-task
+[nx-distributed-task-link]: https://github.com/marketplace/actions/nx-distributed-task
 
 ## Features
 
-- ✅ One
-- ✅ Two
-- ✅ Three
+- ✅ Distribution of tasks across multiple parallel jobs
+- ✅ GitHub Cache support 
+- ✅ GitHub artifacts support 
+- ✅ NX Cloud support
 
 ## Table of Contents
 
@@ -24,29 +33,11 @@ Accusantium aliquid corporis cupiditate dolores eum exercitationem illo iure lab
 - [Usage](#usage)
 - [FAQ](#faq)
 
-## Installation
-
-### NPM
-
-`npm install @e-square/name --save-dev`
-
-### Yarn
-
-`yarn add @e-square/name --dev`
-
 ## Usage
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid assumenda atque blanditiis cum delectus eligendi ipsam iste iure, maxime modi molestiae nihil obcaecati odit officiis pariatur quibusdam suscipit temporibus unde.
-
-```ts
-function helloWorld() {}
-```
+TODO: Add workflow example of both actions used together
 
 ## FAQ
-
-## How to ...
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid assumenda atque blanditiis cum delectus eligendi ips
 
 ## Contributors ✨
 
