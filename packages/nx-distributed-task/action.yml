@@ -1,0 +1,16 @@
+name: 'Nx distributed task'
+description: "Executes Nx task"
+inputs:
+  deployArtifacts:
+    description: "should deploy target's artifact from all distributed jobs"
+    required: false
+    default: 'true'
+  nxCloud:
+    description: 'Enable support of Nx Cloud'
+    required: false
+outputs:
+  artifactName:
+    description: "The name of the generated artifact"
+runs:
+  using: 'node12'
+  main: 'src/index.js'

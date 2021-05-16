@@ -1,3 +1,6 @@
 module.exports = {
-  projects: [],
+  projects: [
+    '<rootDir>/packages/nx-affected-matrix',
+    '<rootDir>/packages/nx-distributed-task',
+  ],
 };

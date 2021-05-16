@@ -14,7 +14,14 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@e-square/nx-affected-matrix": [
+        "packages/nx-affected-matrix/src/index.ts"
+      ],
+      "@e-square/nx-distributed-task": [
+        "packages/nx-distributed-task/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

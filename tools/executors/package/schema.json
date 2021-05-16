@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "type": "object",
+  "cli": "nx",
+  "properties": {
+    "main": {
+      "type": "string",
+      "description": "The path to the entry file"
+    },
+    "actionPath": {
+      "type": "string",
+      "description": "The path to the action.yml file"
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "The path to the output"
+    },
+    "watch": {
+      "type": "boolean",
+      "description": "Enable re-building when files change.",
+      "default": false
+    },
+    "sourceMap": {
+      "type": "boolean",
+      "description": "Output sourcemaps.",
+      "default": true
+    }
+  },
+  "required": ["actionPath", "outputPath", "main"]
+}

@@ -1,0 +1,19 @@
+name: 'Nx affected matrix'
+description: "Calculates changes in NX workspace and outputs a JSON that can be used as GitHub's job matrix"
+inputs:
+  targets:
+    description: 'comma-delimited targets to run'
+    required: true
+    default: 'test,build'
+  maxParallel:
+    description: "Maximum jobs distribution for target's affected projects"
+    required: false
+    default: '3'
+outputs:
+  matrix: # id of output
+    description: "The matrix that should be used in next job's matrix strategy"
+  hasChanges:
+    description: "Returns true when there are changes, can be used to skip next steps"
+runs:
+  using: 'node12'
+  main: 'src/index.js'

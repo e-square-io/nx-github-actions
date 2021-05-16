@@ -1,5 +1,68 @@
 {
   "version": 2,
-  "projects": {},
-  "cli": { "defaultCollection": "@nrwl/workspace" }
+  "projects": {
+    "nx-affected-matrix": {
+      "root": "packages/nx-affected-matrix",
+      "sourceRoot": "packages/nx-affected-matrix/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["packages/nx-affected-matrix/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/packages/nx-affected-matrix"],
+          "options": {
+            "jestConfig": "packages/nx-affected-matrix/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "executor": "./tools/executors/package:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "main": "packages/nx-affected-matrix/src/index.ts",
+            "actionPath": "packages/nx-affected-matrix/action.yml",
+            "outputPath": "dist/packages/nx-affected-matrix"
+          }
+        }
+      }
+    },
+    "nx-distributed-task": {
+      "root": "packages/nx-distributed-task",
+      "sourceRoot": "packages/nx-distributed-task/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["packages/nx-distributed-task/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/packages/nx-distributed-task"],
+          "options": {
+            "jestConfig": "packages/nx-distributed-task/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "executor": "./tools/executors/package:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "main": "packages/nx-distributed-task/src/index.ts",
+            "actionPath": "packages/nx-distributed-task/action.yml",
+            "outputPath": "dist/packages/nx-distributed-task"
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/workspace"
+  }
 }

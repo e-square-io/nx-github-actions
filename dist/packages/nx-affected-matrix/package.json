@@ -35,38 +35,6 @@
     "@actions/core": "^1.2.7",
     "@actions/exec": "^1.0.4"
   },
-  "devDependencies": {
-    "@commitlint/cli": "^11.0.0",
-    "@commitlint/config-angular": "^11.0.0",
-    "@commitlint/config-conventional": "^11.0.0",
-    "@nrwl/cli": "12.3.3",
-    "@nrwl/devkit": "12.3.3",
-    "@nrwl/eslint-plugin-nx": "12.3.3",
-    "@nrwl/jest": "12.3.3",
-    "@nrwl/linter": "12.3.3",
-    "@nrwl/node": "12.3.3",
-    "@nrwl/nx-cloud": "^12.1.1",
-    "@nrwl/tao": "12.3.3",
-    "@nrwl/workspace": "12.3.3",
-    "@types/jest": "26.0.8",
-    "@types/node": "14.14.33",
-    "@typescript-eslint/eslint-plugin": "4.19.0",
-    "@typescript-eslint/parser": "4.19.0",
-    "@vercel/ncc": "^0.28.5",
-    "all-contributors-cli": "^6.19.0",
-    "cross-env": "^7.0.3",
-    "dotenv": "8.2.0",
-    "eslint": "7.22.0",
-    "eslint-config-prettier": "8.1.0",
-    "git-cz": "^4.7.6",
-    "husky": "^6.0.0",
-    "jest": "26.6.3",
-    "lint-staged": "^11.0.0",
-    "prettier": "2.2.1",
-    "ts-jest": "26.5.5",
-    "ts-node": "9.1.1",
-    "typescript": "4.1.4"
-  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
@@ -81,5 +49,6 @@
       "eslint --fix",
       "git add"
     ]
-  }
+  },
+  "main": "./src/index.ts"
 }
