@@ -25,7 +25,8 @@
     "dep-graph": "nx dep-graph",
     "help": "nx help",
     "contributors:add": "all-contributors add",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "prepare": "husky install"
   },
   "private": true,
   "dependencies": {},
@@ -49,11 +50,11 @@
     "eslint": "7.22.0",
     "eslint-config-prettier": "8.1.0",
     "git-cz": "^4.7.6",
-    "husky": "^4.3.5",
-    "jest": "26.2.2",
-    "lint-staged": "^10.5.3",
-    "prettier": "2.2.1",
-    "ts-jest": "26.5.5",
+    "husky": "^6.0.0",
+    "jest": "26.6.3",
+    "lint-staged": "^11.0.0",
+    "prettier": "2.3.0",
+    "ts-jest": "26.5.6",
     "ts-node": "~9.1.1",
     "typescript": "4.1.4"
   },
@@ -71,11 +72,5 @@
       "eslint --fix",
       "git add"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "node tools/hooks/pre-commit.js && lint-staged"
-    }
   }
 }
