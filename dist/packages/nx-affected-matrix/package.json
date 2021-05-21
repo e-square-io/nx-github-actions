@@ -6,5 +6,5 @@
     "url": "git+https://github.com/e-square-io/nx-github-actions.git"
   },
   "dependencies": {},
-  "main": "./src/index.ts"
+  "main": "./src/index.js"
 }

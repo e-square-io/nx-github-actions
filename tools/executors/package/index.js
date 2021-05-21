@@ -244,7 +244,7 @@ function generatePackageJson(projectName, graph, options) {
     graph,
     options
   );
-  packageJson.main = './src/' + path_1.basename(options.main, 'js');
+  packageJson.main = './src/' + path_1.basename(options.main, '.ts') + '.js';
   delete packageJson.devDependencies;
   fileutils_1.writeJsonFile(options.outputPath + '/package.json', packageJson);
   devkit_1.logger.info('Done writing package.json to dist');
