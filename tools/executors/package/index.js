@@ -200,24 +200,41 @@ var __asyncGenerator =
       if ((f(v), q.shift(), q.length)) resume(q[0][0], q[0][1]);
     }
   };
+var __spreadArrays =
+  (this && this.__spreadArrays) ||
+  function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++)
+      s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+      for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+        r[k] = a[j];
+    return r;
+  };
 exports.__esModule = true;
 exports.generatePackageJson = void 0;
 var devkit_1 = require('@nrwl/devkit');
 var child_process_1 = require('child_process');
-var fs_1 = require('fs');
 var create_package_json_1 = require('@nrwl/workspace/src/utilities/create-package-json');
 var fileutils_1 = require('@nrwl/workspace/src/utilities/fileutils');
 var path_1 = require('path');
 var project_graph_1 = require('@nrwl/workspace/src/core/project-graph');
+var assets_1 = require('@nrwl/workspace/src/utilities/assets');
 function normalizeOptions(opts, context) {
+  var _a;
+  var projectRoot = path_1.resolve(
+    context.workspace.projects[context.projectName].root
+  );
   return __assign(__assign({}, opts), {
     fileReplacements: [],
-    root: context.root,
-    sourceRoot: path_1.resolve(context.root, 'src'),
-    projectRoot: context.root,
-    tsConfig: path_1.resolve(context.root, 'tsconfig.lib.ts'),
+    assets: __spreadArrays(
+      (_a = opts.assets) !== null && _a !== void 0 ? _a : [],
+      [opts.actionPath]
+    ),
+    root: path_1.resolve(context.root),
+    projectRoot: projectRoot,
+    sourceRoot: path_1.resolve(projectRoot, 'src'),
+    tsConfig: path_1.resolve(projectRoot, 'tsconfig.lib.ts'),
     main: path_1.resolve(opts.main),
-    actionPath: path_1.resolve(opts.actionPath),
     outputPath: path_1.resolve(opts.outputPath),
   });
 }
@@ -233,12 +250,6 @@ function generatePackageJson(projectName, graph, options) {
   devkit_1.logger.info('Done writing package.json to dist');
 }
 exports.generatePackageJson = generatePackageJson;
-function copyActionYaml(opts) {
-  if (fs_1.existsSync(opts.actionPath) && fs_1.existsSync(opts.outputPath)) {
-    fs_1.copyFileSync(opts.actionPath, opts.outputPath + '/action.yml');
-    devkit_1.logger.info('Done copying action.yml to ' + opts.outputPath);
-  }
-}
 function runNccCommand(opts) {
   return __awaiter(this, void 0, void 0, function () {
     var args, pack, processExitListener;
@@ -286,35 +297,47 @@ function packageExecutor(options, context) {
       switch (_a.label) {
         case 0:
           opts = normalizeOptions(options, context);
-          devkit_1.logger.info(JSON.stringify(opts));
           _a.label = 1;
         case 1:
-          _a.trys.push([1, 5, , 8]);
+          _a.trys.push([1, 6, , 9]);
           promise = runNccCommand(opts);
-          copyActionYaml(opts);
+          return [
+            4 /*yield*/,
+            __await(
+              assets_1.copyAssetFiles(
+                assets_1.assetGlobsToFiles(
+                  opts.assets,
+                  opts.root,
+                  opts.outputPath
+                )
+              )
+            ),
+          ];
+        case 2:
+          _a.sent();
           generatePackageJson(
             context.projectName,
             project_graph_1.createProjectGraph(),
             opts
           );
           return [4 /*yield*/, __await({ success: true })];
-        case 2:
-          return [4 /*yield*/, _a.sent()];
         case 3:
+          return [4 /*yield*/, _a.sent()];
+        case 4:
           _a.sent();
           return [4 /*yield*/, __await(promise)];
-        case 4:
-          return [2 /*return*/, _a.sent()];
         case 5:
+          return [2 /*return*/, _a.sent()];
+        case 6:
           e_1 = _a.sent();
           devkit_1.logger.error(e_1);
           return [4 /*yield*/, __await({ success: false })];
-        case 6:
-          return [4 /*yield*/, _a.sent()];
         case 7:
-          _a.sent();
-          return [3 /*break*/, 8];
+          return [4 /*yield*/, _a.sent()];
         case 8:
+          _a.sent();
+          return [3 /*break*/, 9];
+        case 9:
           return [2 /*return*/];
       }
     });

@@ -1,54 +1,10 @@
 {
-  "name": "@e-square/name",
-  "version": "0.0.0",
-  "license": "MIT",
-  "scripts": {
-    "nx": "nx",
-    "start": "nx serve",
-    "build": "nx build",
-    "test": "nx test",
-    "lint": "nx workspace-lint && nx lint",
-    "e2e": "nx e2e",
-    "affected:apps": "nx affected:apps",
-    "affected:libs": "nx affected:libs",
-    "affected:build": "nx affected:build",
-    "affected:e2e": "nx affected:e2e",
-    "affected:test": "nx affected:test",
-    "affected:lint": "nx affected:lint",
-    "affected:dep-graph": "nx affected:dep-graph",
-    "affected": "nx affected",
-    "format": "nx format:write",
-    "format:write": "nx format:write",
-    "format:check": "nx format:check",
-    "update": "nx migrate latest",
-    "workspace-generator": "nx workspace-generator",
-    "dep-graph": "nx dep-graph",
-    "help": "nx help",
-    "contributors:add": "all-contributors add",
-    "commit": "git-cz",
-    "prepare": "husky install"
+  "name": "@e-square/nx-affected-matrix",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/e-square-io/nx-github-actions.git"
   },
-  "private": true,
-  "dependencies": {
-    "@actions/artifact": "^0.5.1",
-    "@actions/cache": "^1.0.7",
-    "@actions/core": "^1.2.7",
-    "@actions/exec": "^1.0.4"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
-  "lint-staged": {
-    "*.{js,json,css,scss,ts,html,component.html}": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.{js,ts}": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
+  "dependencies": {},
   "main": "./src/index.ts"
 }

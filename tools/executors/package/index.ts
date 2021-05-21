@@ -1,11 +1,15 @@
 import { ExecutorContext, logger, ProjectGraph } from '@nrwl/devkit';
 import { exec } from 'child_process';
-import { existsSync, copyFileSync } from 'fs';
 import { createPackageJson } from '@nrwl/workspace/src/utilities/create-package-json';
 import { BuildBuilderOptions } from '@nrwl/node/src/utils/types';
 import { writeJsonFile } from '@nrwl/workspace/src/utilities/fileutils';
 import { basename, resolve } from 'path';
 import { createProjectGraph } from '@nrwl/workspace/src/core/project-graph';
+import {
+  AssetGlob,
+  assetGlobsToFiles,
+  copyAssetFiles,
+} from '@nrwl/workspace/src/utilities/assets';
 
 export interface GHActionPackageBuilderOptions {
   actionPath: string;
@@ -13,24 +17,25 @@ export interface GHActionPackageBuilderOptions {
   outputPath: string;
   watch: boolean;
   sourceMap: boolean;
+  assets: (string | AssetGlob)[];
 }
-
-export type NormalizedOptions = GHActionPackageBuilderOptions &
-  BuildBuilderOptions;
 
 function normalizeOptions(
   opts: GHActionPackageBuilderOptions,
   context: ExecutorContext
-): NormalizedOptions {
+): BuildBuilderOptions {
+  const projectRoot = resolve(
+    context.workspace.projects[context.projectName].root
+  );
   return {
     ...opts,
     fileReplacements: [],
-    root: context.root,
-    sourceRoot: resolve(context.root, 'src'),
-    projectRoot: context.root,
-    tsConfig: resolve(context.root, 'tsconfig.lib.ts'),
+    assets: [...(opts.assets ?? []), opts.actionPath],
+    root: resolve(context.root),
+    projectRoot,
+    sourceRoot: resolve(projectRoot, 'src'),
+    tsConfig: resolve(projectRoot, 'tsconfig.lib.ts'),
     main: resolve(opts.main),
-    actionPath: resolve(opts.actionPath),
     outputPath: resolve(opts.outputPath),
   };
 }
@@ -38,7 +43,7 @@ function normalizeOptions(
 export function generatePackageJson(
   projectName: string,
   graph: ProjectGraph,
-  options: NormalizedOptions
+  options: BuildBuilderOptions
 ) {
   const packageJson = createPackageJson(projectName, graph, options);
   packageJson.main = `./src/${basename(options.main, 'js')}`;
@@ -47,15 +52,8 @@ export function generatePackageJson(
   logger.info(`Done writing package.json to dist`);
 }
 
-function copyActionYaml(opts: NormalizedOptions) {
-  if (existsSync(opts.actionPath) && existsSync(opts.outputPath)) {
-    copyFileSync(opts.actionPath, `${opts.outputPath}/action.yml`);
-    logger.info(`Done copying action.yml to ${opts.outputPath}`);
-  }
-}
-
 async function runNccCommand(
-  opts: NormalizedOptions
+  opts: BuildBuilderOptions
 ): Promise<{ success: boolean }> {
   const args = [`-o ${opts.outputPath}/src`];
   if (opts.watch) {
@@ -93,12 +91,12 @@ async function* packageExecutor(
 ) {
   const opts = normalizeOptions(options, context);
 
-  logger.info(JSON.stringify(opts));
-
   try {
     const promise = runNccCommand(opts);
 
-    copyActionYaml(opts);
+    await copyAssetFiles(
+      assetGlobsToFiles(opts.assets, opts.root, opts.outputPath)
+    );
     generatePackageJson(context.projectName, createProjectGraph(), opts);
 
     yield { success: true };
