@@ -5,6 +5,10 @@
     "type": "git",
     "url": "git+https://github.com/e-square-io/nx-github-actions.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@actions/exec": "^1.0.4",
+    "@actions/core": "^1.2.7",
+    "@actions/github": "^5.0.0"
+  },
   "main": "./src/index.js"
 }

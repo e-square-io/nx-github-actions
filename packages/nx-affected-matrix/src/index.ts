@@ -1,1 +1,1 @@
-export * from './lib/nx-affected-matrix';
+import './lib/nx-affected-matrix';

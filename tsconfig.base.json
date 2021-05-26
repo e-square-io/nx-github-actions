@@ -20,7 +20,8 @@
       ],
       "@e-square/nx-distributed-task": [
         "packages/nx-distributed-task/src/index.ts"
-      ]
+      ],
+      "@e-square/utils": ["packages/utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

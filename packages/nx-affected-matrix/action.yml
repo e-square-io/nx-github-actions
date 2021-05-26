@@ -9,6 +9,9 @@ inputs:
     description: "Maximum jobs distribution for target's affected projects"
     required: false
     default: '3'
+  workingDirectory:
+    description: "Path to the Nx workspace, needed if not the repository root"
+    required: false
 outputs:
   matrix: # id of output
     description: "The matrix that should be used in next job's matrix strategy"

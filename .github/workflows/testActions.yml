@@ -1,0 +1,20 @@
+on: [push]
+
+jobs:
+  nx_affected_matrix:
+    runs-on: ubuntu-latest
+    name: Affected Matrix
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run Action
+        uses: ./dist/packages/nx-affected-matrix
+        id: run
+        with:
+          targets: 'test,build'
+
+      - name: Test Outputs
+        run: |
+          echo "hasChanges value is ${{ steps.run.outputs.hasChanges }}"
+          echo "Generated matrix is ${{ steps.run.outputs.matrix }}"
