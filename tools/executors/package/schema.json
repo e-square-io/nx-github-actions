@@ -23,7 +23,7 @@
     "sourceMap": {
       "type": "boolean",
       "description": "Output sourcemaps.",
-      "default": true
+      "default": false
     },
     "assets": {
       "type": "array",

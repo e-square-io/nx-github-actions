@@ -19,4 +19,4 @@ outputs:
     description: "Returns true when there are changes, can be used to skip next steps"
 runs:
   using: 'node12'
-  main: 'src/index.js'
+  main: 'index.js'

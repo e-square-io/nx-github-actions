@@ -46,7 +46,7 @@ export function generatePackageJson(
   options: BuildBuilderOptions
 ) {
   const packageJson = createPackageJson(projectName, graph, options);
-  packageJson.main = `./src/${basename(options.main, '.ts')}.js`;
+  packageJson.main = `./${basename(options.main, '.ts')}.js`;
   delete packageJson.devDependencies;
   writeJsonFile(`${options.outputPath}/package.json`, packageJson);
   logger.info(`Done writing package.json to dist`);
@@ -55,7 +55,7 @@ export function generatePackageJson(
 async function runNccCommand(
   opts: BuildBuilderOptions
 ): Promise<{ success: boolean }> {
-  const args = [`-o ${opts.outputPath}/src`];
+  const args = [`-o ${opts.outputPath}`];
   if (opts.watch) {
     args.push(`-w`);
   }
