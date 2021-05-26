@@ -1,11 +1,5 @@
 import { Inputs } from './inputs';
 import {
-  assertHasNxPackageScript,
-  Exec,
-  retrieveGitBoundaries,
-  runNxCommand,
-} from '@e-square/utils';
-import {
   getInput,
   info,
   setFailed,
@@ -13,6 +7,12 @@ import {
   endGroup,
   setOutput,
 } from '@actions/core';
+import {
+  runNxCommand,
+  Exec,
+  retrieveGitBoundaries,
+  assertHasNxPackageScript,
+} from '../../../utils/src';
 
 interface NxAffectedMatrix {
   target: string[];

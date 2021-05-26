@@ -10,7 +10,7 @@
           "error",
           {
             "enforceBuildableLibDependency": false,
-            "allow": [],
+            "allow": ["../../../utils/src", "../../../utils/src/lib/nx"],
             "depConstraints": [
               {
                 "sourceTag": "*",
