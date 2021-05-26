@@ -9,7 +9,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Action
-        uses: ./dist/packages/nx-affected-matrix
+        uses: ./
         id: run
         with:
           targets: 'test,build'
