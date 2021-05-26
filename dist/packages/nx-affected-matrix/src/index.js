@@ -840,13 +840,13 @@ function chunkify(arr, numberOfChunks) {
     if (len % numberOfChunks === 0) {
         size = Math.floor(len / numberOfChunks);
         while (i < len) {
-            result.push(arr.slice(i, i += size));
+            result.push(arr.slice(i, (i += size)));
         }
     }
     else {
         while (i < len) {
             size = Math.ceil((len - i) / numberOfChunks--);
-            result.push(arr.slice(i, i += size));
+            result.push(arr.slice(i, (i += size)));
         }
     }
     return result;
@@ -854,8 +854,12 @@ function chunkify(arr, numberOfChunks) {
 function getAffectedProjectsForTarget(target, exec) {
     return __awaiter(this, void 0, void 0, function* () {
         let projects = '';
-        exec.withOptions({ listeners: { stdout: data => projects += data.toString() } });
-        yield (0,utils.runNxCommand)('print-affected', target, exec, ['--select=tasks.target.project']);
+        exec.withOptions({
+            listeners: { stdout: (data) => (projects += data.toString()) },
+        });
+        yield (0,utils.runNxCommand)('print-affected', target, exec, [
+            '--select=tasks.target.project',
+        ]);
         (0,core.info)(`✅ Affected project for ${target}: ${projects}`);
         return projects.split(', ');
     });
@@ -866,15 +870,14 @@ function generateAffectedMatrix({ targets, maxParallel }, exec) {
         const matrix = {
             target: targets,
             bucket: [...new Array(maxParallel)].map((_, idx) => idx + 1),
-            include: []
+            include: [],
         };
         for (const target of targets) {
             (0,core.info)(`⚙️ Calculating affected for ${target} target`);
-            matrix.include.push(...chunkify(yield getAffectedProjectsForTarget(target, exec), maxParallel)
-                .map((projects, idx) => ({
+            matrix.include.push(...chunkify(yield getAffectedProjectsForTarget(target, exec), maxParallel).map((projects, idx) => ({
                 target,
                 bucket: idx + 1,
-                projects: projects.join(',')
+                projects: projects.join(','),
             })));
         }
         (0,core.info)(`✅ Generated affected matrix`);
@@ -891,7 +894,7 @@ function main() {
             maxParallel: isNaN(parseInt((0,core.getInput)('maxParallel')))
                 ? 3
                 : parseInt((0,core.getInput)('maxParallel')),
-            workingDirectory: (0,core.getInput)('workingDirectory')
+            workingDirectory: (0,core.getInput)('workingDirectory'),
         };
         if (inputs.workingDirectory && inputs.workingDirectory.length > 0) {
             (0,core.info)(`🏃 Working in custom directory: ${inputs.workingDirectory}`);
@@ -901,7 +904,9 @@ function main() {
             yield (0,utils.assertHasNxPackageScript)();
             const exec = yield utils.Exec.init();
             yield (0,utils.retrieveGitBoundaries)(exec);
-            (0,core.setOutput)('matrix', yield generateAffectedMatrix(inputs, exec));
+            const matrix = yield generateAffectedMatrix(inputs, exec);
+            (0,core.setOutput)('matrix', matrix);
+            (0,core.setOutput)('hasChanges', matrix.include.find((target) => target.projects.length));
         }
         catch (e) {
             (0,core.setFailed)(e);
