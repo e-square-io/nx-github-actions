@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 7351:
+/***/ 5241:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -109,7 +109,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const command_1 = __nccwpck_require__(7351);
+const command_1 = __nccwpck_require__(5241);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(5278);
 const os = __importStar(__nccwpck_require__(2087));
@@ -472,7 +472,7 @@ const os = __importStar(__nccwpck_require__(2087));
 const events = __importStar(__nccwpck_require__(8614));
 const child = __importStar(__nccwpck_require__(3129));
 const path = __importStar(__nccwpck_require__(5622));
-const io = __importStar(__nccwpck_require__(7436));
+const io = __importStar(__nccwpck_require__(7351));
 const ioUtil = __importStar(__nccwpck_require__(1962));
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
@@ -2087,7 +2087,7 @@ function isUnixExecutable(stats) {
 
 /***/ }),
 
-/***/ 7436:
+/***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -7963,10 +7963,10 @@ const {
 } = tslib;
 
 
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(1514);
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(2186);
 ;// CONCATENATED MODULE: ./packages/utils/src/lib/exec.ts
 
 
@@ -8045,24 +8045,24 @@ function nxCommand(command, target, exec, args) {
     });
 }
 function nxPrintAffected(target, exec) {
-    return modules_awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         const projects = (yield nxCommand('print-affected', target, exec, [
             '--select=tasks.target.project',
         ])).trim();
-        (0,core.debug)(`🐞 Affected project for ${target}: ${projects}`);
+        debug(`🐞 Affected project for ${target}: ${projects}`);
         return projects.split(', ');
     });
 }
 function nxRunMany(target, inputs, exec) {
     var _a;
-    return __awaiter(this, void 0, void 0, function* () {
+    return modules_awaiter(this, void 0, void 0, function* () {
         const args = (_a = inputs.args) !== null && _a !== void 0 ? _a : [];
         if (inputs.nxCloud) {
             args.push('--scan');
             const env = {};
-            env.NX_RUN_GROUP = context.runId.toString();
-            if (context.eventName === 'pull_request') {
-                env.NX_BRANCH = context.payload.pull_request.number.toString();
+            env.NX_RUN_GROUP = github.context.runId.toString();
+            if (github.context.eventName === 'pull_request') {
+                env.NX_BRANCH = github.context.payload.pull_request.number.toString();
             }
             exec.withOptions({ env });
         }
@@ -8076,16 +8076,16 @@ function nxRunMany(target, inputs, exec) {
 
 
 function retrieveGitSHA(exec, rev) {
-    return modules_awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         return exec([rev]).then((res) => res.replace(/(\r\n|\n|\r)/gm, ''));
     });
 }
 function retrieveGitBoundaries(exec) {
-    return modules_awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         const boundaries = [];
-        (0,core.startGroup)('🔀 Setting Git boundaries');
-        if (github.context.eventName === 'pull_request') {
-            const prPayload = github.context.payload.pull_request;
+        startGroup('🔀 Setting Git boundaries');
+        if (context.eventName === 'pull_request') {
+            const prPayload = context.payload.pull_request;
             boundaries.push(prPayload.base.sha, prPayload.head.sha);
         }
         else {
@@ -8097,12 +8097,12 @@ function retrieveGitBoundaries(exec) {
                 ])));
             }
             catch (e) {
-                (0,core.setFailed)(e);
+                setFailed(e);
             }
         }
-        (0,core.debug)(`🐞 Base SHA: ${boundaries[0]}`);
-        (0,core.debug)(`🐞 Head SHA: ${boundaries[1]}`);
-        (0,core.endGroup)();
+        debug(`🐞 Base SHA: ${boundaries[0]}`);
+        debug(`🐞 Head SHA: ${boundaries[1]}`);
+        endGroup();
         return boundaries;
     });
 }
@@ -8112,83 +8112,34 @@ function retrieveGitBoundaries(exec) {
 
 
 
-;// CONCATENATED MODULE: ./packages/nx-affected-matrix/src/lib/nx-affected-matrix.ts
+;// CONCATENATED MODULE: ./packages/nx-distributed-task/src/lib/nx-distributed-task.ts
 
 
 
-function chunkify(arr, numberOfChunks) {
-    if (numberOfChunks < 2)
-        return [arr];
-    const len = arr.length;
-    const result = [];
-    let i = 0;
-    let size;
-    if (len % numberOfChunks === 0) {
-        size = Math.floor(len / numberOfChunks);
-        while (i < len) {
-            result.push(arr.slice(i, (i += size)));
-        }
-    }
-    else {
-        while (i < len) {
-            size = Math.ceil((len - i) / numberOfChunks--);
-            result.push(arr.slice(i, (i += size)));
-        }
-    }
-    return result;
-}
-function generateAffectedMatrix({ targets, maxParallel }, exec) {
-    return modules_awaiter(this, void 0, void 0, function* () {
-        (0,core.startGroup)(`⚙️ Generating affected matrix for ${targets}`);
-        const matrix = {
-            target: targets,
-            bucket: [...new Array(maxParallel)].map((_, idx) => idx + 1),
-            include: [],
-        };
-        for (const target of targets) {
-            (0,core.debug)(`🐞 Calculating affected for "${target}" target`);
-            const projects = yield nxPrintAffected(target, exec);
-            const affectedTargets = chunkify(projects, maxParallel).filter(projects => projects.length > 0).map((projects, idx) => ({
-                target,
-                bucket: idx + 1,
-                projects: projects.join(','),
-            }));
-            if (affectedTargets.length) {
-                matrix.include.push(...affectedTargets);
-            }
-        }
-        (0,core.debug)(`🐞 matrix: ${matrix}`);
-        (0,core.info)(`✅ Generated affected matrix`);
-        (0,core.endGroup)();
-        return matrix;
-    });
-}
 function main() {
     return modules_awaiter(this, void 0, void 0, function* () {
         const inputs = {
-            targets: (0,core.getInput)('targets', { required: true })
+            target: (0,core.getInput)('target', { required: true }),
+            projects: (0,core.getInput)('projects', { required: true })
                 .split(',')
-                .filter((target) => target.length > 0),
+                .filter((arg) => arg.length > 0),
             maxParallel: isNaN(parseInt((0,core.getInput)('maxParallel')))
                 ? 3
                 : parseInt((0,core.getInput)('maxParallel')),
-            workingDirectory: (0,core.getInput)('workingDirectory'),
             args: (0,core.getInput)('args')
                 .split(' ')
                 .filter((arg) => arg.length > 0),
-            nxCloud: (0,core.getInput)('nxCloud') === 'true'
+            nxCloud: (0,core.getInput)('nxCloud') === 'true',
+            deployArtifacts: (0,core.getInput)('deployArtifacts') === 'true'
         };
-        if (inputs.workingDirectory && inputs.workingDirectory.length > 0) {
-            (0,core.info)(`🏃 Working in custom directory: ${inputs.workingDirectory}`);
-            process.chdir(inputs.workingDirectory);
+        if (inputs.projects.length === 0) {
+            (0,core.info)('❗️ There are no projects to run, completing');
+            return;
         }
         try {
             const exec = new Exec();
-            const [base, head] = yield retrieveGitBoundaries(exec);
-            exec.withArgs(`--base=${base}`, `--head=${head}`);
-            const matrix = yield generateAffectedMatrix(inputs, exec);
-            (0,core.setOutput)('matrix', matrix);
-            (0,core.setOutput)('hasChanges', !!matrix.include.find((target) => target.projects.length));
+            exec.withArgs(`--projects=${inputs.projects}`);
+            yield nxRunMany(inputs.target, inputs, exec);
         }
         catch (e) {
             (0,core.setFailed)(e);
@@ -8197,7 +8148,7 @@ function main() {
 }
 void main();
 
-;// CONCATENATED MODULE: ./packages/nx-affected-matrix/src/index.ts
+;// CONCATENATED MODULE: ./packages/nx-distributed-task/src/index.ts
 
 
 })();

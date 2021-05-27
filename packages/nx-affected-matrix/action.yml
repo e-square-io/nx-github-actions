@@ -5,6 +5,12 @@ inputs:
     description: 'comma-delimited targets to run'
     required: true
     default: 'test,build'
+  args:
+    description: 'space-delimited args to add to nx command execution'
+    required: false
+  nxCloud:
+    description: 'Should use NxCloud',
+    required: false
   maxParallel:
     description: "Maximum jobs distribution for target's affected projects"
     required: false

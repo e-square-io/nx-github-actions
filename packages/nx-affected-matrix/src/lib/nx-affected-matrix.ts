@@ -8,7 +8,11 @@ import {
   setOutput,
   debug,
 } from '@actions/core';
-import { runNxCommand, Exec, retrieveGitBoundaries } from '../../../utils/src';
+import {
+  Exec,
+  retrieveGitBoundaries,
+  nxPrintAffected,
+} from '../../../utils/src';
 
 interface NxAffectedMatrix {
   target: string[];
@@ -39,21 +43,6 @@ function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
   return result;
 }
 
-async function getAffectedProjectsForTarget(
-  target: string,
-  exec: Exec
-): Promise<string[]> {
-  const projects = (
-    await runNxCommand('print-affected', target, exec, [
-      '--select=tasks.target.project',
-    ])
-  ).trim();
-
-  debug(`🐞 Affected project for ${target}: ${projects}`);
-
-  return projects.split(', ');
-}
-
 async function generateAffectedMatrix(
   { targets, maxParallel }: Inputs,
   exec: Exec
@@ -67,15 +56,18 @@ async function generateAffectedMatrix(
 
   for (const target of targets) {
     debug(`🐞 Calculating affected for "${target}" target`);
-    const projects = await getAffectedProjectsForTarget(target, exec);
-
-    matrix.include.push(
-      ...chunkify(projects, maxParallel).map((projects, idx) => ({
+    const projects = await nxPrintAffected(target, exec);
+    const affectedTargets = chunkify(projects, maxParallel)
+      .filter((projects) => projects.length > 0)
+      .map((projects, idx) => ({
         target,
         bucket: idx + 1,
         projects: projects.join(','),
-      }))
-    );
+      }));
+
+    if (affectedTargets.length) {
+      matrix.include.push(...affectedTargets);
+    }
   }
 
   debug(`🐞 matrix: ${matrix}`);
@@ -95,6 +87,10 @@ async function main(): Promise<void> {
       ? 3
       : parseInt(getInput('maxParallel')),
     workingDirectory: getInput('workingDirectory'),
+    args: getInput('args')
+      .split(' ')
+      .filter((arg) => arg.length > 0),
+    nxCloud: getInput('nxCloud') === 'true',
   };
 
   if (inputs.workingDirectory && inputs.workingDirectory.length > 0) {

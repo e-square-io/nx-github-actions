@@ -4,13 +4,12 @@ import * as which from 'which';
 import { debug } from '@actions/core';
 
 export interface BaseInputs {
-  targets: string[];
   maxParallel: number;
   nxCloud?: boolean;
   args?: string[];
 }
 
-export async function runNxCommand(
+export async function nxCommand(
   command: string,
   target: string,
   exec: Exec,
@@ -33,8 +32,22 @@ export async function runNxCommand(
   return wrapper();
 }
 
-export async function runNx(
-  command: string,
+export async function nxPrintAffected(
+  target: string,
+  exec: Exec
+): Promise<string[]> {
+  const projects = (
+    await nxCommand('print-affected', target, exec, [
+      '--select=tasks.target.project',
+    ])
+  ).trim();
+
+  debug(`🐞 Affected project for ${target}: ${projects}`);
+
+  return projects.split(', ');
+}
+
+export async function nxRunMany(
   target: string,
   inputs: BaseInputs,
   exec: Exec
@@ -55,5 +68,5 @@ export async function runNx(
 
   args.push('--parallel', `--maxParallel=${inputs.maxParallel}`);
 
-  return runNxCommand(command, target, exec, args);
+  return nxCommand('run-many', target, exec, args);
 }
