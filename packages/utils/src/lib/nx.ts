@@ -1,7 +1,8 @@
-import { getState } from '@actions/core';
 import { context } from '@actions/github';
 import { Exec } from './exec';
-import { BOUNDARIES_STATE_KEY } from './state';
+import { retrieveGitBoundaries } from './git';
+import * as which from 'which';
+import { debug } from '@actions/core';
 
 export interface BaseInputs {
   targets: string[];
@@ -15,11 +16,19 @@ export async function runNxCommand(
   target: string,
   exec: Exec,
   args: string[]
-): Promise<number> {
-  const [base, head] = JSON.parse(getState(BOUNDARIES_STATE_KEY));
+): Promise<string> {
+  const [base, head] = await retrieveGitBoundaries(exec);
+  let binPath = '';
+
+  try {
+    debug(`🐞 Checking existence of nx`);
+    binPath = `${await which('node_modules/.bin/nx')}`;
+  } catch {
+    throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
+  }
 
   const wrapper = exec
-    .withCommand(command)
+    .withCommand(`${binPath} ${command}`)
     .withArgs(`--target=${target}`, `--base=${base}`, `--head=${head}`, ...args)
     .build();
 
@@ -31,7 +40,7 @@ export async function runNx(
   target: string,
   inputs: BaseInputs,
   exec: Exec
-): Promise<number> {
+): Promise<string> {
   const args = inputs.args ?? [];
 
   if (inputs.nxCloud) {

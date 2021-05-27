@@ -6,13 +6,9 @@ import {
   startGroup,
   endGroup,
   setOutput,
+  debug,
 } from '@actions/core';
-import {
-  runNxCommand,
-  Exec,
-  retrieveGitBoundaries,
-  assertHasNxPackageScript,
-} from '../../../utils/src';
+import { runNxCommand, Exec } from '../../../utils/src';
 
 interface NxAffectedMatrix {
   target: string[];
@@ -47,15 +43,13 @@ async function getAffectedProjectsForTarget(
   target: string,
   exec: Exec
 ): Promise<string[]> {
-  let projects = '';
-  exec.withOptions({
-    listeners: { stdout: (data) => (projects += data.toString()) },
-  });
-  await runNxCommand('print-affected', target, exec, [
-    '--select=tasks.target.project',
-  ]);
+  const projects = (
+    await runNxCommand('print-affected', target, exec, [
+      '--select=tasks.target.project',
+    ])
+  ).trim();
 
-  info(`✅ Affected project for ${target}: ${projects}`);
+  debug(`🐞 Affected project for ${target}: ${projects}`);
 
   return projects.split(', ');
 }
@@ -72,18 +66,19 @@ async function generateAffectedMatrix(
   };
 
   for (const target of targets) {
-    info(`⚙️ Calculating affected for ${target} target`);
+    debug(`🐞 Calculating affected for "${target}" target`);
+    const projects = await getAffectedProjectsForTarget(target, exec);
+
     matrix.include.push(
-      ...chunkify(
-        await getAffectedProjectsForTarget(target, exec),
-        maxParallel
-      ).map((projects, idx) => ({
+      ...chunkify(projects, maxParallel).map((projects, idx) => ({
         target,
         bucket: idx + 1,
         projects: projects.join(','),
       }))
     );
   }
+
+  debug(`🐞 matrix: ${matrix}`);
 
   info(`✅ Generated affected matrix`);
   endGroup();
@@ -108,14 +103,12 @@ async function main(): Promise<void> {
   }
 
   try {
-    await assertHasNxPackageScript();
-    const exec = await Exec.init();
-    await retrieveGitBoundaries(exec);
+    const exec = new Exec();
     const matrix = await generateAffectedMatrix(inputs, exec);
     setOutput('matrix', matrix);
     setOutput(
       'hasChanges',
-      matrix.include.find((target) => target.projects.length)
+      !!matrix.include.find((target) => target.projects.length)
     );
   } catch (e) {
     setFailed(e);

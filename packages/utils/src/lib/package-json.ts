@@ -1,4 +1,4 @@
-import { readFile } from 'fs/promises';
+import { promises } from 'fs';
 import { endGroup, info, startGroup } from '@actions/core';
 
 export interface PackageJsonLike {
@@ -6,7 +6,9 @@ export interface PackageJsonLike {
 }
 
 export async function loadPackageJson(): Promise<PackageJsonLike> {
-  return JSON.parse(await readFile('package.json', 'utf8')) as PackageJsonLike;
+  return JSON.parse(
+    await promises.readFile('package.json', 'utf8')
+  ) as PackageJsonLike;
 }
 
 export async function assertHasNxPackageScript(): Promise<void> {
@@ -25,6 +27,6 @@ export async function assertHasNxPackageScript(): Promise<void> {
       "Failed to locate the 'nx' script in package.json, did you setup your project with Nx's CLI?"
     );
 
-  info("✅ Found 'nx' script inside package.json file");
+  info('✅ Found NX in workspace');
   endGroup();
 }

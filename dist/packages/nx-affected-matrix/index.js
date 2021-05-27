@@ -5103,6 +5103,167 @@ exports.Deprecation = Deprecation;
 
 /***/ }),
 
+/***/ 7126:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var fs = __nccwpck_require__(5747)
+var core
+if (process.platform === 'win32' || global.TESTING_WINDOWS) {
+  core = __nccwpck_require__(2001)
+} else {
+  core = __nccwpck_require__(9728)
+}
+
+module.exports = isexe
+isexe.sync = sync
+
+function isexe (path, options, cb) {
+  if (typeof options === 'function') {
+    cb = options
+    options = {}
+  }
+
+  if (!cb) {
+    if (typeof Promise !== 'function') {
+      throw new TypeError('callback not provided')
+    }
+
+    return new Promise(function (resolve, reject) {
+      isexe(path, options || {}, function (er, is) {
+        if (er) {
+          reject(er)
+        } else {
+          resolve(is)
+        }
+      })
+    })
+  }
+
+  core(path, options || {}, function (er, is) {
+    // ignore EACCES because that just means we aren't allowed to run it
+    if (er) {
+      if (er.code === 'EACCES' || options && options.ignoreErrors) {
+        er = null
+        is = false
+      }
+    }
+    cb(er, is)
+  })
+}
+
+function sync (path, options) {
+  // my kingdom for a filtered catch
+  try {
+    return core.sync(path, options || {})
+  } catch (er) {
+    if (options && options.ignoreErrors || er.code === 'EACCES') {
+      return false
+    } else {
+      throw er
+    }
+  }
+}
+
+
+/***/ }),
+
+/***/ 9728:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+module.exports = isexe
+isexe.sync = sync
+
+var fs = __nccwpck_require__(5747)
+
+function isexe (path, options, cb) {
+  fs.stat(path, function (er, stat) {
+    cb(er, er ? false : checkStat(stat, options))
+  })
+}
+
+function sync (path, options) {
+  return checkStat(fs.statSync(path), options)
+}
+
+function checkStat (stat, options) {
+  return stat.isFile() && checkMode(stat, options)
+}
+
+function checkMode (stat, options) {
+  var mod = stat.mode
+  var uid = stat.uid
+  var gid = stat.gid
+
+  var myUid = options.uid !== undefined ?
+    options.uid : process.getuid && process.getuid()
+  var myGid = options.gid !== undefined ?
+    options.gid : process.getgid && process.getgid()
+
+  var u = parseInt('100', 8)
+  var g = parseInt('010', 8)
+  var o = parseInt('001', 8)
+  var ug = u | g
+
+  var ret = (mod & o) ||
+    (mod & g) && gid === myGid ||
+    (mod & u) && uid === myUid ||
+    (mod & ug) && myUid === 0
+
+  return ret
+}
+
+
+/***/ }),
+
+/***/ 2001:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+module.exports = isexe
+isexe.sync = sync
+
+var fs = __nccwpck_require__(5747)
+
+function checkPathExt (path, options) {
+  var pathext = options.pathExt !== undefined ?
+    options.pathExt : process.env.PATHEXT
+
+  if (!pathext) {
+    return true
+  }
+
+  pathext = pathext.split(';')
+  if (pathext.indexOf('') !== -1) {
+    return true
+  }
+  for (var i = 0; i < pathext.length; i++) {
+    var p = pathext[i].toLowerCase()
+    if (p && path.substr(-p.length).toLowerCase() === p) {
+      return true
+    }
+  }
+  return false
+}
+
+function checkStat (stat, path, options) {
+  if (!stat.isSymbolicLink() && !stat.isFile()) {
+    return false
+  }
+  return checkPathExt(path, options)
+}
+
+function isexe (path, options, cb) {
+  fs.stat(path, function (er, stat) {
+    cb(er, er ? false : checkStat(stat, path, options))
+  })
+}
+
+function sync (path, options) {
+  return checkStat(fs.statSync(path), path, options)
+}
+
+
+/***/ }),
+
 /***/ 467:
 /***/ ((module, exports, __nccwpck_require__) => {
 
@@ -7424,6 +7585,138 @@ exports.getUserAgent = getUserAgent;
 
 /***/ }),
 
+/***/ 4207:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const isWindows = process.platform === 'win32' ||
+    process.env.OSTYPE === 'cygwin' ||
+    process.env.OSTYPE === 'msys'
+
+const path = __nccwpck_require__(5622)
+const COLON = isWindows ? ';' : ':'
+const isexe = __nccwpck_require__(7126)
+
+const getNotFoundError = (cmd) =>
+  Object.assign(new Error(`not found: ${cmd}`), { code: 'ENOENT' })
+
+const getPathInfo = (cmd, opt) => {
+  const colon = opt.colon || COLON
+
+  // If it has a slash, then we don't bother searching the pathenv.
+  // just check the file itself, and that's it.
+  const pathEnv = cmd.match(/\//) || isWindows && cmd.match(/\\/) ? ['']
+    : (
+      [
+        // windows always checks the cwd first
+        ...(isWindows ? [process.cwd()] : []),
+        ...(opt.path || process.env.PATH ||
+          /* istanbul ignore next: very unusual */ '').split(colon),
+      ]
+    )
+  const pathExtExe = isWindows
+    ? opt.pathExt || process.env.PATHEXT || '.EXE;.CMD;.BAT;.COM'
+    : ''
+  const pathExt = isWindows ? pathExtExe.split(colon) : ['']
+
+  if (isWindows) {
+    if (cmd.indexOf('.') !== -1 && pathExt[0] !== '')
+      pathExt.unshift('')
+  }
+
+  return {
+    pathEnv,
+    pathExt,
+    pathExtExe,
+  }
+}
+
+const which = (cmd, opt, cb) => {
+  if (typeof opt === 'function') {
+    cb = opt
+    opt = {}
+  }
+  if (!opt)
+    opt = {}
+
+  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
+  const found = []
+
+  const step = i => new Promise((resolve, reject) => {
+    if (i === pathEnv.length)
+      return opt.all && found.length ? resolve(found)
+        : reject(getNotFoundError(cmd))
+
+    const ppRaw = pathEnv[i]
+    const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw
+
+    const pCmd = path.join(pathPart, cmd)
+    const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd
+      : pCmd
+
+    resolve(subStep(p, i, 0))
+  })
+
+  const subStep = (p, i, ii) => new Promise((resolve, reject) => {
+    if (ii === pathExt.length)
+      return resolve(step(i + 1))
+    const ext = pathExt[ii]
+    isexe(p + ext, { pathExt: pathExtExe }, (er, is) => {
+      if (!er && is) {
+        if (opt.all)
+          found.push(p + ext)
+        else
+          return resolve(p + ext)
+      }
+      return resolve(subStep(p, i, ii + 1))
+    })
+  })
+
+  return cb ? step(0).then(res => cb(null, res), cb) : step(0)
+}
+
+const whichSync = (cmd, opt) => {
+  opt = opt || {}
+
+  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
+  const found = []
+
+  for (let i = 0; i < pathEnv.length; i ++) {
+    const ppRaw = pathEnv[i]
+    const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw
+
+    const pCmd = path.join(pathPart, cmd)
+    const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd
+      : pCmd
+
+    for (let j = 0; j < pathExt.length; j ++) {
+      const cur = p + pathExt[j]
+      try {
+        const is = isexe.sync(cur, { pathExt: pathExtExe })
+        if (is) {
+          if (opt.all)
+            found.push(cur)
+          else
+            return cur
+        }
+      } catch (ex) {}
+    }
+  }
+
+  if (opt.all && found.length)
+    return found
+
+  if (opt.nothrow)
+    return null
+
+  throw getNotFoundError(cmd)
+}
+
+module.exports = which
+which.sync = whichSync
+
+
+/***/ }),
+
 /***/ 2940:
 /***/ ((module) => {
 
@@ -7672,29 +7965,29 @@ const {
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
-;// CONCATENATED MODULE: external "fs/promises"
-const promises_namespaceObject = require("fs/promises");;
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(5747);
 ;// CONCATENATED MODULE: ./packages/utils/src/lib/package-json.ts
 
 
 
 function loadPackageJson() {
-    return modules_awaiter(this, void 0, void 0, function* () {
-        return JSON.parse(yield (0,promises_namespaceObject.readFile)('package.json', 'utf8'));
+    return __awaiter(this, void 0, void 0, function* () {
+        return JSON.parse(yield promises.readFile('package.json', 'utf8'));
     });
 }
 function assertHasNxPackageScript() {
     var _a;
-    return modules_awaiter(this, void 0, void 0, function* () {
-        (0,core.startGroup)('🔍 Ensuring Nx is available');
+    return __awaiter(this, void 0, void 0, function* () {
+        startGroup('🔍 Ensuring Nx is available');
         const packageJson = yield loadPackageJson().catch(() => {
             throw new Error("Failed to load the 'package.json' file, did you setup your project correctly?");
         });
-        (0,core.info)('✅ Found package.json file');
+        info('✅ Found package.json file');
         if (typeof ((_a = packageJson.scripts) === null || _a === void 0 ? void 0 : _a.nx) !== 'string')
             throw new Error("Failed to locate the 'nx' script in package.json, did you setup your project with Nx's CLI?");
-        (0,core.info)("✅ Found 'nx' script inside package.json file");
-        (0,core.endGroup)();
+        info("✅ Found NX in workspace");
+        endGroup();
     });
 }
 
@@ -7704,63 +7997,35 @@ var exec = __nccwpck_require__(1514);
 
 
 
-
-function locateManager(entries) {
-    return modules_awaiter(this, void 0, void 0, function* () {
-        if (entries.length === 0) {
-            throw new Error('Failed to detect your package manager, are you using npm or yarn?');
-        }
-        const [[name, filePath, command, argsSeparator], ...rest] = entries;
-        return (0,promises_namespaceObject.stat)(filePath)
-            .then(() => {
-            (0,core.info)(`✅ Found ${name} as your package manager`);
-            return { command, argsSeparator };
-        })
-            .catch(() => locateManager(rest));
-    });
-}
 class Exec {
-    constructor(managerCommand, argsSeparator) {
+    constructor() {
         this.command = '';
         this.options = {};
         this.args = [];
-        this.managerCommand = managerCommand;
-        this.argsSeparator = argsSeparator;
     }
-    static init() {
-        return modules_awaiter(this, void 0, void 0, function* () {
-            const entries = [
-                ['npm', 'package-lock.json', 'npm run', '--'],
-                ['yarn', 'yarn.lock', 'yarn', ''],
-                ['pnpm', 'pnpm-lock.yaml', 'pnpm run', '--'],
-            ];
-            const { command, argsSeparator } = yield locateManager(entries);
-            return new Exec(command, argsSeparator);
-        });
-    }
-    build(skipManager) {
-        var _a, _b;
-        let command = this.command;
-        let coercedArgs = [...this.args];
-        let coercedOptions = Object.assign({}, this.options);
+    build() {
+        const command = this.command;
+        const coercedArgs = [...this.args];
+        const coercedOptions = Object.assign({}, this.options);
         if (!command) {
             throw new Error('No command given to Exec');
         }
         this.command = '';
         this.args = [];
         this.options = {};
-        if (!skipManager) {
-            if (((_a = this.argsSeparator) === null || _a === void 0 ? void 0 : _a.length) && coercedArgs[0] !== this.argsSeparator) {
-                coercedArgs.unshift(this.argsSeparator);
-            }
-            if ((_b = this.managerCommand) === null || _b === void 0 ? void 0 : _b.length) {
-                command = `${this.managerCommand} ${command}`;
-            }
-        }
         return (args, options) => modules_awaiter(this, void 0, void 0, function* () {
-            coercedArgs = [...this.args, ...(args !== null && args !== void 0 ? args : [])];
-            coercedOptions = Object.assign(Object.assign({}, options), options);
-            return (0,exec.exec)(command, coercedArgs.filter((arg) => arg.length > 0).map((arg) => arg.trim()), coercedOptions);
+            let stdout = '', stderr = '';
+            const finalArgs = [...coercedArgs, ...(args !== null && args !== void 0 ? args : [])].filter((arg) => arg.length > 0).map((arg) => arg.trim());
+            const finalOpts = Object.assign(Object.assign(Object.assign({}, coercedOptions), options), { listeners: {
+                    stdout: data => stdout += data.toString(),
+                    stderr: data => stderr += data.toString(),
+                } });
+            (0,core.debug)(`🐞 Running command ${command} - args: ${finalArgs.join(' ')}", options: ${finalOpts}`);
+            return (0,exec.exec)(command, finalArgs, finalOpts).then(code => {
+                if (code !== 0)
+                    (0,core.setFailed)(stderr);
+                return stdout;
+            });
         });
     }
     withCommand(command) {
@@ -7779,19 +8044,63 @@ class Exec {
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
-;// CONCATENATED MODULE: ./packages/utils/src/lib/state.ts
-const BOUNDARIES_STATE_KEY = 'git.boundaries';
+;// CONCATENATED MODULE: ./packages/utils/src/lib/git.ts
 
+
+
+function retrieveGitSHA(exec, rev) {
+    return modules_awaiter(this, void 0, void 0, function* () {
+        return exec([rev]).then((res) => res.replace(/(\r\n|\n|\r)/gm, ''));
+    });
+}
+function retrieveGitBoundaries(exec) {
+    return modules_awaiter(this, void 0, void 0, function* () {
+        const boundaries = [];
+        (0,core.startGroup)('🔀 Setting Git boundaries');
+        if (github.context.eventName === 'pull_request') {
+            const prPayload = github.context.payload.pull_request;
+            boundaries.push(prPayload.base.sha, prPayload.head.sha);
+        }
+        else {
+            const wrapper = exec.withCommand('git rev-parse').build();
+            try {
+                boundaries.push(...(yield Promise.all([
+                    retrieveGitSHA(wrapper, 'HEAD~1'),
+                    retrieveGitSHA(wrapper, 'HEAD'),
+                ])));
+            }
+            catch (e) {
+                (0,core.setFailed)(e);
+            }
+        }
+        (0,core.debug)(`🐞 Base SHA: ${boundaries[0]}`);
+        (0,core.debug)(`🐞 Head SHA: ${boundaries[1]}`);
+        (0,core.endGroup)();
+        return boundaries;
+    });
+}
+
+// EXTERNAL MODULE: ./node_modules/which/which.js
+var which = __nccwpck_require__(4207);
 ;// CONCATENATED MODULE: ./packages/utils/src/lib/nx.ts
+
 
 
 
 
 function runNxCommand(command, target, exec, args) {
     return modules_awaiter(this, void 0, void 0, function* () {
-        const [base, head] = JSON.parse((0,core.getState)(BOUNDARIES_STATE_KEY));
+        const [base, head] = yield retrieveGitBoundaries(exec);
+        let binPath = '';
+        try {
+            (0,core.debug)(`🐞 Checking existence of nx`);
+            binPath = `${yield which('node_modules/.bin/nx')}`;
+        }
+        catch (_a) {
+            throw new Error('Couldn\'t find Nx binary, Have you run npm/yarn install?');
+        }
         const wrapper = exec
-            .withCommand(command)
+            .withCommand(`${binPath} ${command}`)
             .withArgs(`--target=${target}`, `--base=${base}`, `--head=${head}`, ...args)
             .build();
         return wrapper();
@@ -7812,53 +8121,6 @@ function runNx(command, target, inputs, exec) {
         }
         args.push('--parallel', `--maxParallel=${inputs.maxParallel}`);
         return runNxCommand(command, target, exec, args);
-    });
-}
-
-;// CONCATENATED MODULE: ./packages/utils/src/lib/git.ts
-
-
-
-
-function retrieveGitSHA(exec, rev) {
-    return modules_awaiter(this, void 0, void 0, function* () {
-        let sha = '';
-        const command = exec
-            .withCommand('git')
-            .withArgs('rev-parse')
-            .withOptions({
-            listeners: {
-                stdout: (data) => (sha += data.toString()),
-            },
-        })
-            .build(true);
-        return command([rev]).then(() => sha.replace(/(\r\n|\n|\r)/gm, ''));
-    });
-}
-function retrieveGitBoundaries(exec) {
-    return modules_awaiter(this, void 0, void 0, function* () {
-        const boundaries = [];
-        (0,core.startGroup)('Setting Git boundaries');
-        if (github.context.eventName === 'pull_request') {
-            const prPayload = github.context.payload.pull_request;
-            boundaries.push(prPayload.base.sha, prPayload.head.sha);
-        }
-        else {
-            try {
-                boundaries.push(...(yield Promise.all([
-                    retrieveGitSHA(exec, 'HEAD~1'),
-                    retrieveGitSHA(exec, 'HEAD'),
-                ])));
-            }
-            catch (e) {
-                (0,core.setFailed)(e);
-            }
-        }
-        (0,core.info)(`Base SHA: ${boundaries[0]}`);
-        (0,core.info)(`Base SHA: ${boundaries[1]}`);
-        (0,core.saveState)(BOUNDARIES_STATE_KEY, boundaries);
-        (0,core.info)('✅ Saved git base & head SHA');
-        (0,core.endGroup)();
     });
 }
 
@@ -7895,14 +8157,10 @@ function chunkify(arr, numberOfChunks) {
 }
 function getAffectedProjectsForTarget(target, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
-        let projects = '';
-        exec.withOptions({
-            listeners: { stdout: (data) => (projects += data.toString()) },
-        });
-        yield runNxCommand('print-affected', target, exec, [
-            '--select=tasks.target.project',
-        ]);
-        (0,core.info)(`✅ Affected project for ${target}: ${projects}`);
+        const projects = (yield runNxCommand('print-affected', target, exec, [
+            '--select=tasks.target.project'
+        ])).trim();
+        (0,core.debug)(`🐞 Affected project for ${target}: ${projects}`);
         return projects.split(', ');
     });
 }
@@ -7915,13 +8173,15 @@ function generateAffectedMatrix({ targets, maxParallel }, exec) {
             include: [],
         };
         for (const target of targets) {
-            (0,core.info)(`⚙️ Calculating affected for ${target} target`);
-            matrix.include.push(...chunkify(yield getAffectedProjectsForTarget(target, exec), maxParallel).map((projects, idx) => ({
+            (0,core.debug)(`🐞 Calculating affected for "${target}" target`);
+            const projects = yield getAffectedProjectsForTarget(target, exec);
+            matrix.include.push(...chunkify(projects, maxParallel).map((projects, idx) => ({
                 target,
                 bucket: idx + 1,
                 projects: projects.join(','),
             })));
         }
+        (0,core.debug)(`🐞 matrix: ${matrix}`);
         (0,core.info)(`✅ Generated affected matrix`);
         (0,core.endGroup)();
         return matrix;
@@ -7943,12 +8203,10 @@ function main() {
             process.chdir(inputs.workingDirectory);
         }
         try {
-            yield assertHasNxPackageScript();
-            const exec = yield Exec.init();
-            yield retrieveGitBoundaries(exec);
+            const exec = new Exec();
             const matrix = yield generateAffectedMatrix(inputs, exec);
             (0,core.setOutput)('matrix', matrix);
-            (0,core.setOutput)('hasChanges', matrix.include.find((target) => target.projects.length));
+            (0,core.setOutput)('hasChanges', !!matrix.include.find((target) => target.projects.length));
         }
         catch (e) {
             (0,core.setFailed)(e);
