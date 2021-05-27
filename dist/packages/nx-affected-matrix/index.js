@@ -7965,32 +7965,6 @@ const {
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(5747);
-;// CONCATENATED MODULE: ./packages/utils/src/lib/package-json.ts
-
-
-
-function loadPackageJson() {
-    return __awaiter(this, void 0, void 0, function* () {
-        return JSON.parse(yield promises.readFile('package.json', 'utf8'));
-    });
-}
-function assertHasNxPackageScript() {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        startGroup('🔍 Ensuring Nx is available');
-        const packageJson = yield loadPackageJson().catch(() => {
-            throw new Error("Failed to load the 'package.json' file, did you setup your project correctly?");
-        });
-        info('✅ Found package.json file');
-        if (typeof ((_a = packageJson.scripts) === null || _a === void 0 ? void 0 : _a.nx) !== 'string')
-            throw new Error("Failed to locate the 'nx' script in package.json, did you setup your project with Nx's CLI?");
-        info('✅ Found NX in workspace');
-        endGroup();
-    });
-}
-
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(1514);
 ;// CONCATENATED MODULE: ./packages/utils/src/lib/exec.ts
@@ -8046,6 +8020,48 @@ class Exec {
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
+// EXTERNAL MODULE: ./node_modules/which/which.js
+var which = __nccwpck_require__(4207);
+;// CONCATENATED MODULE: ./packages/utils/src/lib/nx.ts
+
+
+
+
+function runNxCommand(command, target, exec, args) {
+    return modules_awaiter(this, void 0, void 0, function* () {
+        const binPath = 'node_modules/.bin/nx';
+        try {
+            (0,core.debug)(`🐞 Checking existence of nx`);
+            yield which(binPath);
+        }
+        catch (_a) {
+            throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
+        }
+        const wrapper = exec
+            .withCommand(`${binPath} ${command}`)
+            .withArgs(`--target=${target}`, ...args)
+            .build();
+        return wrapper();
+    });
+}
+function runNx(command, target, inputs, exec) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const args = (_a = inputs.args) !== null && _a !== void 0 ? _a : [];
+        if (inputs.nxCloud) {
+            args.push('--scan');
+            const env = {};
+            env.NX_RUN_GROUP = context.runId.toString();
+            if (context.eventName === 'pull_request') {
+                env.NX_BRANCH = context.payload.pull_request.number.toString();
+            }
+            exec.withOptions({ env });
+        }
+        args.push('--parallel', `--maxParallel=${inputs.maxParallel}`);
+        return runNxCommand(command, target, exec, args);
+    });
+}
+
 ;// CONCATENATED MODULE: ./packages/utils/src/lib/git.ts
 
 
@@ -8082,52 +8098,7 @@ function retrieveGitBoundaries(exec) {
     });
 }
 
-// EXTERNAL MODULE: ./node_modules/which/which.js
-var which = __nccwpck_require__(4207);
-;// CONCATENATED MODULE: ./packages/utils/src/lib/nx.ts
-
-
-
-
-
-function runNxCommand(command, target, exec, args) {
-    return modules_awaiter(this, void 0, void 0, function* () {
-        const [base, head] = yield retrieveGitBoundaries(exec);
-        let binPath = '';
-        try {
-            (0,core.debug)(`🐞 Checking existence of nx`);
-            binPath = `${yield which('node_modules/.bin/nx')}`;
-        }
-        catch (_a) {
-            throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
-        }
-        const wrapper = exec
-            .withCommand(`${binPath} ${command}`)
-            .withArgs(`--target=${target}`, ...args)
-            .build();
-        return wrapper();
-    });
-}
-function runNx(command, target, inputs, exec) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const args = (_a = inputs.args) !== null && _a !== void 0 ? _a : [];
-        if (inputs.nxCloud) {
-            args.push('--scan');
-            const env = {};
-            env.NX_RUN_GROUP = context.runId.toString();
-            if (context.eventName === 'pull_request') {
-                env.NX_BRANCH = context.payload.pull_request.number.toString();
-            }
-            exec.withOptions({ env });
-        }
-        args.push('--parallel', `--maxParallel=${inputs.maxParallel}`);
-        return runNxCommand(command, target, exec, args);
-    });
-}
-
 ;// CONCATENATED MODULE: ./packages/utils/src/index.ts
-
 
 
 
@@ -8159,7 +8130,9 @@ function chunkify(arr, numberOfChunks) {
 }
 function getAffectedProjectsForTarget(target, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
-        const projects = (yield runNxCommand('print-affected', target, exec, ['--select=tasks.target.project',])).trim();
+        const projects = (yield runNxCommand('print-affected', target, exec, [
+            '--select=tasks.target.project',
+        ])).trim();
         (0,core.debug)(`🐞 Affected project for ${target}: ${projects}`);
         return projects.split(', ');
     });

@@ -1,6 +1,5 @@
 import { context } from '@actions/github';
 import { Exec } from './exec';
-import { retrieveGitBoundaries } from './git';
 import * as which from 'which';
 import { debug } from '@actions/core';
 
@@ -17,12 +16,11 @@ export async function runNxCommand(
   exec: Exec,
   args: string[]
 ): Promise<string> {
-  const [base, head] = await retrieveGitBoundaries(exec);
-  let binPath = '';
+  const binPath = 'node_modules/.bin/nx';
 
   try {
     debug(`🐞 Checking existence of nx`);
-    binPath = `${await which('node_modules/.bin/nx')}`;
+    await which(binPath);
   } catch {
     throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
   }
