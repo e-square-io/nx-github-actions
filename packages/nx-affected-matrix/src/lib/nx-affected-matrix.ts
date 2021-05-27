@@ -8,7 +8,7 @@ import {
   setOutput,
   debug,
 } from '@actions/core';
-import { runNxCommand, Exec } from '../../../utils/src';
+import { runNxCommand, Exec, retrieveGitBoundaries } from '../../../utils/src';
 
 interface NxAffectedMatrix {
   target: string[];
@@ -104,6 +104,10 @@ async function main(): Promise<void> {
 
   try {
     const exec = new Exec();
+    const [base, head] = await retrieveGitBoundaries(exec);
+
+    exec.withArgs(`--base=${base}`, `--head=${head}`);
+
     const matrix = await generateAffectedMatrix(inputs, exec);
     setOutput('matrix', matrix);
     setOutput(

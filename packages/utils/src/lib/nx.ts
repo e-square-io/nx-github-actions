@@ -29,7 +29,7 @@ export async function runNxCommand(
 
   const wrapper = exec
     .withCommand(`${binPath} ${command}`)
-    .withArgs(`--target=${target}`, `--base=${base}`, `--head=${head}`, ...args)
+    .withArgs(`--target=${target}`, ...args)
     .build();
 
   return wrapper();

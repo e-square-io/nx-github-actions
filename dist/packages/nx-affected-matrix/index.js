@@ -7986,7 +7986,7 @@ function assertHasNxPackageScript() {
         info('✅ Found package.json file');
         if (typeof ((_a = packageJson.scripts) === null || _a === void 0 ? void 0 : _a.nx) !== 'string')
             throw new Error("Failed to locate the 'nx' script in package.json, did you setup your project with Nx's CLI?");
-        info("✅ Found NX in workspace");
+        info('✅ Found NX in workspace');
         endGroup();
     });
 }
@@ -8015,13 +8015,15 @@ class Exec {
         this.options = {};
         return (args, options) => modules_awaiter(this, void 0, void 0, function* () {
             let stdout = '', stderr = '';
-            const finalArgs = [...coercedArgs, ...(args !== null && args !== void 0 ? args : [])].filter((arg) => arg.length > 0).map((arg) => arg.trim());
+            const finalArgs = [...coercedArgs, ...(args !== null && args !== void 0 ? args : [])]
+                .filter((arg) => arg.length > 0)
+                .map((arg) => arg.trim());
             const finalOpts = Object.assign(Object.assign(Object.assign({}, coercedOptions), options), { listeners: {
-                    stdout: data => stdout += data.toString(),
-                    stderr: data => stderr += data.toString(),
+                    stdout: (data) => (stdout += data.toString()),
+                    stderr: (data) => (stderr += data.toString()),
                 } });
             (0,core.debug)(`🐞 Running command ${command} - args: ${finalArgs.join(' ')}", options: ${finalOpts}`);
-            return (0,exec.exec)(command, finalArgs, finalOpts).then(code => {
+            return (0,exec.exec)(command, finalArgs, finalOpts).then((code) => {
                 if (code !== 0)
                     (0,core.setFailed)(stderr);
                 return stdout;
@@ -8097,11 +8099,11 @@ function runNxCommand(command, target, exec, args) {
             binPath = `${yield which('node_modules/.bin/nx')}`;
         }
         catch (_a) {
-            throw new Error('Couldn\'t find Nx binary, Have you run npm/yarn install?');
+            throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
         }
         const wrapper = exec
             .withCommand(`${binPath} ${command}`)
-            .withArgs(`--target=${target}`, `--base=${base}`, `--head=${head}`, ...args)
+            .withArgs(`--target=${target}`, ...args)
             .build();
         return wrapper();
     });
@@ -8157,9 +8159,7 @@ function chunkify(arr, numberOfChunks) {
 }
 function getAffectedProjectsForTarget(target, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
-        const projects = (yield runNxCommand('print-affected', target, exec, [
-            '--select=tasks.target.project'
-        ])).trim();
+        const projects = (yield runNxCommand('print-affected', target, exec, ['--select=tasks.target.project',])).trim();
         (0,core.debug)(`🐞 Affected project for ${target}: ${projects}`);
         return projects.split(', ');
     });
@@ -8204,6 +8204,8 @@ function main() {
         }
         try {
             const exec = new Exec();
+            const [base, head] = yield retrieveGitBoundaries(exec);
+            exec.withArgs(`--base=${base}`, `--head=${head}`);
             const matrix = yield generateAffectedMatrix(inputs, exec);
             (0,core.setOutput)('matrix', matrix);
             (0,core.setOutput)('hasChanges', !!matrix.include.find((target) => target.projects.length));
