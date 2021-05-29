@@ -61408,7 +61408,7 @@ var cache = __nccwpck_require__(7799);
 
 
 
-const NX_CACHE_PATH = './node_modules/.cache/nx';
+const NX_CACHE_PATH = 'node_modules/.cache/nx';
 function getCacheKeys(target, bucket) {
     const keyParts = [];
     keyParts.push(`${process.platform}-${process.arch}`);
@@ -61422,7 +61422,7 @@ function getCacheKeys(target, bucket) {
     debug(`🐞 key so far: ${keyParts.join('-')}`);
     const restoreKeys = [
         keyParts.slice(0, -1).join('-'),
-        keyParts.slice(0, -2).join('-')
+        keyParts.slice(0, -2).join('-'),
     ];
     return [keyParts.join('-'), restoreKeys];
 }
@@ -61435,8 +61435,7 @@ function restoreNxCache(primaryKey, restoreKeys) {
 function saveNxCache(primaryKey) {
     return __awaiter(this, void 0, void 0, function* () {
         debug(`🐞 Saving NX cache to ${primaryKey}`);
-        return saveCache([NX_CACHE_PATH], primaryKey)
-            .catch(err => {
+        return saveCache([NX_CACHE_PATH], primaryKey).catch((err) => {
             // don't throw an error if cache already exists, which may happen due to
             // race conditions
             if (err instanceof ReserveCacheError) {
@@ -61511,7 +61510,7 @@ var which = __nccwpck_require__(4207);
 
 
 
-const NX_BIN_PATH = '';
+const NX_BIN_PATH = 'node_modules/.bin/nx';
 function assertNxInstalled() {
     return modules_awaiter(this, void 0, void 0, function* () {
         try {

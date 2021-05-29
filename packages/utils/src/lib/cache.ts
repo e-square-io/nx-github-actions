@@ -1,7 +1,7 @@
 import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
 import { debug, warning } from '@actions/core';
 
-export const NX_CACHE_PATH = './node_modules/.cache/nx';
+export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
 export function getCacheKeys(
   target: string,

@@ -3,7 +3,7 @@ import { Exec } from './exec';
 import * as which from 'which';
 import { debug } from '@actions/core';
 
-export const NX_BIN_PATH = '';
+export const NX_BIN_PATH = 'node_modules/.bin/nx';
 
 export interface BaseInputs {
   maxParallel: number;
