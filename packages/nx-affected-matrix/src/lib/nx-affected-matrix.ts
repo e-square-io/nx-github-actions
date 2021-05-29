@@ -12,6 +12,7 @@ import {
   Exec,
   retrieveGitBoundaries,
   nxPrintAffected,
+  assertNxInstalled,
 } from '../../../utils/src';
 
 interface NxAffectedMatrix {
@@ -99,6 +100,8 @@ async function main(): Promise<void> {
   }
 
   try {
+    await assertNxInstalled();
+
     const exec = new Exec();
     const [base, head] = await retrieveGitBoundaries(exec);
 

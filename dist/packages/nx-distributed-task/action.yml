@@ -4,6 +4,9 @@ inputs:
   target:
     description: "Target to run"
     required: true
+  bucket:
+    description: "Current bucket run"
+    required: true
   projects:
     description: "Projects to run against target"
     required: true
@@ -19,7 +22,7 @@ inputs:
     required: false
 outputs:
   artifactName:
-    description: "The name of the generated artifact"
+    description: 'The name of the generated artifact'
 runs:
   using: 'node12'
   main: 'index.js'

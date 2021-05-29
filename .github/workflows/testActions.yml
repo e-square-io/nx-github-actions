@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.job1.outputs.hasChanges == 'true' }}
     needs: [job1]
-    name: Distributed Task
+    name: ${{ matrix.target }} (${{ matrix.bucket }})
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}
     steps:
@@ -61,22 +61,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Cache nx
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-nx
-        with:
-          path: ./node_modules/.cache/nx
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.target }}-${{ matrix.bucket }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.target }}-${{ matrix.bucket }}-
-            ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.target }}-
-            ${{ runner.os }}-${{ env.cache-name }}-
-            ${{ runner.os }}-
-
       - name: Run Action
         uses: ./dist/packages/nx-distributed-task
         id: run
         with:
           target: ${{ matrix.target }}
+          bucket: ${{ matrix.bucket }}
           projects: ${{ matrix.projects }}

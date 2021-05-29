@@ -3,10 +3,21 @@ import { Exec } from './exec';
 import * as which from 'which';
 import { debug } from '@actions/core';
 
+export const NX_BIN_PATH = '';
+
 export interface BaseInputs {
   maxParallel: number;
   nxCloud?: boolean;
   args?: string[];
+}
+
+export async function assertNxInstalled() {
+  try {
+    debug(`🐞 Checking existence of nx`);
+    await which(NX_BIN_PATH);
+  } catch {
+    throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
+  }
 }
 
 export async function nxCommand(
@@ -15,17 +26,8 @@ export async function nxCommand(
   exec: Exec,
   args: string[]
 ): Promise<string> {
-  const binPath = 'node_modules/.bin/nx';
-
-  try {
-    debug(`🐞 Checking existence of nx`);
-    await which(binPath);
-  } catch {
-    throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
-  }
-
   const wrapper = exec
-    .withCommand(`${binPath} ${command}`)
+    .withCommand(`${NX_BIN_PATH} ${command}`)
     .withArgs(`--target=${target}`, ...args)
     .build();
 
