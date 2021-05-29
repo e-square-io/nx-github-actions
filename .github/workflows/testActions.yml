@@ -6,6 +6,9 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     name: Affected Matrix
+    outputs:
+      hasChanges: ${{ steps.run.outputs.hasChanges }}
+      matrix: ${{ steps.run.outputs.matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
