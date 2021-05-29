@@ -16,8 +16,6 @@ import {
 } from '../../../utils/src';
 
 interface NxAffectedMatrix {
-  target: string[];
-  bucket: number[];
   include: { target: string; bucket: number; projects: string }[];
 }
 
@@ -50,8 +48,6 @@ async function generateAffectedMatrix(
 ): Promise<NxAffectedMatrix> {
   startGroup(`⚙️ Generating affected matrix for ${targets}`);
   const matrix = {
-    target: targets,
-    bucket: [...new Array(maxParallel)].map((_, idx) => idx + 1),
     include: [],
   };
 
