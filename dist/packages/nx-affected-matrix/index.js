@@ -61629,20 +61629,18 @@ function generateAffectedMatrix({ targets, maxParallel }, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
         (0,core.startGroup)(`⚙️ Generating affected matrix for ${targets}`);
         const matrix = {
-            target: targets,
-            bucket: [...new Array(maxParallel)].map((_, idx) => idx + 1),
-            include: [],
+            include: []
         };
         for (const target of targets) {
             (0,core.debug)(`🐞 Calculating affected for "${target}" target`);
             const projects = yield nxPrintAffected(target, exec);
             const affectedTargets = chunkify(projects, maxParallel)
-                .filter((projects) => projects.length > 0)
                 .map((projects, idx) => ({
                 target,
                 bucket: idx + 1,
-                projects: projects.join(','),
-            }));
+                projects: projects.join(',')
+            }))
+                .filter((target) => target.projects !== '');
             if (affectedTargets.length) {
                 matrix.include.push(...affectedTargets);
             }
