@@ -61629,7 +61629,9 @@ function generateAffectedMatrix({ targets, maxParallel }, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
         (0,core.startGroup)(`⚙️ Generating affected matrix for ${targets}`);
         const matrix = {
-            include: []
+            target: targets,
+            bucket: [...new Array(maxParallel)].map((_, idx) => idx + 1),
+            include: [],
         };
         for (const target of targets) {
             (0,core.debug)(`🐞 Calculating affected for "${target}" target`);
