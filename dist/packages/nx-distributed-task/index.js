@@ -18537,8 +18537,7 @@ function uploadProjectsOutputs(inputs) {
         (0,core.startGroup)('⬆️ Uploading artifacts');
         const projects = getWorkspaceProjects();
         const artifactName = inputs.target;
-        yield Promise.all(inputs.projects
-            .map((project) => uploadArtifact(artifactName, getProjectOutputs(projects, project, inputs.target))));
+        yield Promise.all(inputs.projects.map((project) => uploadArtifact(artifactName, getProjectOutputs(projects, project, inputs.target))));
         (0,core.setOutput)('artifactName', artifactName);
         (0,core.endGroup)();
     });
