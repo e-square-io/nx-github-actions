@@ -1,6 +1,6 @@
 {
-  "projectName": "test",
-  "projectOwner": "",
+  "projectName": "nx-github-actions",
+  "projectOwner": "ronnetzer",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [
@@ -9,6 +9,21 @@
   "imageSize": 100,
   "commit": true,
   "commitConvention": "angular",
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "ronnetzer",
+      "name": "Ron Netzer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1116785?v=4",
+      "profile": "https://github.com/ronnetzer",
+      "contributions": [
+        "code",
+        "content",
+        "design",
+        "doc",
+        "ideas",
+        "maintenance"
+      ]
+    }
+  ],
   "contributorsPerLine": 7
 }

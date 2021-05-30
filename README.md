@@ -85,11 +85,16 @@ A: Make sure you checkout with `fetch-depth: 0` for affected-matrix job. It is r
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<!-- markdownlint-enable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/ronnetzer"><img src="https://avatars.githubusercontent.com/u/1116785?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ron Netzer</b></sub></a><br /><a href="https://github.com/ronnetzer/nx-github-actions/commits?author=ronnetzer" title="Code">💻</a> <a href="#content-ronnetzer" title="Content">🖋</a> <a href="#design-ronnetzer" title="Design">🎨</a> <a href="https://github.com/ronnetzer/nx-github-actions/commits?author=ronnetzer" title="Documentation">📖</a> <a href="#ideas-ronnetzer" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-ronnetzer" title="Maintenance">🚧</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
