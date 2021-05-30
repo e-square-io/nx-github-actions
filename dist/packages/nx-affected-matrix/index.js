@@ -18232,7 +18232,7 @@ function uploadArtifact(name, paths) {
     return __awaiter(this, void 0, void 0, function* () {
         if (paths.length === 0)
             return;
-        const globPaths = paths.map(path => `${path}/*`).join('\n');
+        const globPaths = paths.map((path) => `${path}/*`).join('\n');
         debug(`🐞 Upload paths: ${globPaths}`);
         const glob = yield createGlob(globPaths);
         const client = create();
@@ -18412,7 +18412,9 @@ var which = __nccwpck_require__(4207);
 
 const NX_BIN_PATH = 'node_modules/.bin/nx';
 function getWorkspaceProjects() {
-    const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
+    const workspaceFile = tree.exists('angular.json')
+        ? 'angular.json'
+        : 'workspace.json';
     const workspaceContent = JSON.parse(tree.read(workspaceFile).toString());
     return workspaceContent.projects;
 }
@@ -18538,7 +18540,9 @@ function generateAffectedMatrix({ targets, maxParallel }, exec) {
         const matrix = {
             include: [],
         };
+        const [base, head] = yield retrieveGitBoundaries(exec);
         for (const target of targets) {
+            exec.withArgs(`--base=${base}`, `--head=${head}`);
             (0,core.debug)(`🐞 Calculating affected for "${target}" target`);
             const projects = yield nxPrintAffected(target, exec);
             const affectedTargets = chunkify(projects, maxParallel)
@@ -18580,8 +18584,6 @@ function main() {
         try {
             yield assertNxInstalled();
             const exec = new Exec();
-            const [base, head] = yield retrieveGitBoundaries(exec);
-            exec.withArgs(`--base=${base}`, `--head=${head}`);
             const matrix = yield generateAffectedMatrix(inputs, exec);
             (0,core.setOutput)('matrix', matrix);
             (0,core.setOutput)('hasChanges', !!matrix.include.find((target) => target.projects.length));
@@ -18601,4 +18603,3 @@ void main();
 module.exports = __webpack_exports__;
 /******/ })()
 ;
-//# sourceMappingURL=index.js.map

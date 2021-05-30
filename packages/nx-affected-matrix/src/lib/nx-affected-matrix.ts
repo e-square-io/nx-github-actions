@@ -71,7 +71,6 @@ async function generateAffectedMatrix(
   }
 
   debug(`🐞 matrix: ${matrix}`);
-
   info(`✅ Generated affected matrix`);
   endGroup();
 

@@ -18232,7 +18232,7 @@ function uploadArtifact(name, paths) {
     return modules_awaiter(this, void 0, void 0, function* () {
         if (paths.length === 0)
             return;
-        const globPaths = paths.map(path => `${path}/*`).join('\n');
+        const globPaths = paths.map((path) => `${path}/*`).join('\n');
         (0,core.debug)(`🐞 Upload paths: ${globPaths}`);
         const glob = yield (0,lib_glob.create)(globPaths);
         const client = (0,artifact_client/* create */.U)();
@@ -18412,7 +18412,9 @@ var which = __nccwpck_require__(4207);
 
 const NX_BIN_PATH = 'node_modules/.bin/nx';
 function getWorkspaceProjects() {
-    const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
+    const workspaceFile = tree.exists('angular.json')
+        ? 'angular.json'
+        : 'workspace.json';
     const workspaceContent = JSON.parse(tree.read(workspaceFile).toString());
     return workspaceContent.projects;
 }
@@ -18518,7 +18520,7 @@ function uploadProjectsOutputs(inputs) {
         (0,core.startGroup)('⬆️ Uploading artifacts');
         const projects = getWorkspaceProjects();
         const artifactName = inputs.target;
-        yield Promise.all(inputs.projects.map(project => {
+        yield Promise.all(inputs.projects.map((project) => {
             var _a;
             const outputs = (_a = projects[project].targets[inputs.target].outputs) !== null && _a !== void 0 ? _a : [];
             return uploadArtifact(artifactName, outputs);
@@ -18579,4 +18581,3 @@ void main();
 module.exports = __webpack_exports__;
 /******/ })()
 ;
-//# sourceMappingURL=index.js.map
