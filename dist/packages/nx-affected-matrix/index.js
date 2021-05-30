@@ -18416,8 +18416,24 @@ function getWorkspaceProjects() {
     const workspaceFile = tree.exists('angular.json')
         ? 'angular.json'
         : 'workspace.json';
+    debug(`🐞 Found ${workspaceFile} as nx workspace`);
     const workspaceContent = JSON.parse(tree.read(workspaceFile).toString());
     return workspaceContent.projects;
+}
+function getProjectOutputs(projects, project, target) {
+    var _a;
+    const projectTarget = projects[project].targets[target];
+    let outputs = (_a = projectTarget.outputs) !== null && _a !== void 0 ? _a : [];
+    const replaceExpressions = (path) => {
+        var _a, _b;
+        if (!path.includes('{') || !path.includes('}'))
+            return path;
+        const [scope, prop] = path.replace(/[{}]/g, '').split('.');
+        return (_b = (_a = projectTarget === null || projectTarget === void 0 ? void 0 : projectTarget[scope]) === null || _a === void 0 ? void 0 : _a[prop]) !== null && _b !== void 0 ? _b : '';
+    };
+    outputs = outputs.map(replaceExpressions);
+    debug(`🐞 Found ${outputs} as outputs for ${target}`);
+    return outputs;
 }
 function assertNxInstalled() {
     return modules_awaiter(this, void 0, void 0, function* () {

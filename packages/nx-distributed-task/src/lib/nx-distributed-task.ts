@@ -11,6 +11,7 @@ import {
   assertNxInstalled,
   Exec,
   getCacheKeys,
+  getProjectOutputs,
   getWorkspaceProjects,
   nxRunMany,
   restoreNxCache,
@@ -26,11 +27,12 @@ async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
   const artifactName = inputs.target;
 
   await Promise.all(
-    inputs.projects.map((project) => {
-      const outputs = projects[project].targets[inputs.target].outputs ?? [];
-
-      return uploadArtifact(artifactName, outputs);
-    })
+    inputs.projects.map((project) =>
+      uploadArtifact(
+        artifactName,
+        getProjectOutputs(projects, project, inputs.target)
+      )
+    )
   );
 
   setOutput('artifactName', artifactName);

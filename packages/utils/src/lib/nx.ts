@@ -19,12 +19,35 @@ export function getWorkspaceProjects(): WorkspaceProjects {
   const workspaceFile = tree.exists('angular.json')
     ? 'angular.json'
     : 'workspace.json';
+  debug(`🐞 Found ${workspaceFile} as nx workspace`);
 
   const workspaceContent: WorkspaceJsonConfiguration = JSON.parse(
     tree.read(workspaceFile).toString()
   );
 
   return workspaceContent.projects;
+}
+
+export function getProjectOutputs(
+  projects: WorkspaceProjects,
+  project: string,
+  target: string
+): string[] {
+  const projectTarget = projects[project].targets[target];
+  let outputs = projectTarget.outputs ?? [];
+
+  const replaceExpressions = (path: string) => {
+    if (!path.includes('{') || !path.includes('}')) return path;
+
+    const [scope, prop] = path.replace(/[{}]/g, '').split('.');
+    return projectTarget?.[scope]?.[prop] ?? '';
+  };
+
+  outputs = outputs.map(replaceExpressions);
+
+  debug(`🐞 Found ${outputs} as outputs for ${target}`);
+
+  return outputs;
 }
 
 export async function assertNxInstalled() {
