@@ -1,4 +1,4 @@
-# Github NX Actions
+# NX Github Actions
 
 [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)](LICENSE)
 [![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)](CONTRIBUTING.md#commit-message-format)
@@ -29,15 +29,58 @@
 
 ## Table of Contents
 
-- [Installation](#installation)
 - [Usage](#usage)
 - [FAQ](#faq)
+- [Contributors](#contributors-)
 
 ## Usage
+Here's an example of a workflow file that uses both actions
+```yaml
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    name: Affected Matrix
+    outputs:
+      hasChanges: ${{ steps.affected.outputs.hasChanges }}
+      matrix: ${{ steps.affected.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # important to have history for affected calculation
+          
+      # install node modules, cache etc
 
-TODO: Add workflow example of both actions used together
+      - name: Calculate affected projects
+        uses: e-square-io/nx-github-actions/dist/packages/nx-affected-matrix@master
+        id: affected
+        with:
+          targets: 'test,build'
+
+  execute:
+    name: ${{ matrix.target }} (${{ matrix.bucket }})
+    if: ${{ needs.setup.outputs.hasChanges == 'true' }}
+    needs: [setup]
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.target == 'test' }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+    steps:
+      # Checkout, cache, install node modules
+
+      - name: Execute
+        uses: e-square-io/nx-github-actions/dist/packages/nx-distributed-task@master
+        id: execute
+        with:
+          target: ${{ matrix.target }}
+          bucket: ${{ matrix.bucket }}
+          projects: ${{ matrix.projects }}
+```
 
 ## FAQ
+**Q: I don't get the full affected list I expect to see**  
+A: Make sure you checkout with `fetch-depth: 0` for affected-matrix job. It is required in order to pull the full commit history which is needed for the calculation.
 
 ## Contributors ✨
 
