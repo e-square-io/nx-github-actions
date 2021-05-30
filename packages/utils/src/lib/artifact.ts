@@ -7,7 +7,6 @@ export async function uploadArtifact(
   paths: string[]
 ): Promise<string | undefined> {
   if (paths.length === 0) return;
-
   const globPaths = paths.map((path) => `${path}/*`).join('\n');
   debug(`🐞 Upload paths: ${globPaths}`);
 

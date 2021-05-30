@@ -2,6 +2,9 @@ name: Test Github Actions
 
 on: [push]
 
+env:
+  ACTIONS_RUNNER_DEBUG: true
+
 jobs:
   job1:
     runs-on: ubuntu-latest
