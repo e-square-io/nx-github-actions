@@ -11,7 +11,7 @@ import {
   copyAssetFiles,
 } from '@nrwl/workspace/src/utilities/assets';
 
-const externals = ['typescript', '@azure/storage-blob', '@azure/core-http'];
+const externals = ['typescript'];
 
 export interface GHActionPackageBuilderOptions {
   actionPath: string;

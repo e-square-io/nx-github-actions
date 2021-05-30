@@ -219,7 +219,7 @@ var fileutils_1 = require('@nrwl/workspace/src/utilities/fileutils');
 var path_1 = require('path');
 var project_graph_1 = require('@nrwl/workspace/src/core/project-graph');
 var assets_1 = require('@nrwl/workspace/src/utilities/assets');
-var externals = ['typescript', '@azure/storage-blob', '@azure/core-http'];
+var externals = ['typescript'];
 function normalizeOptions(opts, context) {
   var _a;
   var projectRoot = path_1.resolve(
