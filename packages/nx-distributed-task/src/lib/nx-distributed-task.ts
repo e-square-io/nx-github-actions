@@ -28,6 +28,7 @@ async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
   await Promise.all(
     inputs.projects.map((project) => {
       const outputs = projects[project].targets[inputs.target].outputs ?? [];
+
       return uploadArtifact(artifactName, outputs);
     })
   );
