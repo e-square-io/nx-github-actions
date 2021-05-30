@@ -11,6 +11,8 @@ import {
   copyAssetFiles,
 } from '@nrwl/workspace/src/utilities/assets';
 
+const externals = ['typescript', '@azure/storage-blob', '@azure/core-http'];
+
 export interface GHActionPackageBuilderOptions {
   actionPath: string;
   main: string;
@@ -56,11 +58,15 @@ async function runNccCommand(
   opts: BuildBuilderOptions
 ): Promise<{ success: boolean }> {
   const args = [`-o ${opts.outputPath}`];
+
+  // set external modules
+  args.push(...externals.map((module) => `--external ${module}`));
+
   if (opts.watch) {
     args.push(`-w`);
   }
   if (opts.sourceMap) {
-    args.push(`-s --no-source-map-register`);
+    args.push(`-s`);
   }
 
   const pack = exec(`npx ncc build ${opts.main} ${args.join(' ')}`);

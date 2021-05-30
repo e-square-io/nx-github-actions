@@ -2,6 +2,8 @@ import { context } from '@actions/github';
 import { Exec } from './exec';
 import * as which from 'which';
 import { debug } from '@actions/core';
+import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { tree } from './fs';
 
 export const NX_BIN_PATH = 'node_modules/.bin/nx';
 
@@ -9,6 +11,20 @@ export interface BaseInputs {
   maxParallel: number;
   nxCloud?: boolean;
   args?: string[];
+}
+
+export type WorkspaceProjects = WorkspaceJsonConfiguration['projects'];
+
+export function getWorkspaceProjects(): WorkspaceProjects {
+  const workspaceFile = tree.exists('angular.json')
+    ? 'angular.json'
+    : 'workspace.json';
+
+  const workspaceContent: WorkspaceJsonConfiguration = JSON.parse(
+    tree.read(workspaceFile).toString()
+  );
+
+  return workspaceContent.projects;
 }
 
 export async function assertNxInstalled() {

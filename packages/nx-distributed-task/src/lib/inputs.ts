@@ -4,5 +4,5 @@ export interface Inputs extends BaseInputs {
   target: string;
   bucket: number;
   projects: string[];
-  deployArtifacts: boolean;
+  uploadOutputs: boolean;
 }

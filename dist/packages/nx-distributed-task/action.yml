@@ -10,8 +10,8 @@ inputs:
   projects:
     description: "Projects to run against target"
     required: true
-  deployArtifacts:
-    description: "Should deploy target's artifact from all distributed jobs"
+  uploadOutputs:
+    description: "Should upload target's outputs from all distributed jobs"
     required: false
     default: 'true'
   args:

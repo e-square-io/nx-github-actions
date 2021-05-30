@@ -1,13 +1,40 @@
-import { endGroup, getInput, info, setFailed, startGroup } from '@actions/core';
+import {
+  endGroup,
+  getInput,
+  info,
+  setFailed,
+  setOutput,
+  startGroup,
+} from '@actions/core';
 import { Inputs } from './inputs';
 import {
   assertNxInstalled,
   Exec,
   getCacheKeys,
+  getWorkspaceProjects,
   nxRunMany,
   restoreNxCache,
   saveNxCache,
+  uploadArtifact,
 } from '../../../utils/src';
+
+async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
+  if (!inputs.uploadOutputs) return;
+
+  startGroup('⬆️ Uploading artifacts');
+  const projects = getWorkspaceProjects();
+  const artifactName = inputs.target;
+
+  await Promise.all(
+    inputs.projects.map((project) => {
+      const outputs = projects[project].targets[inputs.target].outputs ?? [];
+      return uploadArtifact(artifactName, outputs);
+    })
+  );
+
+  setOutput('artifactName', artifactName);
+  endGroup();
+}
 
 async function main(): Promise<void> {
   const inputs: Inputs = {
@@ -23,7 +50,7 @@ async function main(): Promise<void> {
       .split(' ')
       .filter((arg) => arg.length > 0),
     nxCloud: getInput('nxCloud') === 'true',
-    deployArtifacts: getInput('deployArtifacts') === 'true',
+    uploadOutputs: getInput('uploadOutputs') === 'true',
   };
 
   if (inputs.projects.length === 0) {
@@ -49,7 +76,7 @@ async function main(): Promise<void> {
     await saveNxCache(cacheParams[0]);
     endGroup();
 
-    //  TODO: add upload artifact
+    await uploadProjectsOutputs(inputs);
   } catch (e) {
     setFailed(e);
   }

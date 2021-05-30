@@ -1,5 +1,5 @@
 import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
-import { debug, warning } from '@actions/core';
+import { debug, info, warning } from '@actions/core';
 
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
@@ -31,23 +31,27 @@ export function getCacheKeys(
 export async function restoreNxCache(
   primaryKey: string,
   restoreKeys: string[]
-): Promise<string> {
+): Promise<void> {
   debug(`🐞 Restoring NX cache from ${primaryKey}`);
 
-  return restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
+  const hitKey = await restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
+  info(`✅ Cache hit: ${hitKey}`);
 }
 
-export async function saveNxCache(primaryKey: string): Promise<number> {
+export async function saveNxCache(primaryKey: string): Promise<void> {
   debug(`🐞 Saving NX cache to ${primaryKey}`);
 
-  return saveCache([NX_CACHE_PATH], primaryKey).catch((err) => {
+  try {
+    await saveCache([NX_CACHE_PATH], primaryKey);
+
+    info(`✅ Cache saved successfully`);
+  } catch (err) {
     // don't throw an error if cache already exists, which may happen due to
     // race conditions
     if (err instanceof ReserveCacheError) {
       warning(err);
-      return -1;
     }
     // otherwise re-throw
     throw err;
-  });
+  }
 }
