@@ -52,7 +52,7 @@ jobs:
       # install node modules, cache etc
 
       - name: Calculate affected projects
-        uses: e-square-io/nx-github-actions/dist/packages/nx-affected-matrix@1
+        uses: e-square-io/nx-github-actions/dist/packages/nx-affected-matrix@v1
         id: affected
         with:
           targets: 'test,build'
@@ -70,7 +70,7 @@ jobs:
       # Checkout, cache, install node modules
 
       - name: Execute
-        uses: e-square-io/nx-github-actions/dist/packages/nx-distributed-task@1
+        uses: e-square-io/nx-github-actions/dist/packages/nx-distributed-task@v1
         id: execute
         with:
           target: ${{ matrix.target }}
