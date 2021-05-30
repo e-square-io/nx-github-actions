@@ -51,7 +51,10 @@ async function generateAffectedMatrix(
     include: [],
   };
 
+  const [base, head] = await retrieveGitBoundaries(exec);
+
   for (const target of targets) {
+    exec.withArgs(`--base=${base}`, `--head=${head}`);
     debug(`🐞 Calculating affected for "${target}" target`);
     const projects = await nxPrintAffected(target, exec);
     const affectedTargets = chunkify(projects, maxParallel)
@@ -99,11 +102,8 @@ async function main(): Promise<void> {
     await assertNxInstalled();
 
     const exec = new Exec();
-    const [base, head] = await retrieveGitBoundaries(exec);
-
-    exec.withArgs(`--base=${base}`, `--head=${head}`);
-
     const matrix = await generateAffectedMatrix(inputs, exec);
+
     setOutput('matrix', matrix);
     setOutput(
       'hasChanges',

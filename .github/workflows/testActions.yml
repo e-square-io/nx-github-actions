@@ -43,11 +43,13 @@ jobs:
           echo "Generated matrix is ${{ steps.run.outputs.matrix }}"
 
   job2:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.target }} (${{ matrix.bucket }})
     if: ${{ needs.job1.outputs.hasChanges == 'true' }}
     needs: [job1]
-    name: ${{ matrix.target }} (${{ matrix.bucket }})
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.target == 'test' }}
     strategy:
+      fail-fast: false
       matrix: ${{ fromJSON(needs.job1.outputs.matrix) }}
     steps:
       - name: Checkout
