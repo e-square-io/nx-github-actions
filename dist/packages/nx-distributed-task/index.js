@@ -18286,13 +18286,14 @@ function saveNxCache(primaryKey) {
         (0,core.debug)(`🐞 Saving NX cache to ${primaryKey}`);
         try {
             yield (0,cache.saveCache)([NX_CACHE_PATH], primaryKey);
-            (0,core.info)(`✅ Cache saved successfully`);
+            (0,core.info)(`✅ Successfully saved cache to ${primaryKey}`);
         }
         catch (err) {
             // don't throw an error if cache already exists, which may happen due to
             // race conditions
             if (err instanceof cache.ReserveCacheError) {
                 (0,core.warning)(err);
+                return;
             }
             // otherwise re-throw
             throw err;

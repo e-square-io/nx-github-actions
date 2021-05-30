@@ -18286,13 +18286,14 @@ function saveNxCache(primaryKey) {
         debug(`🐞 Saving NX cache to ${primaryKey}`);
         try {
             yield saveCache([NX_CACHE_PATH], primaryKey);
-            info(`✅ Cache saved successfully`);
+            info(`✅ Successfully saved cache to ${primaryKey}`);
         }
         catch (err) {
             // don't throw an error if cache already exists, which may happen due to
             // race conditions
             if (err instanceof ReserveCacheError) {
                 warning(err);
+                return;
             }
             // otherwise re-throw
             throw err;
