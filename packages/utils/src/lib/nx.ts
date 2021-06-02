@@ -96,6 +96,9 @@ export async function nxRunMany(
   const args = inputs.args ?? [];
 
   if (inputs.nxCloud) {
+    // fix for GH no node in path error
+    tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
+
     args.push('--scan');
     const env: Record<string, string> = {};
     env.NX_RUN_GROUP = context.runId.toString();

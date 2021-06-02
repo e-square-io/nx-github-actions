@@ -66531,6 +66531,9 @@ class GHTree {
     write(filePath, content) {
         (0,external_fs_.writeFileSync)((0,external_path_.resolve)(this.root, filePath), content);
     }
+    symlink(from, to) {
+        (0,external_fs_.symlinkSync)(from, to, 'file');
+    }
 }
 const tree = new GHTree();
 
@@ -66602,6 +66605,8 @@ function nxRunMany(target, inputs, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
         const args = (_a = inputs.args) !== null && _a !== void 0 ? _a : [];
         if (inputs.nxCloud) {
+            // fix for GH no node in path error
+            tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
             args.push('--scan');
             const env = {};
             env.NX_RUN_GROUP = github.context.runId.toString();
