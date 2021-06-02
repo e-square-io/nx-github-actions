@@ -66425,6 +66425,14 @@ function saveNxCache(primaryKey) {
         }
     });
 }
+function withCache(target, bucket, cb) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cacheParams = getCacheKeys(target, bucket);
+        yield group('🚀 Retrieving NX cache', () => restoreNxCache(...cacheParams));
+        yield cb();
+        yield group('✅ Saving NX cache', () => saveNxCache(cacheParams[0]));
+    });
+}
 
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(1514);

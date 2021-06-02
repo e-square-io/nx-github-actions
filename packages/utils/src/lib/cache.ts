@@ -1,5 +1,5 @@
 import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
-import { debug, info, warning } from '@actions/core';
+import { debug, group, info, warning } from '@actions/core';
 
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
@@ -55,4 +55,16 @@ export async function saveNxCache(primaryKey: string): Promise<void> {
     // otherwise re-throw
     throw err;
   }
+}
+
+export async function withCache(
+  target: string,
+  bucket: number,
+  cb: () => Promise<unknown>
+): Promise<void> {
+  const cacheParams = getCacheKeys(target, bucket);
+
+  await group('🚀 Retrieving NX cache', () => restoreNxCache(...cacheParams));
+  await cb();
+  await group('✅ Saving NX cache', () => saveNxCache(cacheParams[0]));
 }

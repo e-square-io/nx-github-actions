@@ -66425,6 +66425,14 @@ function saveNxCache(primaryKey) {
         }
     });
 }
+function withCache(target, bucket, cb) {
+    return modules_awaiter(this, void 0, void 0, function* () {
+        const cacheParams = getCacheKeys(target, bucket);
+        yield (0,core.group)('🚀 Retrieving NX cache', () => restoreNxCache(...cacheParams));
+        yield cb();
+        yield (0,core.group)('✅ Saving NX cache', () => saveNxCache(cacheParams[0]));
+    });
+}
 
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(1514);
@@ -66667,6 +66675,15 @@ function uploadProjectsOutputs(inputs) {
         (0,core.endGroup)();
     });
 }
+function runNxTask(inputs) {
+    return modules_awaiter(this, void 0, void 0, function* () {
+        (0,core.startGroup)('🏃 Running NX target');
+        const exec = new Exec();
+        exec.withArgs(`--projects=${inputs.projects}`);
+        yield nxRunMany(inputs.target, inputs, exec);
+        (0,core.endGroup)();
+    });
+}
 function main() {
     return modules_awaiter(this, void 0, void 0, function* () {
         const inputs = {
@@ -66685,23 +66702,18 @@ function main() {
             uploadOutputs: (0,core.getInput)('uploadOutputs') === 'true',
         };
         if (inputs.projects.length === 0) {
-            (0,core.info)('❗️ There are no projects to run, completing');
+            (0,core.info)('❕ There are no projects to run, completing');
             return;
         }
         try {
             yield assertNxInstalled();
-            (0,core.startGroup)('🚀 Retrieving NX cache');
-            const cacheParams = getCacheKeys(inputs.target, inputs.bucket);
-            yield restoreNxCache(...cacheParams);
-            (0,core.endGroup)();
-            (0,core.startGroup)('🏃 Running NX target');
-            const exec = new Exec();
-            exec.withArgs(`--projects=${inputs.projects}`);
-            yield nxRunMany(inputs.target, inputs, exec);
-            (0,core.endGroup)();
-            (0,core.startGroup)('✅ Saving NX cache');
-            yield saveNxCache(cacheParams[0]);
-            (0,core.endGroup)();
+            if (!inputs.nxCloud) {
+                yield withCache(inputs.target, inputs.bucket, () => runNxTask(inputs));
+            }
+            else {
+                (0,core.info)('❕ Skipped cache due to NX Cloud usage');
+                yield runNxTask(inputs);
+            }
             yield uploadProjectsOutputs(inputs);
         }
         catch (e) {

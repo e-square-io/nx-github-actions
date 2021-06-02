@@ -10,13 +10,11 @@ import { Inputs } from './inputs';
 import {
   assertNxInstalled,
   Exec,
-  getCacheKeys,
   getProjectOutputs,
   getWorkspaceProjects,
   nxRunMany,
-  restoreNxCache,
-  saveNxCache,
   uploadArtifact,
+  withCache,
 } from '../../../utils/src';
 
 async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
@@ -39,6 +37,14 @@ async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
   endGroup();
 }
 
+async function runNxTask(inputs: Inputs): Promise<void> {
+  startGroup('🏃 Running NX target');
+  const exec = new Exec();
+  exec.withArgs(`--projects=${inputs.projects}`);
+  await nxRunMany(inputs.target, inputs, exec);
+  endGroup();
+}
+
 async function main(): Promise<void> {
   const inputs: Inputs = {
     target: getInput('target', { required: true }),
@@ -57,27 +63,19 @@ async function main(): Promise<void> {
   };
 
   if (inputs.projects.length === 0) {
-    info('❗️ There are no projects to run, completing');
+    info('❕ There are no projects to run, completing');
     return;
   }
 
   try {
     await assertNxInstalled();
 
-    startGroup('🚀 Retrieving NX cache');
-    const cacheParams = getCacheKeys(inputs.target, inputs.bucket);
-    await restoreNxCache(...cacheParams);
-    endGroup();
-
-    startGroup('🏃 Running NX target');
-    const exec = new Exec();
-    exec.withArgs(`--projects=${inputs.projects}`);
-    await nxRunMany(inputs.target, inputs, exec);
-    endGroup();
-
-    startGroup('✅ Saving NX cache');
-    await saveNxCache(cacheParams[0]);
-    endGroup();
+    if (!inputs.nxCloud) {
+      await withCache(inputs.target, inputs.bucket, () => runNxTask(inputs));
+    } else {
+      info('❕ Skipped cache due to NX Cloud usage');
+      await runNxTask(inputs);
+    }
 
     await uploadProjectsOutputs(inputs);
   } catch (e) {
