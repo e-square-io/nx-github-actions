@@ -66606,7 +66606,7 @@ function nxRunMany(target, inputs, exec) {
         const args = (_a = inputs.args) !== null && _a !== void 0 ? _a : [];
         if (inputs.nxCloud) {
             // fix for GH no node in path error
-            tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
+            // tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
             args.push('--scan');
             const env = {};
             env.NX_RUN_GROUP = github.context.runId.toString();

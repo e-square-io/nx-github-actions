@@ -97,7 +97,7 @@ export async function nxRunMany(
 
   if (inputs.nxCloud) {
     // fix for GH no node in path error
-    tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
+    // tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
 
     args.push('--scan');
     const env: Record<string, string> = {};
