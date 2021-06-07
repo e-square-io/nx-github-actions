@@ -66605,8 +66605,6 @@ function nxRunMany(target, inputs, exec) {
     return __awaiter(this, void 0, void 0, function* () {
         const args = (_a = inputs.args) !== null && _a !== void 0 ? _a : [];
         if (inputs.nxCloud) {
-            // fix for GH no node in path error
-            // await cp('/usr/bin/nodejs', '/usr/bin/node');
             args.push('--scan');
             const env = {};
             env.NX_RUN_GROUP = context.runId.toString();
