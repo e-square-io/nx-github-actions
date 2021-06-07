@@ -5,7 +5,6 @@ import {
   readdirSync,
   readFileSync,
   statSync,
-  symlinkSync,
   writeFileSync,
 } from 'fs';
 import { resolve } from 'path';
@@ -50,10 +49,6 @@ export class GHTree implements Tree {
 
   write(filePath: string, content: Buffer | string): void {
     writeFileSync(resolve(this.root, filePath), content);
-  }
-
-  symlink(from: string, to: string): void {
-    symlinkSync(from, to, 'file');
   }
 }
 

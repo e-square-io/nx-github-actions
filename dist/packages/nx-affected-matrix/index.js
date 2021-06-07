@@ -66531,9 +66531,6 @@ class GHTree {
     write(filePath, content) {
         (0,external_fs_.writeFileSync)((0,external_path_.resolve)(this.root, filePath), content);
     }
-    symlink(from, to) {
-        (0,external_fs_.symlinkSync)(from, to, 'file');
-    }
 }
 const fs_tree = new GHTree();
 
@@ -66553,7 +66550,10 @@ function getWorkspaceProjects() {
         ? 'angular.json'
         : 'workspace.json';
     debug(`🐞 Found ${workspaceFile} as nx workspace`);
-    const workspaceContent = JSON.parse(tree.read(workspaceFile).toString().replace(/architect/g, 'targets'));
+    const workspaceContent = JSON.parse(tree
+        .read(workspaceFile)
+        .toString()
+        .replace(/architect/g, 'targets'));
     return workspaceContent.projects;
 }
 function getProjectOutputs(projects, project, target) {
@@ -66606,14 +66606,14 @@ function nxRunMany(target, inputs, exec) {
         const args = (_a = inputs.args) !== null && _a !== void 0 ? _a : [];
         if (inputs.nxCloud) {
             // fix for GH no node in path error
-            // tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
+            // await cp('/usr/bin/nodejs', '/usr/bin/node');
             args.push('--scan');
             const env = {};
             env.NX_RUN_GROUP = context.runId.toString();
             if (context.eventName === 'pull_request') {
                 env.NX_BRANCH = context.payload.pull_request.number.toString();
             }
-            exec.withOptions({ env });
+            exec.withOptions({ env: Object.assign(Object.assign({}, process.env), env) });
         }
         args.push('--parallel', `--maxParallel=${inputs.maxParallel}`);
         return nxCommand('run-many', target, exec, args);

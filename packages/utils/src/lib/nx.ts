@@ -4,6 +4,7 @@ import * as which from 'which';
 import { debug } from '@actions/core';
 import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { tree } from './fs';
+import { cp } from '@actions/io';
 
 export const NX_BIN_PATH = 'node_modules/.bin/nx';
 
@@ -100,7 +101,7 @@ export async function nxRunMany(
 
   if (inputs.nxCloud) {
     // fix for GH no node in path error
-    // tree.symlink('/usr/bin/nodejs', '/usr/bin/node');
+    // await cp('/usr/bin/nodejs', '/usr/bin/node');
 
     args.push('--scan');
     const env: Record<string, string> = {};
@@ -110,7 +111,7 @@ export async function nxRunMany(
       env.NX_BRANCH = context.payload.pull_request.number.toString();
     }
 
-    exec.withOptions({ env });
+    exec.withOptions({ env: { ...process.env, ...env } });
   }
 
   args.push('--parallel', `--maxParallel=${inputs.maxParallel}`);
