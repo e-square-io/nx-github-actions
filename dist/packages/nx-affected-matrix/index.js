@@ -66553,7 +66553,7 @@ function getWorkspaceProjects() {
         ? 'angular.json'
         : 'workspace.json';
     debug(`🐞 Found ${workspaceFile} as nx workspace`);
-    const workspaceContent = JSON.parse(tree.read(workspaceFile).toString());
+    const workspaceContent = JSON.parse(tree.read(workspaceFile).toString().replace(/architect/g, 'targets'));
     return workspaceContent.projects;
 }
 function getProjectOutputs(projects, project, target) {

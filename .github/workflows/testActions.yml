@@ -71,7 +71,6 @@ jobs:
         uses: ./dist/packages/nx-distributed-task
         id: run
         with:
-          nxCloud: true
           target: ${{ matrix.target }}
           bucket: ${{ matrix.bucket }}
           projects: ${{ matrix.projects }}

@@ -22,7 +22,10 @@ export function getWorkspaceProjects(): WorkspaceProjects {
   debug(`🐞 Found ${workspaceFile} as nx workspace`);
 
   const workspaceContent: WorkspaceJsonConfiguration = JSON.parse(
-    tree.read(workspaceFile).toString()
+    tree
+      .read(workspaceFile)
+      .toString()
+      .replace(/architect/g, 'targets')
   );
 
   return workspaceContent.projects;
