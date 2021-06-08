@@ -43,7 +43,7 @@ function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
 }
 
 async function generateAffectedMatrix(
-  { targets, maxParallel }: Inputs,
+  { targets, maxParallel, args = [] }: Inputs,
   exec: Exec
 ): Promise<NxAffectedMatrix> {
   startGroup(`⚙️ Generating affected matrix for ${targets}`);
@@ -54,7 +54,7 @@ async function generateAffectedMatrix(
   const [base, head] = await retrieveGitBoundaries(exec);
 
   for (const target of targets) {
-    exec.withArgs(`--base=${base}`, `--head=${head}`);
+    exec.withArgs(`--base=${base}`, `--head=${head}`, ...args);
     debug(`🐞 Calculating affected for "${target}" target`);
     const projects = await nxPrintAffected(target, exec);
     const affectedTargets = chunkify(projects, maxParallel)

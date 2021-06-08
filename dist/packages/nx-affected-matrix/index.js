@@ -66687,7 +66687,7 @@ function chunkify(arr, numberOfChunks) {
     }
     return result;
 }
-function generateAffectedMatrix({ targets, maxParallel }, exec) {
+function generateAffectedMatrix({ targets, maxParallel, args = [] }, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
         (0,core.startGroup)(`⚙️ Generating affected matrix for ${targets}`);
         const matrix = {
@@ -66695,7 +66695,7 @@ function generateAffectedMatrix({ targets, maxParallel }, exec) {
         };
         const [base, head] = yield retrieveGitBoundaries(exec);
         for (const target of targets) {
-            exec.withArgs(`--base=${base}`, `--head=${head}`);
+            exec.withArgs(`--base=${base}`, `--head=${head}`, ...args);
             (0,core.debug)(`🐞 Calculating affected for "${target}" target`);
             const projects = yield nxPrintAffected(target, exec);
             const affectedTargets = chunkify(projects, maxParallel)
