@@ -1,7 +1,7 @@
 import { context } from '@actions/github';
 import { Exec } from './exec';
 import * as which from 'which';
-import { debug } from '@actions/core';
+import { debug, warning } from '@actions/core';
 import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { tree } from './fs';
 
@@ -16,9 +16,7 @@ export interface BaseInputs {
 export type WorkspaceProjects = WorkspaceJsonConfiguration['projects'];
 
 export function getWorkspaceProjects(): WorkspaceProjects {
-  const workspaceFile = tree.exists('angular.json')
-    ? 'angular.json'
-    : 'workspace.json';
+  const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
   debug(`🐞 Found ${workspaceFile} as nx workspace`);
 
   const workspaceContent: WorkspaceJsonConfiguration = JSON.parse(
@@ -31,11 +29,7 @@ export function getWorkspaceProjects(): WorkspaceProjects {
   return workspaceContent.projects;
 }
 
-export function getProjectOutputs(
-  projects: WorkspaceProjects,
-  project: string,
-  target: string
-): string[] {
+export function getProjectOutputs(projects: WorkspaceProjects, project: string, target: string): string[] {
   const projectTarget = projects[project].targets[target];
   let outputs = projectTarget.outputs ?? [];
 
@@ -43,6 +37,16 @@ export function getProjectOutputs(
     if (!path.includes('{') || !path.includes('}')) return path;
 
     const [scope, prop] = path.replace(/[{}]/g, '').split('.');
+
+    if (!projectTarget?.[scope]?.[prop]) {
+      warning(
+        new Error(
+          `Couldn't find output value for ${project}. full path: project.${project}.targets.${target}.${scope}.${prop}`
+        )
+      );
+      return '';
+    }
+
     return projectTarget?.[scope]?.[prop] ?? '';
   };
 
@@ -62,12 +66,7 @@ export async function assertNxInstalled() {
   }
 }
 
-export async function nxCommand(
-  command: string,
-  target: string,
-  exec: Exec,
-  args: string[]
-): Promise<string> {
+export async function nxCommand(command: string, target: string, exec: Exec, args: string[]): Promise<string> {
   const wrapper = exec
     .withCommand(`${NX_BIN_PATH} ${command}`)
     .withArgs(`--target=${target}`, ...args)
@@ -76,26 +75,15 @@ export async function nxCommand(
   return wrapper();
 }
 
-export async function nxPrintAffected(
-  target: string,
-  exec: Exec
-): Promise<string[]> {
-  const projects = (
-    await nxCommand('print-affected', target, exec, [
-      '--select=tasks.target.project',
-    ])
-  ).trim();
+export async function nxPrintAffected(target: string, exec: Exec): Promise<string[]> {
+  const projects = (await nxCommand('print-affected', target, exec, ['--select=tasks.target.project'])).trim();
 
   debug(`🐞 Affected project for ${target}: ${projects}`);
 
   return projects.split(', ');
 }
 
-export async function nxRunMany(
-  target: string,
-  inputs: BaseInputs,
-  exec: Exec
-): Promise<string> {
+export async function nxRunMany(target: string, inputs: BaseInputs, exec: Exec): Promise<string> {
   const args = inputs.args ?? [];
 
   if (inputs.nxCloud) {
