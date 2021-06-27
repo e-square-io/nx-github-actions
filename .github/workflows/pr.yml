@@ -107,24 +107,22 @@ jobs:
 
       - name: Publish NX affected matrix
         if: ${{ contains(needs.setup.outputs.matrix, 'nx-affected-matrix') }}
-        uses: cpina/github-action-push-to-another-repository@main
+        uses: dmnemec/copy_file_to_another_repo_action@main
         env:
           API_TOKEN_GITHUB: ${{ steps.githubAppAuth.outputs.token }}
         with:
-          source-directory: './build/dist/packages/nx-affected-matrix'
-          destination-github-username: 'e-square-io'
-          destination-repository-name: 'nx-affected-matrix'
-          user-email: github@no-replay.net
-          target-branch: main
+          source_file: './build/dist/packages/nx-affected-matrix'
+          destination_repo: 'e-square-io/nx-affected-matrix'
+          user_name: 'e-square-io'
+          user_email: 'e-square-io@no-replay.com'
 
       - name: Publish NX distributed task
         if: ${{ contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
-        uses: cpina/github-action-push-to-another-repository@main
+        uses: dmnemec/copy_file_to_another_repo_action@main
         env:
           API_TOKEN_GITHUB: ${{ steps.githubAppAuth.outputs.token }}
         with:
-          source-directory: './build/dist/packages/nx-distributed-task'
-          destination-github-username: 'e-square-io'
-          destination-repository-name: 'nx-distributed-task'
-          user-email: github@no-replay.net
-          target-branch: main
+          source_file: './build/dist/packages/nx-distributed-task'
+          destination_repo: 'e-square-io/nx-distributed-task'
+          user_name: 'e-square-io'
+          user_email: 'e-square-io@no-replay.com'
