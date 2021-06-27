@@ -105,7 +105,7 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "::set-output name=token::$TOKEN"
 
-      - id: Publish NX affected matrix
+      - name: Publish NX affected matrix
         if: ${{ contains(needs.setup.outputs.matrix, 'nx-affected-matrix') }}
         uses: cpina/github-action-push-to-another-repository@main
         env:
@@ -117,7 +117,7 @@ jobs:
           user-email: github@no-replay.net
           target-branch: main
 
-      - id: Publish NX distributed task
+      - name: Publish NX distributed task
         if: ${{ contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
         uses: cpina/github-action-push-to-another-repository@main
         env:
