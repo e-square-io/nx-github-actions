@@ -70,6 +70,8 @@ export async function withCache(target: string, bucket: number, cb: () => Promis
   const cacheParams = getCacheKeys(target, bucket);
 
   await group('🚀 Retrieving NX cache', () => restoreNxCache(...cacheParams));
+
   await cb();
+
   await group('✅ Saving NX cache', () => saveNxCache(cacheParams[0]));
 }
