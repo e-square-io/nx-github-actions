@@ -88,4 +88,43 @@ jobs:
         with:
           directory: ./coverage/packages/*
 
+  publish:
+    name: Publish actions
+    runs-on: ubuntu-latest
+    needs: [setup, execute]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build
 
+      - name: Obtain GitHub App Installation Access Token
+        id: githubAppAuth
+        run: |
+          TOKEN="$(npx obtain-github-app-installation-access-token ci ${{ secrets.GH_AUTH_SECRET }})"
+          echo "::add-mask::$TOKEN"
+          echo "::set-output name=token::$TOKEN"
+
+      - id: Publish NX affected matrix
+        if: ${{ contains(needs.setup.outputs.matrix, 'nx-affected-matrix') }}
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ steps.githubAppAuth.outputs.token }}
+        with:
+          source-directory: './build/dist/packages/nx-affected-matrix'
+          destination-github-username: 'e-square-io'
+          destination-repository-name: 'nx-affected-matrix'
+          user-email: github@no-replay.net
+          target-branch: main
+
+      - id: Publish NX distributed task
+        if: ${{ contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ steps.githubAppAuth.outputs.token }}
+        with:
+          source-directory: './build/dist/packages/nx-distributed-task'
+          destination-github-username: 'e-square-io'
+          destination-repository-name: 'nx-distributed-task'
+          user-email: github@no-replay.net
+          target-branch: main

@@ -55,8 +55,7 @@ export async function saveNxCache(primaryKey: string): Promise<void> {
 
     info(`✅ Successfully saved cache to ${primaryKey}`);
   } catch (err) {
-    // don't throw an error if cache already exists, which may happen due to
-    // race conditions
+    // don't throw an error if cache already exists, which may happen due to concurrency
     if (err instanceof ReserveCacheError) {
       warning(err);
       return;
