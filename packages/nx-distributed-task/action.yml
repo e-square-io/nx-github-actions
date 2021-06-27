@@ -1,4 +1,7 @@
 name: 'Nx distributed task'
+branding:
+  icon: chevron-right
+  color: white
 description: "Executes Nx task"
 inputs:
   target:

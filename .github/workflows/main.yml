@@ -86,7 +86,7 @@ jobs:
 
       - uses: codecov/codecov-action@v1
         with:
-          directory: ./coverage/packages
+          directory: ./coverage/packages/*
 
   publish:
     name: Publish actions
