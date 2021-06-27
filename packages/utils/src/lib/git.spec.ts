@@ -1,6 +1,7 @@
 import { retrieveGitBoundaries, retrieveGitSHA } from './git';
 import { Exec } from './exec';
 import * as core from '@actions/core';
+import { context } from '@actions/github';
 
 describe('git', () => {
   let exec: Exec;
@@ -19,7 +20,7 @@ describe('git', () => {
   describe('retrieveGitSHA', () => {
     it('should get SHA', async () => {
       buildSpy.and.callThrough();
-      await expect(retrieveGitSHA(exec.withCommand('git rev-parse').build(), 'HEAD')).resolves.toBeTruthy();
+      await expect(retrieveGitSHA(exec.withCommand('git rev-parse').build(), 'HEAD')).resolves.toBeDefined();
     });
 
     it('should format result', async () => {
@@ -31,6 +32,7 @@ describe('git', () => {
 
   describe('retrieveGitBoundaries', () => {
     it('should fail pipeline if throws', async () => {
+      jest.spyOn(context, 'eventName', 'get').mockReturnValueOnce('push');
       execWrapper.mockReturnValueOnce(Promise.reject());
       jest.spyOn(core, 'setFailed');
 
@@ -39,6 +41,8 @@ describe('git', () => {
     });
 
     it('should use git to get base & head SHA', async () => {
+      jest.spyOn(context, 'eventName', 'get').mockReturnValueOnce('push');
+
       await expect(retrieveGitBoundaries(exec)).resolves.toEqual(['', '']);
       expect(execWrapper).toHaveBeenNthCalledWith(1, ['HEAD~1']);
       expect(execWrapper).toHaveBeenNthCalledWith(2, ['HEAD']);

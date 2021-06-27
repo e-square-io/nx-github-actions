@@ -17,7 +17,8 @@
           "outputs": ["coverage/packages/nx-affected-matrix"],
           "options": {
             "jestConfig": "packages/nx-affected-matrix/jest.config.js",
-            "passWithNoTests": true
+            "passWithNoTests": true,
+            "collectCoverage": true
           }
         },
         "build": {
@@ -48,7 +49,8 @@
           "outputs": ["coverage/packages/nx-distributed-task"],
           "options": {
             "jestConfig": "packages/nx-distributed-task/jest.config.js",
-            "passWithNoTests": true
+            "passWithNoTests": true,
+            "collectCoverage": true
           }
         },
         "build": {
@@ -79,7 +81,8 @@
           "outputs": ["coverage/packages/utils"],
           "options": {
             "jestConfig": "packages/utils/jest.config.js",
-            "passWithNoTests": true
+            "passWithNoTests": true,
+            "collectCoverage": true
           }
         }
       }
