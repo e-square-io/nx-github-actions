@@ -144,7 +144,7 @@ jobs:
 
       - name: Publish action ${{ matrix.package }}
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
-        uses: symplify/monorepo-split-github-action@2
+        uses: symplify/monorepo-split-github-action@2.0
         env:
           GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
         with:
