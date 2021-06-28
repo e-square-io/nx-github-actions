@@ -36,9 +36,10 @@ export async function restoreNxCache(primaryKey: string, restoreKeys: string[]):
   debug(`🐞 Restoring NX cache from ${primaryKey}`);
 
   try {
-    const hitKey = await restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
-    if (hitKey) {
-      info(`✅ Cache hit: ${hitKey}`);
+    const key = await restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
+
+    if (key) {
+      info(`✅ Cache hit: ${key}`);
     } else {
       info(`❕ Cache miss`);
     }
