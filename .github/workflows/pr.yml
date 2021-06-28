@@ -40,19 +40,21 @@ jobs:
     name: Release version
     runs-on: ubuntu-latest
     outputs:
-      releaseCreated: steps.release.outputs.release_created
-      major: steps.release.outputs.major
-      minor: steps.release.outputs.minor
-      patch: steps.release.outputs.patch
-      tag: steps.release.outputs.tag_name
+      releaseCreated: ${{ steps.release.outputs.release_created }}
+      major: ${{ steps.release.outputs.major }}
+      minor: ${{ steps.release.outputs.minor }}
+      patch: ${{ steps.release.outputs.patch }}
+      tag: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: GoogleCloudPlatform/release-please-action@v2
         id: release
         with:
           release-type: node
           command: github-release
+
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
+
       - name: tag major and patch versions
         if: ${{ steps.release.outputs.release_created }}
         run: |
@@ -127,7 +129,7 @@ jobs:
       fail-fast: false
       matrix:
         package: ['nx-affected-matrix', 'nx-distributed-task']
-    needs: [execute, release]
+    needs: [setup, execute, release]
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
