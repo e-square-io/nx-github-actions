@@ -5,11 +5,8 @@ import { BuildBuilderOptions } from '@nrwl/node/src/utils/types';
 import { writeJsonFile } from '@nrwl/workspace/src/utilities/fileutils';
 import { basename, resolve } from 'path';
 import { createProjectGraph } from '@nrwl/workspace/src/core/project-graph';
-import {
-  AssetGlob,
-  assetGlobsToFiles,
-  copyAssetFiles,
-} from '@nrwl/workspace/src/utilities/assets';
+import { AssetGlob, assetGlobsToFiles, copyAssetFiles } from '@nrwl/workspace/src/utilities/assets';
+import { readFileSync } from 'fs';
 
 const externals = ['typescript'];
 
@@ -22,13 +19,8 @@ export interface GHActionPackageBuilderOptions {
   assets: (string | AssetGlob)[];
 }
 
-function normalizeOptions(
-  opts: GHActionPackageBuilderOptions,
-  context: ExecutorContext
-): BuildBuilderOptions {
-  const projectRoot = resolve(
-    context.workspace.projects[context.projectName].root
-  );
+function normalizeOptions(opts: GHActionPackageBuilderOptions, context: ExecutorContext): BuildBuilderOptions {
+  const projectRoot = resolve(context.workspace.projects[context.projectName].root);
   return {
     ...opts,
     fileReplacements: [],
@@ -42,21 +34,17 @@ function normalizeOptions(
   };
 }
 
-export function generatePackageJson(
-  projectName: string,
-  graph: ProjectGraph,
-  options: BuildBuilderOptions
-) {
+export function generatePackageJson(projectName: string, graph: ProjectGraph, options: BuildBuilderOptions) {
+  const version = JSON.parse(readFileSync(`${options.root!}/package.json`).toString()).version;
   const packageJson = createPackageJson(projectName, graph, options);
   packageJson.main = `./${basename(options.main, '.ts')}.js`;
+  packageJson.version = version;
   delete packageJson.devDependencies;
   writeJsonFile(`${options.outputPath}/package.json`, packageJson);
   logger.info(`Done writing package.json to dist`);
 }
 
-async function runNccCommand(
-  opts: BuildBuilderOptions
-): Promise<{ success: boolean }> {
+async function runNccCommand(opts: BuildBuilderOptions): Promise<{ success: boolean }> {
   const args = [`-o ${opts.outputPath}`];
 
   // set external modules
@@ -91,18 +79,13 @@ async function runNccCommand(
   });
 }
 
-async function* packageExecutor(
-  options: GHActionPackageBuilderOptions,
-  context: ExecutorContext
-) {
+async function* packageExecutor(options: GHActionPackageBuilderOptions, context: ExecutorContext) {
   const opts = normalizeOptions(options, context);
 
   try {
     const promise = runNccCommand(opts);
 
-    await copyAssetFiles(
-      assetGlobsToFiles(opts.assets, opts.root, opts.outputPath)
-    );
+    await copyAssetFiles(assetGlobsToFiles(opts.assets, opts.root, opts.outputPath));
     generatePackageJson(context.projectName, createProjectGraph(), opts);
 
     yield { success: true };

@@ -7,8 +7,7 @@ var __assign =
       function (t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
           s = arguments[i];
-          for (var p in s)
-            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
         }
         return t;
       };
@@ -40,9 +39,7 @@ var __awaiter =
         }
       }
       function step(result) {
-        result.done
-          ? resolve(result.value)
-          : adopt(result.value).then(fulfilled, rejected);
+        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
       }
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
@@ -83,12 +80,7 @@ var __generator =
           if (
             ((f = 1),
             y &&
-              (t =
-                op[0] & 2
-                  ? y['return']
-                  : op[0]
-                  ? y['throw'] || ((t = y['return']) && t.call(y), 0)
-                  : y.next) &&
+              (t = op[0] & 2 ? y['return'] : op[0] ? y['throw'] || ((t = y['return']) && t.call(y), 0) : y.next) &&
               !(t = t.call(y, op[1])).done)
           )
             return t;
@@ -111,10 +103,7 @@ var __generator =
               _.trys.pop();
               continue;
             default:
-              if (
-                !((t = _.trys), (t = t.length > 0 && t[t.length - 1])) &&
-                (op[0] === 6 || op[0] === 2)
-              ) {
+              if (!((t = _.trys), (t = t.length > 0 && t[t.length - 1])) && (op[0] === 6 || op[0] === 2)) {
                 _ = 0;
                 continue;
               }
@@ -155,8 +144,7 @@ var __await =
 var __asyncGenerator =
   (this && this.__asyncGenerator) ||
   function (thisArg, _arguments, generator) {
-    if (!Symbol.asyncIterator)
-      throw new TypeError('Symbol.asyncIterator is not defined.');
+    if (!Symbol.asyncIterator) throw new TypeError('Symbol.asyncIterator is not defined.');
     var g = generator.apply(thisArg, _arguments || []),
       i,
       q = [];
@@ -186,9 +174,7 @@ var __asyncGenerator =
       }
     }
     function step(r) {
-      r.value instanceof __await
-        ? Promise.resolve(r.value.v).then(fulfill, reject)
-        : settle(q[0][2], r);
+      r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
     }
     function fulfill(value) {
       resume('next', value);
@@ -203,11 +189,9 @@ var __asyncGenerator =
 var __spreadArrays =
   (this && this.__spreadArrays) ||
   function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++)
-      s += arguments[i].length;
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
     for (var r = Array(s), k = 0, i = 0; i < il; i++)
-      for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-        r[k] = a[j];
+      for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) r[k] = a[j];
     return r;
   };
 exports.__esModule = true;
@@ -219,18 +203,14 @@ var fileutils_1 = require('@nrwl/workspace/src/utilities/fileutils');
 var path_1 = require('path');
 var project_graph_1 = require('@nrwl/workspace/src/core/project-graph');
 var assets_1 = require('@nrwl/workspace/src/utilities/assets');
+var fs_1 = require('fs');
 var externals = ['typescript'];
 function normalizeOptions(opts, context) {
   var _a;
-  var projectRoot = path_1.resolve(
-    context.workspace.projects[context.projectName].root
-  );
+  var projectRoot = path_1.resolve(context.workspace.projects[context.projectName].root);
   return __assign(__assign({}, opts), {
     fileReplacements: [],
-    assets: __spreadArrays(
-      (_a = opts.assets) !== null && _a !== void 0 ? _a : [],
-      [opts.actionPath]
-    ),
+    assets: __spreadArrays((_a = opts.assets) !== null && _a !== void 0 ? _a : [], [opts.actionPath]),
     root: path_1.resolve(context.root),
     projectRoot: projectRoot,
     sourceRoot: path_1.resolve(projectRoot, 'src'),
@@ -240,12 +220,10 @@ function normalizeOptions(opts, context) {
   });
 }
 function generatePackageJson(projectName, graph, options) {
-  var packageJson = create_package_json_1.createPackageJson(
-    projectName,
-    graph,
-    options
-  );
+  var version = JSON.parse(fs_1.readFileSync(options.root + '/package.json').toString()).version;
+  var packageJson = create_package_json_1.createPackageJson(projectName, graph, options);
   packageJson.main = './' + path_1.basename(options.main, '.ts') + '.js';
+  packageJson.version = version;
   delete packageJson.devDependencies;
   fileutils_1.writeJsonFile(options.outputPath + '/package.json', packageJson);
   devkit_1.logger.info('Done writing package.json to dist');
@@ -269,9 +247,7 @@ function runNccCommand(opts) {
       if (opts.sourceMap) {
         args.push('-s');
       }
-      pack = child_process_1.exec(
-        'npx ncc build ' + opts.main + ' ' + args.join(' ')
-      );
+      pack = child_process_1.exec('npx ncc build ' + opts.main + ' ' + args.join(' '));
       processExitListener = function () {
         return pack.kill();
       };
@@ -311,23 +287,11 @@ function packageExecutor(options, context) {
           promise = runNccCommand(opts);
           return [
             4 /*yield*/,
-            __await(
-              assets_1.copyAssetFiles(
-                assets_1.assetGlobsToFiles(
-                  opts.assets,
-                  opts.root,
-                  opts.outputPath
-                )
-              )
-            ),
+            __await(assets_1.copyAssetFiles(assets_1.assetGlobsToFiles(opts.assets, opts.root, opts.outputPath))),
           ];
         case 2:
           _a.sent();
-          generatePackageJson(
-            context.projectName,
-            project_graph_1.createProjectGraph(),
-            opts
-          );
+          generatePackageJson(context.projectName, project_graph_1.createProjectGraph(), opts);
           return [4 /*yield*/, __await({ success: true })];
         case 3:
           return [4 /*yield*/, _a.sent()];
