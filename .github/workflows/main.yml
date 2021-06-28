@@ -70,6 +70,7 @@ jobs:
         if: ${{ matrix.target == 'build' }}
         uses: ridedott/release-me-action@master
         with:
+          release-branches: '["main"]'
           node-module: true
           dry-run: true
         env:
@@ -127,6 +128,7 @@ jobs:
         id: release
         uses: ridedott/release-me-action@master
         with:
+          release-branches: '["main"]'
           node-module: true
           release-assets: |
             './dist/packages/*'

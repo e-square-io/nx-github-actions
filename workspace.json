@@ -28,7 +28,7 @@
             "main": "packages/nx-affected-matrix/src/index.ts",
             "actionPath": "packages/nx-affected-matrix/action.yml",
             "outputPath": "dist/packages/nx-affected-matrix",
-            "assets": ["README.md", "CHANGELOG.md"]
+            "assets": ["README.md"]
           }
         }
       }
@@ -60,7 +60,7 @@
             "main": "packages/nx-distributed-task/src/index.ts",
             "actionPath": "packages/nx-distributed-task/action.yml",
             "outputPath": "dist/packages/nx-distributed-task",
-            "assets": ["README.md", "CHANGELOG.md"]
+            "assets": ["README.md"]
           }
         }
       }
