@@ -105,29 +105,30 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "::set-output name=token::$TOKEN"
 
-      - id: Publish NX affected matrix
+      - name: Publish NX affected matrix
         if: ${{ contains(needs.setup.outputs.matrix, 'nx-affected-matrix') }}
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ steps.githubAppAuth.outputs.token }}
         with:
-          source-directory: './build/dist/packages/nx-affected-matrix'
+          source-directory: './dist/packages/nx-affected-matrix'
           destination-github-username: 'e-square-io'
           destination-repository-name: 'nx-affected-matrix'
           user-email: github@no-replay.net
           target-branch: main
 
-      - id: Publish NX distributed task
+      - name: Publish NX distributed task
         if: ${{ contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ steps.githubAppAuth.outputs.token }}
         with:
-          source-directory: './build/dist/packages/nx-distributed-task'
+          source-directory: './dist/packages/nx-distributed-task'
           destination-github-username: 'e-square-io'
           destination-repository-name: 'nx-distributed-task'
           user-email: github@no-replay.net
           target-branch: main
+
 
 
 
