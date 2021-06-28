@@ -50,7 +50,6 @@ jobs:
         id: release
         with:
           release-type: node
-          command: github-release
 
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
