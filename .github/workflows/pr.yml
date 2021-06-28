@@ -36,43 +36,10 @@ jobs:
         with:
           targets: 'test,build'
 
-  release:
-    name: Release version
-    runs-on: ubuntu-latest
-    outputs:
-      releaseCreated: ${{ steps.release.outputs.release_created }}
-      major: ${{ steps.release.outputs.major }}
-      minor: ${{ steps.release.outputs.minor }}
-      patch: ${{ steps.release.outputs.patch }}
-      tag: ${{ steps.release.outputs.tag_name }}
-    steps:
-      - uses: GoogleCloudPlatform/release-please-action@v2
-        id: release
-        with:
-          release-type: node
-          command: github-release
-
-      - uses: actions/checkout@v2
-        if: ${{ steps.release.outputs.release_created }}
-
-      - name: tag major and patch versions
-        if: ${{ steps.release.outputs.release_created }}
-        run: |
-          git config user.name e-square-ci
-          git config user.email ci@e-square.io
-          git tag -d v${{ steps.release.outputs.major }} || true
-          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git push origin :v${{ steps.release.outputs.major }} || true
-          git push origin :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git tag -a v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
-          git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
-          git push origin v${{ steps.release.outputs.major }}
-          git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
-
   execute:
     name: ${{ matrix.target }} (${{ matrix.bucket }})
     if: ${{ needs.setup.outputs.hasChanges == 'true' }}
-    needs: [setup, release]
+    needs: [setup]
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.target == 'test' }}
     strategy:
@@ -120,57 +87,3 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           directory: ./coverage/packages/*
-
-  publish:
-    name: Publish actions
-    if: ${{ needs.release.outputs.releaseCreated }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ['nx-affected-matrix', 'nx-distributed-task']
-    needs: [setup, execute, release]
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: build
-
-      - name: Obtain GitHub App Installation Access Token
-        id: githubAppAuth
-        run: |
-          TOKEN="$(npx obtain-github-app-installation-access-token ci ${{ secrets.GH_AUTH_SECRET }})"
-          echo "::add-mask::$TOKEN"
-          echo "::set-output name=token::$TOKEN"
-
-      - name: Publish action ${{ matrix.package }}
-        if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
-        uses: symplify/monorepo-split-github-action@2.0
-        env:
-          GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
-        with:
-          tag: ${{ needs.release.outputs.tag }}
-          package-directory: './dist/packages/${{ matrix.package }}'
-          split-repository-organization: 'e-square-io'
-          split-repository-name: ${{ matrix.package }}
-          user-name: e-square-ci
-          user-email: ci@e-sqiaure.io
-          target-branch: main
-
-      - name: Update major and patch version tags
-        if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
-        env:
-          GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
-        run: |
-          git config user.name e-square-ci
-          git config user.email ci@e-square.io
-          git remote add origin "https://$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
-          git tag -d v${{ steps.release.outputs.major }} || true
-          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git push origin :v${{ steps.release.outputs.major }} || true
-          git push origin :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git tag -a v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
-          git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
-          git push origin v${{ steps.release.outputs.major }}
-          git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
-

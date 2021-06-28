@@ -6,12 +6,12 @@
     "url": "git+https://github.com/e-square-io/nx-github-actions.git"
   },
   "dependencies": {
+    "@actions/cache": "^1.0.7",
     "@actions/artifact": "^0.5.1",
     "@actions/core": "^1.2.7",
-    "@actions/cache": "^1.0.7",
+    "@actions/github": "^5.0.0",
     "@actions/exec": "^1.0.4",
     "@actions/io": "^1.1.0",
-    "@actions/github": "^5.0.0",
     "which": "^2.0.2"
   },
   "main": "./index.js"
