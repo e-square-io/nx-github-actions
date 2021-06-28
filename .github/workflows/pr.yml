@@ -7,8 +7,9 @@ on:
 
 jobs:
   setup:
-    runs-on: ubuntu-latest
     name: Affected Matrix
+    if: !contains(github.event.head_commit.message, 'skip ci')
+    runs-on: ubuntu-latest
     outputs:
       hasChanges: ${{ steps.affected.outputs.hasChanges }}
       matrix: ${{ steps.affected.outputs.matrix }}

@@ -1,24 +1,26 @@
 # NX Github Actions
 
-[![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)](LICENSE)
-[![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)](CONTRIBUTING.md#commit-message-format)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/e-square-io/nx-github-actions/Main%20Workflow?style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/e-square-io/nx-github-actions?logo=codecov&style=flat-square&token=PVPVUJAD1X)](https://app.codecov.io/gh/e-square-io/nx-github-actions)
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](.github/PULL_REQUEST_TEMPLATE.md)
-[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
-
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)](CONTRIBUTING.md#commit-message-format)
+[![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)](LICENSE)
 
 > A set of Github Actions for NX workspaces 
 
 | project | version | description |
 |:-------:|:-------:|:-------:|
-| [@e-square/nx-affected-matrix] | [![GitHub Marketplace][monorepo-version-badge]][nx-affected-matrix-link] | Uses NX's affected utils to calculate the changes.  Outputs a matrix of the distributed tasks |
-| [@e-square/nx-distributed-task] | [![GitHub Marketplace][monorepo-version-badge]][nx-distributed-task-link] | Execute each distributed task from the matrix generated from nx-affected-matrix action |
+| [@e-square/nx-affected-matrix] | [![GitHub Marketplace][nx-affected-matrix-badge]][nx-affected-matrix-link] | Uses NX's affected utils to calculate the changes.  Outputs a matrix of the distributed tasks |
+| [@e-square/nx-distributed-task] | [![GitHub Marketplace][nx-distributed-task-badge]][nx-distributed-task-link] | Execute each distributed task from the matrix generated from nx-affected-matrix action |
 
-[monorepo-version-badge]: https://img.shields.io/github/package-json/v/e-square-io/nx-github-actions?color=light-green&label=Marketplace&logo=github&style=flat-square
-[@e-square/nx-affected-matrix]: https://github.com/e-square-io/nx-github-actions/tree/main/packages/nx-affected-matrix
+[@e-square/nx-affected-matrix]: https://github.com/e-square-io/nx-affected-matrix
 [nx-affected-matrix-link]: https://github.com/marketplace/actions/nx-affected-matrix
-[@e-square/nx-distributed-task]: https://github.com/e-square-io/nx-github-actions/tree/main/packages/nx-distributed-task
+[nx-affected-matrix-badge]: https://img.shields.io/github/package-json/v/e-square-io/nx-affected-matrix?label=Marketplace&logo=github&style=flat-square
+[@e-square/nx-distributed-task]: https://github.com/e-square-io/nx-distributed-task
 [nx-distributed-task-link]: https://github.com/marketplace/actions/nx-distributed-task
+[nx-distributed-task-badge]: https://img.shields.io/github/package-json/v/e-square-io/nx-affected-matrix?label=Marketplace&logo=github&style=flat-square
 
 ## Features
 
