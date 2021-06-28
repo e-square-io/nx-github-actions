@@ -51,7 +51,6 @@ jobs:
         with:
           release-type: node
           command: github-release
-          default-branch: feature/tests
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
       - name: tag major and patch versions
@@ -128,7 +127,7 @@ jobs:
       fail-fast: false
       matrix:
         package: ['nx-affected-matrix', 'nx-distributed-task']
-    needs: [release]
+    needs: [execute, release]
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
