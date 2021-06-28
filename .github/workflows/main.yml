@@ -14,12 +14,6 @@ jobs:
       hasChanges: ${{ steps.affected.outputs.hasChanges }}
       matrix: ${{ steps.affected.outputs.matrix }}
     steps:
-      - name: Obtain GitHub App Installation Access Token
-        id: githubAppAuth
-        run: |
-          TOKEN="$(npx obtain-github-app-installation-access-token ci ${{ secrets.GH_AUTH_SECRET }})"
-          echo "GLOBAL_GITHUB_TOKEN=$TOKEN" >> $GITHUB_ENV
-
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -123,6 +117,13 @@ jobs:
       minor: ${{ steps.release.outputs.minor }}
       patch: ${{ steps.release.outputs.patch }}
     steps:
+      - name: Obtain GitHub App Installation Access Token
+        id: githubAppAuth
+        run: |
+          TOKEN="$(npx obtain-github-app-installation-access-token ci ${{ secrets.GH_AUTH_SECRET }})"
+          echo "::add-mask::$TOKEN"
+          echo "::set-output name=token::$TOKEN"
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -141,7 +142,7 @@ jobs:
             './dist/packages/*'
             './CHANGELOG.md'
         env:
-          GITHUB_TOKEN: ${{ env.GLOBAL_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish:
@@ -154,6 +155,13 @@ jobs:
         package: ['nx-affected-matrix', 'nx-distributed-task']
     needs: [setup, execute, release]
     steps:
+      - name: Obtain GitHub App Installation Access Token
+        id: githubAppAuth
+        run: |
+          TOKEN="$(npx obtain-github-app-installation-access-token ci ${{ secrets.GH_AUTH_SECRET }})"
+          echo "::add-mask::$TOKEN"
+          echo "::set-output name=token::$TOKEN"
+
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
@@ -163,7 +171,7 @@ jobs:
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
         uses: symplify/monorepo-split-github-action@2.0
         env:
-          GITHUB_TOKEN: ${{ env.GLOBAL_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
         with:
           tag: v${{ needs.release.outputs.version }}
           package-directory: './dist/packages/${{ matrix.package }}'
@@ -176,7 +184,7 @@ jobs:
       - name: Update major and patch version tags
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
         env:
-          GITHUB_TOKEN: ${{ env.GLOBAL_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
         run: |
           git config user.name e-square-ci
           git config user.email ci@e-square.io
