@@ -16282,7 +16282,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(6819), exports);
+__exportStar(__nccwpck_require__(2289), exports);
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -16316,7 +16316,7 @@ exports._globalThis = typeof globalThis === 'object' ? globalThis : global;
 
 /***/ }),
 
-/***/ 6819:
+/***/ 2289:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -48571,7 +48571,7 @@ function range(a, b, str) {
 
 var register = __nccwpck_require__(4670)
 var addHook = __nccwpck_require__(5549)
-var removeHook = __nccwpck_require__(4726)
+var removeHook = __nccwpck_require__(6819)
 
 // bind with array of arguments: https://stackoverflow.com/a/21792913
 var bind = Function.bind
@@ -48717,7 +48717,7 @@ function register(state, name, method, options) {
 
 /***/ }),
 
-/***/ 4726:
+/***/ 6819:
 /***/ ((module) => {
 
 module.exports = removeHook;
@@ -66359,12 +66359,14 @@ function uploadArtifact(name, paths) {
             return;
         const globPaths = paths.map((path) => `${path}/*`).join('\n');
         debug(`🐞 Upload paths: ${globPaths}`);
-        const glob = yield createGlob(globPaths);
-        const client = create();
-        const files = yield glob.glob();
+        const files = yield globClient(globPaths).then((glob) => glob.glob());
         debug(`🐞 Found ${files.length} files to upload`);
+        if (!files.length) {
+            info(`❕ Couldn't find files to upload in ${paths.join(', ')}`);
+            return;
+        }
         try {
-            const { failedItems, artifactName, size } = yield client.uploadArtifact(name, files, process.cwd());
+            const { failedItems, artifactName, size } = yield artifactClient().uploadArtifact(name, files, process.cwd());
             debug(`🐞 name: ${artifactName}, size: ${size}, failedItems: ${failedItems.join(', ')}`);
             info(`✅ Successfully uploaded ${artifactName}`);
             return artifactName;
@@ -66375,9 +66377,12 @@ function uploadArtifact(name, paths) {
     });
 }
 
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/@actions/cache/lib/cache.js
 var cache = __nccwpck_require__(7799);
 ;// CONCATENATED MODULE: ./packages/utils/src/lib/cache.ts
+
 
 
 
@@ -66393,17 +66398,32 @@ function getCacheKeys(target, bucket) {
     // setting target and bucket
     keyParts.push(target, bucket);
     debug(`🐞 key so far: ${keyParts.join('-')}`);
+    if (context.eventName === 'pull_request') {
+        keyParts.push(context.payload.pull_request.number.toString());
+        debug(`🐞 key so far: ${keyParts.join('-')}`);
+    }
     const restoreKeys = [
         keyParts.slice(0, -1).join('-'),
         keyParts.slice(0, -2).join('-'),
+        keyParts.slice(0, -3).join('-'),
     ];
     return [keyParts.join('-'), restoreKeys];
 }
 function restoreNxCache(primaryKey, restoreKeys) {
     return __awaiter(this, void 0, void 0, function* () {
         debug(`🐞 Restoring NX cache from ${primaryKey}`);
-        const hitKey = yield restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
-        info(`✅ Cache hit: ${hitKey}`);
+        try {
+            const hitKey = yield restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
+            if (hitKey) {
+                info(`✅ Cache hit: ${hitKey}`);
+            }
+            else {
+                info(`❕ Cache miss`);
+            }
+        }
+        catch (e) {
+            warning(e);
+        }
     });
 }
 function saveNxCache(primaryKey) {
@@ -66414,8 +66434,7 @@ function saveNxCache(primaryKey) {
             info(`✅ Successfully saved cache to ${primaryKey}`);
         }
         catch (err) {
-            // don't throw an error if cache already exists, which may happen due to
-            // race conditions
+            // don't throw an error if cache already exists, which may happen due to concurrency
             if (err instanceof ReserveCacheError) {
                 warning(err);
                 return;
@@ -66458,9 +66477,7 @@ class Exec {
         this.options = {};
         return (args, options) => modules_awaiter(this, void 0, void 0, function* () {
             let stdout = '', stderr = '';
-            const finalArgs = [...coercedArgs, ...(args !== null && args !== void 0 ? args : [])]
-                .filter((arg) => arg.length > 0)
-                .map((arg) => arg.trim());
+            const finalArgs = [...coercedArgs, ...(args !== null && args !== void 0 ? args : [])].filter((arg) => arg.length > 0).map((arg) => arg.trim());
             const finalOpts = Object.assign(Object.assign(Object.assign({}, coercedOptions), options), { listeners: {
                     stdout: (data) => (stdout += data.toString()),
                     stderr: (data) => (stderr += data.toString()),
@@ -66499,8 +66516,8 @@ var external_path_ = __nccwpck_require__(5622);
 
 
 class GHTree {
-    constructor() {
-        this.root = process.cwd();
+    constructor(root) {
+        this.root = root !== null && root !== void 0 ? root : process.cwd();
     }
     children(dirPath) {
         if ((0,external_fs_.statSync)((0,external_path_.resolve)(this.root, dirPath)).isDirectory()) {
@@ -66534,8 +66551,6 @@ class GHTree {
 }
 const fs_tree = new GHTree();
 
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/which/which.js
 var which = __nccwpck_require__(4207);
 ;// CONCATENATED MODULE: ./packages/utils/src/lib/nx.ts
@@ -66546,9 +66561,7 @@ var which = __nccwpck_require__(4207);
 
 const NX_BIN_PATH = 'node_modules/.bin/nx';
 function getWorkspaceProjects() {
-    const workspaceFile = tree.exists('angular.json')
-        ? 'angular.json'
-        : 'workspace.json';
+    const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
     debug(`🐞 Found ${workspaceFile} as nx workspace`);
     const workspaceContent = JSON.parse(tree
         .read(workspaceFile)
@@ -66561,11 +66574,15 @@ function getProjectOutputs(projects, project, target) {
     const projectTarget = projects[project].targets[target];
     let outputs = (_a = projectTarget.outputs) !== null && _a !== void 0 ? _a : [];
     const replaceExpressions = (path) => {
-        var _a, _b;
+        var _a, _b, _c;
         if (!path.includes('{') || !path.includes('}'))
             return path;
         const [scope, prop] = path.replace(/[{}]/g, '').split('.');
-        return (_b = (_a = projectTarget === null || projectTarget === void 0 ? void 0 : projectTarget[scope]) === null || _a === void 0 ? void 0 : _a[prop]) !== null && _b !== void 0 ? _b : '';
+        if (!((_a = projectTarget === null || projectTarget === void 0 ? void 0 : projectTarget[scope]) === null || _a === void 0 ? void 0 : _a[prop])) {
+            warning(new Error(`Couldn't find output value for ${project}. full path: project.${project}.targets.${target}.${scope}.${prop}`));
+            return '';
+        }
+        return (_c = (_b = projectTarget === null || projectTarget === void 0 ? void 0 : projectTarget[scope]) === null || _b === void 0 ? void 0 : _b[prop]) !== null && _c !== void 0 ? _c : '';
     };
     outputs = outputs.map(replaceExpressions);
     debug(`🐞 Found ${outputs} as outputs for ${target}`);
@@ -66593,9 +66610,7 @@ function nxCommand(command, target, exec, args) {
 }
 function nxPrintAffected(target, exec) {
     return modules_awaiter(this, void 0, void 0, function* () {
-        const projects = (yield nxCommand('print-affected', target, exec, [
-            '--select=tasks.target.project',
-        ])).trim();
+        const projects = (yield nxCommand('print-affected', target, exec, ['--select=tasks.target.project'])).trim();
         (0,core.debug)(`🐞 Affected project for ${target}: ${projects}`);
         return projects.split(', ');
     });
@@ -66633,15 +66648,12 @@ function retrieveGitBoundaries(exec) {
         (0,core.startGroup)('🔀 Setting Git boundaries');
         if (github.context.eventName === 'pull_request') {
             const prPayload = github.context.payload.pull_request;
-            boundaries.push(prPayload.base.sha, prPayload.head.sha);
+            boundaries.push(prPayload.base.sha.toString(), prPayload.head.sha.toString());
         }
         else {
             const wrapper = exec.withCommand('git rev-parse').build();
             try {
-                boundaries.push(...(yield Promise.all([
-                    retrieveGitSHA(wrapper, 'HEAD~1'),
-                    retrieveGitSHA(wrapper, 'HEAD'),
-                ])));
+                boundaries.push(...(yield Promise.all([retrieveGitSHA(wrapper, 'HEAD~1'), retrieveGitSHA(wrapper, 'HEAD')])));
             }
             catch (e) {
                 (0,core.setFailed)(e);

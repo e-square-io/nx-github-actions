@@ -1,12 +1,10 @@
+import { context } from '@actions/github';
 import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
 import { debug, group, info, warning } from '@actions/core';
 
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
-export function getCacheKeys(
-  target: string,
-  bucket: number
-): [primary: string, restoreKeys: string[]] {
+export function getCacheKeys(target: string, bucket: number): [primary: string, restoreKeys: string[]] {
   const keyParts = [];
   keyParts.push(`${process.platform}-${process.arch}`);
   debug(`🐞 key so far: ${keyParts.join('-')}`);
@@ -20,22 +18,33 @@ export function getCacheKeys(
   keyParts.push(target, bucket);
   debug(`🐞 key so far: ${keyParts.join('-')}`);
 
+  if (context.eventName === 'pull_request') {
+    keyParts.push(context.payload.pull_request.number.toString());
+    debug(`🐞 key so far: ${keyParts.join('-')}`);
+  }
+
   const restoreKeys = [
     keyParts.slice(0, -1).join('-'),
     keyParts.slice(0, -2).join('-'),
+    keyParts.slice(0, -3).join('-'),
   ];
 
   return [keyParts.join('-'), restoreKeys];
 }
 
-export async function restoreNxCache(
-  primaryKey: string,
-  restoreKeys: string[]
-): Promise<void> {
+export async function restoreNxCache(primaryKey: string, restoreKeys: string[]): Promise<void> {
   debug(`🐞 Restoring NX cache from ${primaryKey}`);
 
-  const hitKey = await restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
-  info(`✅ Cache hit: ${hitKey}`);
+  try {
+    const hitKey = await restoreCache([NX_CACHE_PATH], primaryKey, restoreKeys);
+    if (hitKey) {
+      info(`✅ Cache hit: ${hitKey}`);
+    } else {
+      info(`❕ Cache miss`);
+    }
+  } catch (e) {
+    warning(e);
+  }
 }
 
 export async function saveNxCache(primaryKey: string): Promise<void> {
@@ -46,8 +55,7 @@ export async function saveNxCache(primaryKey: string): Promise<void> {
 
     info(`✅ Successfully saved cache to ${primaryKey}`);
   } catch (err) {
-    // don't throw an error if cache already exists, which may happen due to
-    // race conditions
+    // don't throw an error if cache already exists, which may happen due to concurrency
     if (err instanceof ReserveCacheError) {
       warning(err);
       return;
@@ -57,14 +65,12 @@ export async function saveNxCache(primaryKey: string): Promise<void> {
   }
 }
 
-export async function withCache(
-  target: string,
-  bucket: number,
-  cb: () => Promise<unknown>
-): Promise<void> {
+export async function withCache(target: string, bucket: number, cb: () => Promise<unknown>): Promise<void> {
   const cacheParams = getCacheKeys(target, bucket);
 
   await group('🚀 Retrieving NX cache', () => restoreNxCache(...cacheParams));
+
   await cb();
+
   await group('✅ Saving NX cache', () => saveNxCache(cacheParams[0]));
 }

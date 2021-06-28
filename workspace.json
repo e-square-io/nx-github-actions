@@ -17,7 +17,8 @@
           "outputs": ["coverage/packages/nx-affected-matrix"],
           "options": {
             "jestConfig": "packages/nx-affected-matrix/jest.config.js",
-            "passWithNoTests": true
+            "passWithNoTests": true,
+            "codeCoverage": true
           }
         },
         "build": {
@@ -27,7 +28,7 @@
             "main": "packages/nx-affected-matrix/src/index.ts",
             "actionPath": "packages/nx-affected-matrix/action.yml",
             "outputPath": "dist/packages/nx-affected-matrix",
-            "assets": ["packages/nx-affected-matrix/*.md"]
+            "assets": ["README.md"]
           }
         }
       }
@@ -48,7 +49,8 @@
           "outputs": ["coverage/packages/nx-distributed-task"],
           "options": {
             "jestConfig": "packages/nx-distributed-task/jest.config.js",
-            "passWithNoTests": true
+            "passWithNoTests": true,
+            "codeCoverage": true
           }
         },
         "build": {
@@ -58,7 +60,7 @@
             "main": "packages/nx-distributed-task/src/index.ts",
             "actionPath": "packages/nx-distributed-task/action.yml",
             "outputPath": "dist/packages/nx-distributed-task",
-            "assets": ["packages/nx-distributed-task/*.md"]
+            "assets": ["README.md"]
           }
         }
       }
@@ -79,7 +81,8 @@
           "outputs": ["coverage/packages/utils"],
           "options": {
             "jestConfig": "packages/utils/jest.config.js",
-            "passWithNoTests": true
+            "passWithNoTests": true,
+            "codeCoverage": true
           }
         }
       }

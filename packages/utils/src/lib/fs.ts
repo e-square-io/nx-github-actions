@@ -1,19 +1,13 @@
 import { Tree } from '@nrwl/devkit';
 import { cp, rmRF } from '@actions/io';
-import {
-  existsSync,
-  readdirSync,
-  readFileSync,
-  statSync,
-  writeFileSync,
-} from 'fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 export class GHTree implements Tree {
-  root: string;
+  readonly root: string;
 
-  constructor() {
-    this.root = process.cwd();
+  constructor(root?: string) {
+    this.root = root ?? process.cwd();
   }
 
   children(dirPath: string): string[] {

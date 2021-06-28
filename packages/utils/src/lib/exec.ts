@@ -1,10 +1,7 @@
 import { exec, ExecOptions } from '@actions/exec';
 import { debug, setFailed } from '@actions/core';
 
-export type ExecWrapper = (
-  args?: string[],
-  options?: ExecOptions
-) => Promise<string>;
+export type ExecWrapper = (args?: string[], options?: ExecOptions) => Promise<string>;
 
 export class Exec {
   private command = '';
@@ -27,9 +24,7 @@ export class Exec {
     return async (args?: string[], options?: ExecOptions) => {
       let stdout = '',
         stderr = '';
-      const finalArgs = [...coercedArgs, ...(args ?? [])]
-        .filter((arg) => arg.length > 0)
-        .map((arg) => arg.trim());
+      const finalArgs = [...coercedArgs, ...(args ?? [])].filter((arg) => arg.length > 0).map((arg) => arg.trim());
       const finalOpts = {
         ...coercedOptions,
         ...options,
@@ -39,11 +34,7 @@ export class Exec {
         },
       };
 
-      debug(
-        `🐞 Running command ${command} - args: ${finalArgs.join(
-          ' '
-        )}", options: ${finalOpts}`
-      );
+      debug(`🐞 Running command ${command} - args: ${finalArgs.join(' ')}", options: ${finalOpts}`);
 
       return exec(command, finalArgs, finalOpts).then((code) => {
         if (code !== 0) setFailed(stderr);
