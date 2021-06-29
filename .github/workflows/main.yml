@@ -216,6 +216,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
         run: |
+          git config --global hub.protocol https
+          git config user.name e-square-ci
+          git config user.email ci@e-square.io
           git remote rm origin
           git remote add origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
           git fetch
