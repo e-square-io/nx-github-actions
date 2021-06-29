@@ -1,3 +1,9 @@
+## [1.0.22](https://github.com/e-square-io/nx-github-actions/compare/v1.0.21...v1.0.22) (2021-06-29)
+
+### Bug Fixes
+
+- **utils:** rename resolved outputs ([da8cb00](https://github.com/e-square-io/nx-github-actions/commit/da8cb00d67f983cbf3962fea6de6247c153e19ea))
+
 ## [1.0.21](https://github.com/e-square-io/nx-github-actions/compare/v1.0.20...v1.0.21) (2021-06-29)
 
 ### Bug Fixes
