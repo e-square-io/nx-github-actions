@@ -229,4 +229,5 @@ jobs:
           git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
           git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
           git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
-          git push -f --tags
+          git push origin -f refs/tags/v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
+          git push origin -f refs/tags/v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
