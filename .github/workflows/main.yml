@@ -169,8 +169,20 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Set git config
-        run: git config --global hub.protocol https
+      - name: Update git tags
+        run: |
+          git config --global hub.protocol https
+          git config user.name e-square-ci
+          git config user.email ci@e-square.io
+          git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
+          git remote set-url --push origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
+          git tag -d v${{ needs.release.outputs.major }} || true
+          git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git -f origin --delete v${{ needs.release.outputs.major }} || true
+          git -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
+          git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
+          git push -f --follow-tags
 
       - name: Obtain GitHub App Installation Access Token
         id: githubAppAuth
@@ -202,15 +214,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
         run: |
-          git config user.name e-square-ci
-          git config user.email ci@e-square.io
           git remote rm origin
           git remote add origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
           git fetch
           git config main.remote origin
           git config main.merge refs/heads/main
-          git pull origin main --rebase --allow-unrelated-histories
+          git reset --hard origin/main
+          git tag -d v${{ needs.release.outputs.major }} || true
+          git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
           git push -f origin --delete v${{ needs.release.outputs.major }} || true
           git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git push -f --tags origin main v${{ needs.release.outputs.major }}
-          git push -f --tags origin main v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
+          git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
+          git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
+          git push -f --follow-tags
