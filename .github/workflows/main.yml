@@ -96,6 +96,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setup, execute]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
@@ -121,6 +126,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Obtain GitHub App Installation Access Token
         id: githubAppAuth
@@ -161,6 +167,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Set git config
         run: git config --global hub.protocol https
@@ -198,8 +205,9 @@ jobs:
           git config user.name e-square-ci
           git config user.email ci@e-square.io
           git remote add upstream "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
+          git fetch --unshallow origin
           git fetch --unshallow upstream
-          git push upstream :v${{ needs.release.outputs.major }} || true
-          git push upstream :v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git push upstream v${{ needs.release.outputs.major }}
-          git push upstream v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
+          git push upstream --delete v${{ needs.release.outputs.major }} || true
+          git push upstream --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git push --tags upstream main v${{ needs.release.outputs.major }}
+          git push --tags upstream main v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
