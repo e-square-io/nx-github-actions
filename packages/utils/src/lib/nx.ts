@@ -59,6 +59,7 @@ export function getProjectOutputs(projects: WorkspaceProjects, project: string, 
 export async function assertNxInstalled() {
   try {
     debug(`🐞 Checking existence of nx`);
+
     await which(NX_BIN_PATH);
   } catch {
     throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
