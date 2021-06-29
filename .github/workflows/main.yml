@@ -147,11 +147,28 @@ jobs:
           release-branches: '["main"]'
           node-module: true
           release-assets: |
-            './dist/packages/*'
+            './dist/packages'
             './CHANGELOG.md'
         env:
           GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Update git tags
+        run: |
+          git config --global hub.protocol https
+          git config user.name e-square-ci
+          git config user.email ci@e-square.io
+          git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
+          git remote set-url --push origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
+          git tag -d v${{ needs.release.outputs.major }} || true
+          git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git push -f origin --delete v${{ needs.release.outputs.major }} || true
+          git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
+          git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
+          git push -f --tags
+        env:
+          GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
 
   publish:
     name: Publish actions
@@ -168,21 +185,6 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-
-      - name: Update git tags
-        run: |
-          git config --global hub.protocol https
-          git config user.name e-square-ci
-          git config user.email ci@e-square.io
-          git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
-          git remote set-url --push origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
-          git tag -d v${{ needs.release.outputs.major }} || true
-          git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git push -f origin --delete v${{ needs.release.outputs.major }} || true
-          git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
-          git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
-          git push -f --tags
 
       - name: Obtain GitHub App Installation Access Token
         id: githubAppAuth
