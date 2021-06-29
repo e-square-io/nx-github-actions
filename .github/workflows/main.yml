@@ -178,11 +178,11 @@ jobs:
           git remote set-url --push origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
           git tag -d v${{ needs.release.outputs.major }} || true
           git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git -f origin --delete v${{ needs.release.outputs.major }} || true
-          git -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git push -f origin --delete v${{ needs.release.outputs.major }} || true
+          git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
           git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
           git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
-          git push -f --follow-tags
+          git push -f --tags
 
       - name: Obtain GitHub App Installation Access Token
         id: githubAppAuth
@@ -226,4 +226,4 @@ jobs:
           git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
           git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
           git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
-          git push -f --follow-tags
+          git push -f --tags
