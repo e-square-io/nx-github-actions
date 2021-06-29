@@ -8,7 +8,7 @@ on:
 jobs:
   setup:
     name: Affected Matrix
-    if: ${{ !contains(github.event.head_commit.message, 'skip ci') || !contains(github.event.head_commit.message, 'chore(release)') }}
+    if: ${{ !contains(github.event.head_commit.message, 'skip ci') && !contains(github.event.head_commit.message, 'chore(release)') }}
     runs-on: ubuntu-latest
     outputs:
       hasChanges: ${{ steps.affected.outputs.hasChanges }}
@@ -117,17 +117,17 @@ jobs:
       minor: ${{ steps.release.outputs.minor }}
       patch: ${{ steps.release.outputs.patch }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
       - name: Obtain GitHub App Installation Access Token
         id: githubAppAuth
         run: |
           TOKEN="$(npx obtain-github-app-installation-access-token ci ${{ secrets.GH_AUTH_SECRET }})"
           echo "::add-mask::$TOKEN"
           echo "::set-output name=token::$TOKEN"
-
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          persist-credentials: false
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
@@ -157,6 +157,11 @@ jobs:
         package: ['nx-affected-matrix', 'nx-distributed-task']
     needs: [setup, execute, release]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
       - name: Obtain GitHub App Installation Access Token
         id: githubAppAuth
         run: |
@@ -181,7 +186,6 @@ jobs:
           split-repository-name: ${{ matrix.package }}
           user-name: e-square-ci
           user-email: ci@e-sqiaure.io
-          target-branch: main
 
       - name: Update major and patch version tags
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
@@ -190,7 +194,8 @@ jobs:
         run: |
           git config user.name e-square-ci
           git config user.email ci@e-square.io
-          git remote add origin "https://$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
+          git remote set-url origin "https://github.com/e-square-io/${{ matrix.package }}.git"
+          git remote set-url --push origin "https://github.com/e-square-io/${{ matrix.package }}.git"
           git tag -d v${{ steps.release.outputs.major }} || true
           git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
           git push origin :v${{ steps.release.outputs.major }} || true
