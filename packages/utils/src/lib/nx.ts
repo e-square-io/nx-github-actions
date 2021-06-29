@@ -78,6 +78,7 @@ export async function nxCommand(command: string, target: string, exec: Exec, arg
 
 export async function nxPrintAffected(target: string, exec: Exec): Promise<string[]> {
   const projects = (await nxCommand('print-affected', target, exec, ['--select=tasks.target.project'])).trim();
+
   debug(`🐞 Affected project for ${target}: ${projects}`);
 
   return projects.split(', ');
