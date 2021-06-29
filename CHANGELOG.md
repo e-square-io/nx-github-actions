@@ -1,3 +1,10 @@
+## [1.0.18](https://github.com/e-square-io/nx-github-actions/compare/v1.0.17...v1.0.18) (2021-06-29)
+
+### Bug Fixes
+
+- **utils:** add line break ([fda4c20](https://github.com/e-square-io/nx-github-actions/commit/fda4c2052e3122484ca80448dfd90218346d753e))
+- **utils:** remove line break ([157ea79](https://github.com/e-square-io/nx-github-actions/commit/157ea790beede63b98a06e43594941f16a9457fd))
+
 ## [1.0.17](https://github.com/e-square-io/nx-github-actions/compare/v1.0.16...v1.0.17) (2021-06-29)
 
 ### Bug Fixes
