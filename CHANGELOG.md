@@ -1,3 +1,9 @@
+## [1.0.15](https://github.com/e-square-io/nx-github-actions/compare/v1.0.14...v1.0.15) (2021-06-29)
+
+### Bug Fixes
+
+- **utils:** remove line break ([cbb9921](https://github.com/e-square-io/nx-github-actions/commit/cbb99211ef032700a9b8172ba39f1a8b35c2d9cc))
+
 ## [1.0.14](https://github.com/e-square-io/nx-github-actions/compare/v1.0.13...v1.0.14) (2021-06-29)
 
 ### Bug Fixes
