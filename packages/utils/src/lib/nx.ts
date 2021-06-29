@@ -17,6 +17,7 @@ export type WorkspaceProjects = WorkspaceJsonConfiguration['projects'];
 
 export function getWorkspaceProjects(): WorkspaceProjects {
   const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
+
   debug(`🐞 Found ${workspaceFile} as nx workspace`);
 
   const workspaceContent: WorkspaceJsonConfiguration = JSON.parse(

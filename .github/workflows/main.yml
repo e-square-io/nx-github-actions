@@ -209,7 +209,7 @@ jobs:
           git fetch
           git config main.remote origin
           git config main.merge refs/heads/main
-          git pull origin main --allow-unrelated-histories
+          git pull origin main --rebase --allow-unrelated-histories
           git push -f origin --delete v${{ needs.release.outputs.major }} || true
           git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
           git push -f --tags origin main v${{ needs.release.outputs.major }}
