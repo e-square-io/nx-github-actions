@@ -54,10 +54,13 @@ jobs:
       # install node modules, cache etc
 
       - name: Calculate affected projects
-        uses: e-square-io/nx-github-actions/dist/packages/nx-affected-matrix@v1
+        uses: e-square-io/nx-affected-matrix@v1
         id: affected
         with:
-          targets: 'test,build'
+          targets: 'test,build' # Comma-delimited targets to run, required
+          maxParallel: 3 # Maximum jobs distribution for target's affected projects, optional, default is 3
+          workingDirectory: '' # Path to the Nx workspace, needed if not the repository root, optional
+          args: '' # Space-delimited args to add to nx command execution, optional
 
   execute:
     name: ${{ matrix.target }} (${{ matrix.bucket }})
@@ -72,12 +75,15 @@ jobs:
       # Checkout, cache, install node modules
 
       - name: Execute
-        uses: e-square-io/nx-github-actions/dist/packages/nx-distributed-task@v1
+        uses: e-square-io/nx-distributed-task@v1
         id: execute
         with:
-          target: ${{ matrix.target }}
-          bucket: ${{ matrix.bucket }}
-          projects: ${{ matrix.projects }}
+          target: ${{ matrix.target }} # Target to run, required
+          bucket: ${{ matrix.bucket }} # Current bucket run, required
+          projects: ${{ matrix.projects }} # Projects to run against target, required
+          uploadOutputs: true # Should upload target's outputs from all distributed jobs, optional, default is true
+          nxCloud: false # Enable support of Nx Cloud, will skip github cache usage, optional
+          args: '' # Space-delimited args to add to nx command execution, optional
 ```
 
 ## FAQ

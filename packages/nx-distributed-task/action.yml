@@ -23,9 +23,6 @@ inputs:
   nxCloud:
     description: 'Enable support of Nx Cloud'
     required: false
-outputs:
-  artifactName:
-    description: 'The name of the generated artifact'
 runs:
   using: 'node12'
   main: 'index.js'

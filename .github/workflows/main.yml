@@ -32,7 +32,7 @@ jobs:
         run: npm ci --cache .npm
 
       - name: Calculate affected
-        uses: ./dist/packages/nx-affected-matrix
+        uses: e-square-io/nx-affected-matrix@v1
         id: affected
         with:
           targets: 'test,build'
@@ -83,7 +83,7 @@ jobs:
         run: npm version --no-git-tag-version ${{ steps.release.outputs.version }}
 
       - name: Execute target
-        uses: ./dist/packages/nx-distributed-task
+        uses: e-square-io/nx-distributed-task@v1
         id: run
         with:
           nxCloud: true

@@ -11,9 +11,6 @@ inputs:
   args:
     description: 'space-delimited args to add to nx command execution'
     required: false
-  nxCloud:
-    description: 'Enable support of Nx Cloud'
-    required: false
   maxParallel:
     description: "Maximum jobs distribution for target's affected projects"
     required: false

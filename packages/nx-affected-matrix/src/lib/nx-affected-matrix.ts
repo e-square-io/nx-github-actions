@@ -1,19 +1,6 @@
 import { Inputs } from './inputs';
-import {
-  getInput,
-  info,
-  setFailed,
-  startGroup,
-  endGroup,
-  setOutput,
-  debug,
-} from '@actions/core';
-import {
-  Exec,
-  retrieveGitBoundaries,
-  nxPrintAffected,
-  assertNxInstalled,
-} from '../../../utils/src';
+import { getInput, info, setFailed, startGroup, endGroup, setOutput, debug } from '@actions/core';
+import { Exec, retrieveGitBoundaries, nxPrintAffected, assertNxInstalled } from '../../../utils/src';
 
 interface NxAffectedMatrix {
   include: { target: string; bucket: number; projects: string }[];
@@ -82,14 +69,11 @@ async function main(): Promise<void> {
     targets: getInput('targets', { required: true })
       .split(',')
       .filter((target) => target.length > 0),
-    maxParallel: isNaN(parseInt(getInput('maxParallel')))
-      ? 3
-      : parseInt(getInput('maxParallel')),
+    maxParallel: isNaN(parseInt(getInput('maxParallel'))) ? 3 : parseInt(getInput('maxParallel')),
     workingDirectory: getInput('workingDirectory'),
     args: getInput('args')
       .split(' ')
       .filter((arg) => arg.length > 0),
-    nxCloud: getInput('nxCloud') === 'true',
   };
 
   if (inputs.workingDirectory && inputs.workingDirectory.length > 0) {
@@ -104,10 +88,7 @@ async function main(): Promise<void> {
     const matrix = await generateAffectedMatrix(inputs, exec);
 
     setOutput('matrix', matrix);
-    setOutput(
-      'hasChanges',
-      !!matrix.include.find((target) => target.projects.length)
-    );
+    setOutput('hasChanges', !!matrix.include.find((target) => target.projects.length));
   } catch (e) {
     setFailed(e);
   }

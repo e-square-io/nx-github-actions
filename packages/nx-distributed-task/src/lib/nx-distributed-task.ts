@@ -1,11 +1,4 @@
-import {
-  endGroup,
-  getInput,
-  info,
-  setFailed,
-  setOutput,
-  startGroup,
-} from '@actions/core';
+import { endGroup, getInput, info, setFailed, setOutput, startGroup } from '@actions/core';
 import { Inputs } from './inputs';
 import {
   assertNxInstalled,
@@ -25,15 +18,9 @@ async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
   const artifactName = inputs.target;
 
   await Promise.all(
-    inputs.projects.map((project) =>
-      uploadArtifact(
-        artifactName,
-        getProjectOutputs(projects, project, inputs.target)
-      )
-    )
+    inputs.projects.map((project) => uploadArtifact(artifactName, getProjectOutputs(projects, project, inputs.target)))
   );
 
-  setOutput('artifactName', artifactName);
   endGroup();
 }
 
@@ -52,9 +39,7 @@ async function main(): Promise<void> {
     projects: getInput('projects', { required: true })
       .split(',')
       .filter((arg) => arg.length > 0),
-    maxParallel: isNaN(parseInt(getInput('maxParallel')))
-      ? 3
-      : parseInt(getInput('maxParallel')),
+    maxParallel: isNaN(parseInt(getInput('maxParallel'))) ? 3 : parseInt(getInput('maxParallel')),
     args: getInput('args')
       .split(' ')
       .filter((arg) => arg.length > 0),
