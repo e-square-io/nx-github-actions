@@ -197,14 +197,9 @@ jobs:
         run: |
           git config user.name e-square-ci
           git config user.email ci@e-square.io
-          git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
-          git remote set-url --push origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
-          git fetch --unshallow origin
-          git tag -d v${{ needs.release.outputs.major }} || true
-          git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git push origin :v${{ needs.release.outputs.major }} || true
-          git push origin :v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git tag -a v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
-          git tag -a v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
-          git push origin v${{ needs.release.outputs.major }}
-          git push origin v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
+          git remote add upstream "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
+          git fetch --unshallow upstream
+          git push upstream :v${{ needs.release.outputs.major }} || true
+          git push upstream :v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git push upstream v${{ needs.release.outputs.major }}
+          git push upstream v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
