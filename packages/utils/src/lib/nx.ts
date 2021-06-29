@@ -31,6 +31,7 @@ export function getWorkspaceProjects(): WorkspaceProjects {
 
 export function getProjectOutputs(projects: WorkspaceProjects, project: string, target: string): string[] {
   const projectTarget = projects[project].targets[target];
+
   let outputs = projectTarget.outputs ?? [];
 
   const replaceExpressions = (path: string) => {
