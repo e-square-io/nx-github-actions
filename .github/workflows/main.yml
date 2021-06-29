@@ -162,6 +162,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Set git config
+        run: git config --global hub.protocol https
+
       - name: Obtain GitHub App Installation Access Token
         id: githubAppAuth
         run: |
@@ -194,9 +197,9 @@ jobs:
         run: |
           git config user.name e-square-ci
           git config user.email ci@e-square.io
-          git config --global hub.protocol https
           git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
           git remote set-url --push origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
+          git fetch --unshallow origin
           git tag -d v${{ needs.release.outputs.major }} || true
           git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
           git push origin :v${{ needs.release.outputs.major }} || true
