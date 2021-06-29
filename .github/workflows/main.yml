@@ -178,11 +178,11 @@ jobs:
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
         uses: symplify/monorepo-split-github-action@2.0
         env:
-          GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
+          GITHUB_TOKEN: '${{ steps.githubAppAuth.outputs.token }}:x-oauth-basic'
         with:
           tag: v${{ needs.release.outputs.version }}
           package-directory: './dist/packages/${{ matrix.package }}'
-          split-repository-organization: 'e-square-io'
+          split-repository-organization: e-square-io
           split-repository-name: ${{ matrix.package }}
           user-name: e-square-ci
           user-email: ci@e-sqiaure.io
@@ -194,13 +194,14 @@ jobs:
         run: |
           git config user.name e-square-ci
           git config user.email ci@e-square.io
-          git remote set-url origin "https://github.com/e-square-io/${{ matrix.package }}.git"
-          git remote set-url --push origin "https://github.com/e-square-io/${{ matrix.package }}.git"
-          git tag -d v${{ steps.release.outputs.major }} || true
-          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git push origin :v${{ steps.release.outputs.major }} || true
-          git push origin :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git tag -a v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
-          git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
-          git push origin v${{ steps.release.outputs.major }}
-          git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
+          git config --global hub.protocol https
+          git remote set-url origin "https://$GITHUB_TOKEN:x-oauth-basic@github.com/e-square-io/${{ matrix.package }}.git"
+          git remote set-url --push origin "https://$GITHUB_TOKEN:x-oauth-basic@github.com/e-square-io/${{ matrix.package }}.git"
+          git tag -d v${{ needs.release.outputs.major }} || true
+          git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git push origin :v${{ needs.release.outputs.major }} || true
+          git push origin :v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
+          git tag -a v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
+          git tag -a v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
+          git push origin v${{ needs.release.outputs.major }}
+          git push origin v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
