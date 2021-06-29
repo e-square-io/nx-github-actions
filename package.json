@@ -1,6 +1,6 @@
 {
   "name": "@e-square/nx-github-actions",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "license": "MIT",
   "scripts": {
     "nx": "nx",
