@@ -31,7 +31,7 @@ export function getWorkspaceProjects(): WorkspaceProjects {
 
 export function getProjectOutputs(projects: WorkspaceProjects, project: string, target: string): string[] {
   const projectTarget = projects[project].targets[target];
-  let outputs = projectTarget.outputs ?? [];
+  const outputs = projectTarget.outputs ?? [];
 
   const replaceExpressions = (path: string) => {
     if (!path.includes('{') || !path.includes('}')) return path;
@@ -50,10 +50,10 @@ export function getProjectOutputs(projects: WorkspaceProjects, project: string, 
     return projectTarget?.[scope]?.[prop] ?? '';
   };
 
-  outputs = outputs.map(replaceExpressions);
-  debug(`🐞 Found ${outputs} as outputs for ${target}`);
+  const resolvedOutputs = outputs.map(replaceExpressions);
+  debug(`🐞 Found ${resolvedOutputs} as outputs for ${target}`);
 
-  return outputs;
+  return resolvedOutputs;
 }
 
 export async function assertNxInstalled() {
