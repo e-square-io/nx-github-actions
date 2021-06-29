@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/e-square-io/nx-github-actions/compare/v1.0.22...v1.1.0) (2021-06-29)
+
+### Features
+
+- update actions inputs and outputs ([c1e14d5](https://github.com/e-square-io/nx-github-actions/commit/c1e14d5198b0d61e06e1dbcfeed8021ac456b624))
+
 ## [1.0.22](https://github.com/e-square-io/nx-github-actions/compare/v1.0.21...v1.0.22) (2021-06-29)
 
 ### Bug Fixes
