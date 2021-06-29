@@ -52,7 +52,6 @@ export function getProjectOutputs(projects: WorkspaceProjects, project: string, 
   };
 
   outputs = outputs.map(replaceExpressions);
-
   debug(`🐞 Found ${outputs} as outputs for ${target}`);
 
   return outputs;

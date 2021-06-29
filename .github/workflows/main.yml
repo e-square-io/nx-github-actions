@@ -146,9 +146,6 @@ jobs:
         with:
           release-branches: '["main"]'
           node-module: true
-          release-assets: |
-            './dist/packages'
-            './CHANGELOG.md'
         env:
           GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -221,7 +218,8 @@ jobs:
           git config user.email ci@e-square.io
           git remote rm origin
           git remote add origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
-          git fetch
+          git fetch -f
+          git fetch --tags -f
           git config main.remote origin
           git config main.merge refs/heads/main
           git reset --hard origin/main
