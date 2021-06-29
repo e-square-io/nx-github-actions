@@ -205,7 +205,6 @@ jobs:
           git config user.name e-square-ci
           git config user.email ci@e-square.io
           git remote add upstream "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/${{ matrix.package }}.git"
-          git fetch --unshallow origin
           git fetch --unshallow upstream
           git push upstream --delete v${{ needs.release.outputs.major }} || true
           git push upstream --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
