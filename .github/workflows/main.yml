@@ -7,7 +7,7 @@ on:
 
 jobs:
   setup:
-    name: Affected Matrix
+    name: Setup
     if: ${{ !contains(github.event.head_commit.message, 'skip ci') && !contains(github.event.head_commit.message, 'chore(release)') }}
     runs-on: ubuntu-latest
     outputs:
@@ -32,7 +32,7 @@ jobs:
         run: npm ci --cache .npm
 
       - name: Calculate affected
-        uses: ./dist/packages/nx-affected-matrix
+        uses: e-square-io/nx-affected-matrix@v1
         id: affected
         with:
           targets: 'test,build'
@@ -160,12 +160,12 @@ jobs:
           git config user.email ci@e-square.io
           git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
           git remote set-url --push origin "https://x-access-token:$GITHUB_TOKEN@github.com/e-square-io/nx-github-actions.git"
-          git tag -d v${{ needs.release.outputs.major }} || true
-          git tag -d v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git push -f origin --delete v${{ needs.release.outputs.major }} || true
-          git push -f origin --delete v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} || true
-          git tag -fa v${{ needs.release.outputs.major }} -m "Release v${{ needs.release.outputs.major }}"
-          git tag -fa v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }} -m "Release v${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}"
+          git tag -d v${{ steps.release.outputs.major }} || true
+          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git push -f origin --delete v${{ steps.release.outputs.major }} || true
+          git push -f origin --delete v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git tag -fa v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
+          git tag -fa v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
           git push -f --tags
         env:
           GITHUB_TOKEN: ${{ steps.githubAppAuth.outputs.token }}
