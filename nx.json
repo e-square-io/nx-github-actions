@@ -21,19 +21,17 @@
       }
     }
   },
-  "projects": {
-    "nx-affected-matrix": {
-      "tags": []
-    },
-    "nx-distributed-task": {
-      "tags": []
-    },
-    "utils": {
-      "tags": []
-    }
-  },
+  "projects": {},
   "workspaceLayout": {
     "appsDir": "packages",
     "libsDir": "packages"
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
   }
 }

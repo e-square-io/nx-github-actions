@@ -1,0 +1,33 @@
+{
+  "root": "packages/nx-affected-matrix",
+  "sourceRoot": "packages/nx-affected-matrix/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["packages/nx-affected-matrix/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/nx-affected-matrix"],
+      "options": {
+        "jestConfig": "packages/nx-affected-matrix/jest.config.js",
+        "passWithNoTests": true,
+        "codeCoverage": true
+      }
+    },
+    "build": {
+      "executor": "./tools/executors/package:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "main": "packages/nx-affected-matrix/src/index.ts",
+        "actionPath": "packages/nx-affected-matrix/action.yml",
+        "outputPath": "dist/packages/nx-affected-matrix",
+        "assets": ["README.md"]
+      }
+    }
+  },
+  "tags": []
+}

@@ -5,21 +5,21 @@ import { context } from '@actions/github';
 
 describe('git', () => {
   let exec: Exec;
-  let buildSpy: jasmine.Spy;
+  let buildSpy: jest.SpyInstance;
   let execWrapper: jest.Mock;
 
   beforeEach(() => {
     exec = new Exec();
     execWrapper = jest.fn().mockReturnValue(Promise.resolve(''));
-    buildSpy = spyOn(exec, 'build').and.returnValue(execWrapper);
-    spyOn(exec, 'withCommand').and.callThrough();
-    spyOn(exec, 'withArgs').and.callThrough();
-    spyOn(exec, 'withOptions').and.callThrough();
+    buildSpy = jest.spyOn(exec, 'build').mockReturnValue(execWrapper);
+    jest.spyOn(exec, 'withCommand');
+    jest.spyOn(exec, 'withArgs');
+    jest.spyOn(exec, 'withOptions');
   });
 
   describe('retrieveGitSHA', () => {
     it('should get SHA', async () => {
-      buildSpy.and.callThrough();
+      buildSpy.mockRestore();
       await expect(retrieveGitSHA(exec.withCommand('git rev-parse').build(), 'HEAD')).resolves.toBeDefined();
     });
 

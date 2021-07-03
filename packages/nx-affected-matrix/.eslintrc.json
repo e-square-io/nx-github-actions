@@ -4,9 +4,6 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
-      "parserOptions": {
-        "project": ["packages/nx-affected-matrix/tsconfig.*?.json"]
-      },
       "rules": {}
     },
     {

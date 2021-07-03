@@ -33,8 +33,10 @@ export class GHTree implements Tree {
     return [];
   }
 
-  read(filePath: string): Buffer | null {
-    return readFileSync(resolve(this.root, filePath));
+  read(filePath: string): Buffer | null;
+  read(filePath: string, encoding: BufferEncoding): string | null;
+  read(filePath: string, encoding?: BufferEncoding): string | Buffer | null {
+    return readFileSync(resolve(this.root, filePath), { encoding });
   }
 
   async rename(from: string, to: string): Promise<void> {

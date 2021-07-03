@@ -2,7 +2,7 @@ import { context } from '@actions/github';
 import { Exec } from './exec';
 import * as which from 'which';
 import { debug, warning } from '@actions/core';
-import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import type { ProjectConfiguration } from '@nrwl/devkit';
 import { tree } from './fs';
 
 export const NX_BIN_PATH = 'node_modules/.bin/nx';
@@ -13,7 +13,11 @@ export interface BaseInputs {
   args?: string[];
 }
 
-export type WorkspaceProjects = WorkspaceJsonConfiguration['projects'];
+export interface WorkspaceJsonConfiguration {
+  projects: Record<string, ProjectConfiguration | string>;
+}
+
+export type WorkspaceProjects = Record<string, ProjectConfiguration>;
 
 export function getWorkspaceProjects(): WorkspaceProjects {
   const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
@@ -26,7 +30,24 @@ export function getWorkspaceProjects(): WorkspaceProjects {
       .replace(/architect/g, 'targets')
   );
 
-  return workspaceContent.projects;
+  const projectKeys = Object.keys(workspaceContent.projects || {});
+  const projects: WorkspaceProjects = {};
+
+  for (const key of projectKeys) {
+    const project = workspaceContent.projects[key];
+    if (typeof project === 'string') {
+      projects[key] = JSON.parse(
+        tree
+          .read(`${project}/project.json`)
+          .toString()
+          .replace(/architect/g, 'targets')
+      );
+    } else {
+      projects[key] = project;
+    }
+  }
+
+  return projects;
 }
 
 export function getProjectOutputs(projects: WorkspaceProjects, project: string, target: string): string[] {

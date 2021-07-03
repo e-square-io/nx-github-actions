@@ -1,4 +1,4 @@
-import { workspaceMock } from '../../__mocks__/fs';
+import { workspaceMock, mergedWorkspaceMock } from './__mocks__/fs';
 
 jest.mock('./fs');
 
@@ -29,9 +29,6 @@ describe('nx', () => {
   });
 
   describe('getWorkspaceProjects', () => {
-    (tree.exists as jest.Mock).mockReturnValue(true);
-    (tree.read as jest.Mock).mockReturnValue(JSON.stringify(workspaceMock));
-
     it('should get workspace from angular.json or workspace.json', () => {
       getWorkspaceProjects();
       expect(tree.read).toHaveBeenCalledWith('angular.json');
@@ -41,9 +38,9 @@ describe('nx', () => {
       expect(tree.read).toHaveBeenCalledWith('workspace.json');
     });
 
-    it('should get projects from workspace configurations', () => {
+    it('should get projects from workspace configuration', () => {
       const projects = getWorkspaceProjects();
-      expect(projects).toEqual(workspaceMock.projects);
+      expect(projects).toEqual(mergedWorkspaceMock.projects);
     });
 
     it('should replace architect with targets', () => {
@@ -59,13 +56,13 @@ describe('nx', () => {
       (tree.read as jest.Mock).mockReturnValueOnce(JSON.stringify(angularWorkspace));
 
       const projects = getWorkspaceProjects();
-      expect(projects).toEqual(jasmine.objectContaining(workspaceMock.projects));
+      expect(projects).toEqual(expect.objectContaining(mergedWorkspaceMock.projects));
     });
   });
 
   describe('getProjectOutputs', () => {
     it('should parse project outputs with options ref', () => {
-      expect(getProjectOutputs(workspaceMock.projects, 'test', 'build')).toEqual([
+      expect(getProjectOutputs(mergedWorkspaceMock.projects, 'test', 'build')).toEqual([
         workspaceMock.projects.test.targets.build.options.outputPath,
       ]);
     });
@@ -74,7 +71,7 @@ describe('nx', () => {
       const org = workspaceMock.projects.test.targets.build.outputs;
       workspaceMock.projects.test.targets.build.outputs = ['should not be parsed'];
 
-      expect(getProjectOutputs(workspaceMock.projects, 'test', 'build')).toEqual(['should not be parsed']);
+      expect(getProjectOutputs(mergedWorkspaceMock.projects, 'test', 'build')).toEqual(['should not be parsed']);
 
       workspaceMock.projects.test.targets.build.outputs = org;
     });
@@ -83,7 +80,7 @@ describe('nx', () => {
       const org = workspaceMock.projects.test.targets.build.options.outputPath;
       delete workspaceMock.projects.test.targets.build.options.outputPath;
 
-      expect(getProjectOutputs(workspaceMock.projects, 'test', 'build')).toEqual(['']);
+      expect(getProjectOutputs(mergedWorkspaceMock.projects, 'test', 'build')).toEqual(['']);
 
       workspaceMock.projects.test.targets.build.options.outputPath = org;
     });
@@ -94,10 +91,10 @@ describe('nx', () => {
 
     beforeEach(() => {
       exec = new Exec();
-      spyOn(exec, 'build').and.returnValue(() => Promise.resolve(''));
-      spyOn(exec, 'withCommand').and.callThrough();
-      spyOn(exec, 'withArgs').and.callThrough();
-      spyOn(exec, 'withOptions').and.callThrough();
+      jest.spyOn(exec, 'build').mockReturnValue(() => Promise.resolve(''));
+      jest.spyOn(exec, 'withCommand');
+      jest.spyOn(exec, 'withArgs');
+      jest.spyOn(exec, 'withOptions');
     });
 
     it('should call nxCommand', async () => {
@@ -117,8 +114,8 @@ describe('nx', () => {
       expect(exec.withCommand).toHaveBeenCalledWith(`${NX_BIN_PATH} run-many`);
       expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--scan', '--parallel', '--maxParallel=3');
       expect(exec.withOptions).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          env: jasmine.objectContaining({
+        expect.objectContaining({
+          env: expect.objectContaining({
             NX_BRANCH: '0',
             NX_RUN_GROUP: '0',
           }),

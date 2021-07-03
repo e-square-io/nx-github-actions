@@ -1,0 +1,33 @@
+{
+  "root": "packages/nx-distributed-task",
+  "sourceRoot": "packages/nx-distributed-task/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["packages/nx-distributed-task/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/nx-distributed-task"],
+      "options": {
+        "jestConfig": "packages/nx-distributed-task/jest.config.js",
+        "passWithNoTests": true,
+        "codeCoverage": true
+      }
+    },
+    "build": {
+      "executor": "./tools/executors/package:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "main": "packages/nx-distributed-task/src/index.ts",
+        "actionPath": "packages/nx-distributed-task/action.yml",
+        "outputPath": "dist/packages/nx-distributed-task",
+        "assets": ["README.md"]
+      }
+    }
+  },
+  "tags": []
+}
