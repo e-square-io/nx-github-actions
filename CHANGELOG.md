@@ -1,3 +1,17 @@
+# [1.2.0](https://github.com/e-square-io/nx-github-actions/compare/v1.1.1...v1.2.0) (2021-07-03)
+
+### Chores
+
+- remove dist from git [skip ci] ([227a3e1](https://github.com/e-square-io/nx-github-actions/commit/227a3e181ff313688b3959f3fc1d6f83f51b0c2e))
+
+### Continuous Integration
+
+- add code scanning workflow [skip ci] ([ffc9069](https://github.com/e-square-io/nx-github-actions/commit/ffc9069e331a96d0a3d0889b16f626ef6e919c95))
+
+### Features
+
+- **utils:** support workspace config per project ([7b5a174](https://github.com/e-square-io/nx-github-actions/commit/7b5a174345fde686da7da7316c5193b95af39903))
+
 ## [1.1.1](https://github.com/e-square-io/nx-github-actions/compare/v1.1.0...v1.1.1) (2021-06-29)
 
 ### Bug Fixes
