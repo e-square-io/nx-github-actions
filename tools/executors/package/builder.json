@@ -1,9 +1,0 @@
-{
-  "builders": {
-    "package": {
-      "implementation": "./index",
-      "schema": "./schema.json",
-      "description": "Package github action"
-    }
-  }
-}

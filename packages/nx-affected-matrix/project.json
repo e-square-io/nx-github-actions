@@ -19,13 +19,20 @@
       }
     },
     "build": {
-      "executor": "./tools/executors/package:package",
+      "executor": "@e-square/nx-ncc:build",
       "outputs": ["{options.outputPath}"],
       "options": {
         "main": "packages/nx-affected-matrix/src/index.ts",
-        "actionPath": "packages/nx-affected-matrix/action.yml",
+        "tsConfig": "packages/nx-affected-matrix/tsconfig.lib.json",
         "outputPath": "dist/packages/nx-affected-matrix",
-        "assets": ["README.md"]
+        "assets": [
+          "README.md",
+          {
+            "input": "packages/nx-affected-matrix",
+            "glob": "action.yml",
+            "output": "."
+          }
+        ]
       }
     }
   },

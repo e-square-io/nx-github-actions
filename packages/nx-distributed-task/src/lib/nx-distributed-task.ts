@@ -1,4 +1,4 @@
-import { endGroup, getInput, info, setFailed, setOutput, startGroup } from '@actions/core';
+import { endGroup, getInput, info, setFailed, startGroup } from '@actions/core';
 import { Inputs } from './inputs';
 import {
   assertNxInstalled,
