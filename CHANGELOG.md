@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/e-square-io/nx-github-actions/compare/v1.2.0...v1.3.0) (2021-07-11)
+
+### Features
+
+- extract ncc builder to its own package ([cc444bd](https://github.com/e-square-io/nx-github-actions/commit/cc444bdbc69bc0031686077ad373424918477955))
+
 # [1.2.0](https://github.com/e-square-io/nx-github-actions/compare/v1.1.1...v1.2.0) (2021-07-03)
 
 ### Chores
