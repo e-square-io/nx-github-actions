@@ -20,6 +20,7 @@ describe('nxDistributedTask', () => {
     const env = {
       INPUT_TARGET: 'test',
       INPUT_BUCKET: '1',
+      INPUT_NXCLOUD: 'false',
       INPUT_PROJECTS: 'project1,project2',
     };
 
