@@ -1,6 +1,6 @@
-import type { BaseInputs } from '../../../utils/src/lib/nx';
+import type { BaseInputsWithParallel } from '../../../utils/src/lib/nx';
 
-export interface Inputs extends BaseInputs {
+export interface Inputs extends BaseInputsWithParallel {
   target: string;
   bucket: number;
   projects: string[];

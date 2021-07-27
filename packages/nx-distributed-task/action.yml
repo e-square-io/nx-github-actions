@@ -13,6 +13,10 @@ inputs:
   projects:
     description: "Projects to run against target"
     required: true
+  maxParallel:
+    description: "Maximum NX cli parallel runs"
+    required: false
+    default: '3'
   uploadOutputs:
     description: "Should upload target's outputs from all distributed jobs"
     required: false

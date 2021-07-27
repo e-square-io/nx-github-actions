@@ -3,7 +3,9 @@ import { Inputs } from './inputs';
 import {
   assertNxInstalled,
   Exec,
+  getMaxDistribution,
   getProjectOutputs,
+  getStringArrayInput,
   getWorkspaceProjects,
   nxRunMany,
   uploadArtifact,
@@ -32,19 +34,17 @@ async function runNxTask(inputs: Inputs): Promise<void> {
   endGroup();
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
+  const target = getInput('target', { required: true });
+
   const inputs: Inputs = {
-    target: getInput('target', { required: true }),
+    target,
     bucket: parseInt(getInput('bucket', { required: true })),
-    projects: getInput('projects', { required: true })
-      .split(',')
-      .filter((arg) => arg.length > 0),
-    maxParallel: isNaN(parseInt(getInput('maxParallel'))) ? 3 : parseInt(getInput('maxParallel')),
-    args: getInput('args')
-      .split(' ')
-      .filter((arg) => arg.length > 0),
+    projects: getStringArrayInput('projects', ',', { required: true }),
+    maxParallel: getMaxDistribution(target, 'maxParallel')[target],
+    args: getStringArrayInput('args'),
     nxCloud: getInput('nxCloud') === 'true',
-    uploadOutputs: getInput('uploadOutputs') === 'true',
+    uploadOutputs: getInput('uploadOutputs') === '' || getInput('uploadOutputs') === 'true',
   };
 
   if (inputs.projects.length === 0) {
@@ -67,5 +67,3 @@ async function main(): Promise<void> {
     setFailed(e);
   }
 }
-
-void main();

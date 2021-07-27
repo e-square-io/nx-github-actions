@@ -11,8 +11,13 @@ inputs:
   args:
     description: 'space-delimited args to add to nx command execution'
     required: false
+  maxDistribution:
+    description: "Maximum distribution of jobs per target"
+    required: false
+    default: '3'
   maxParallel:
-    description: "Maximum jobs distribution for target's affected projects"
+    description: "Maximum distribution of jobs per target"
+    deprecationMessage: "Deprecated. Use maxDistribution instead"
     required: false
     default: '3'
   workingDirectory:

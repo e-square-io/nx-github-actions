@@ -1,23 +1,62 @@
 import { context } from '@actions/github';
 import { Exec } from './exec';
 import * as which from 'which';
-import { debug, warning } from '@actions/core';
+import { debug, getInput, InputOptions, warning } from '@actions/core';
 import type { ProjectConfiguration } from '@nrwl/devkit';
 import { tree } from './fs';
 
 export const NX_BIN_PATH = 'node_modules/.bin/nx';
 
 export interface BaseInputs {
-  maxParallel: number;
   nxCloud?: boolean;
   args?: string[];
 }
+
+export type BaseInputsWithParallel = { maxParallel: number } & BaseInputs;
 
 export interface WorkspaceJsonConfiguration {
   projects: Record<string, ProjectConfiguration | string>;
 }
 
 export type WorkspaceProjects = Record<string, ProjectConfiguration>;
+
+export function getStringArrayInput(name: string, separator = ' ', options?: InputOptions): string[] {
+  return getInput(name, options)
+    .split(separator)
+    .filter((value) => value.length > 0);
+}
+
+export function getMaxDistribution(targets: string | string[], name?: string): Record<string, number> {
+  const value = name ? getInput(name) : getInput('maxDistribution') || getInput('maxParallel');
+  const coercedTargets = [].concat(targets);
+  const maybeNumberValue = parseInt(value);
+
+  const reduceTargetsDistribution = (source: number | number[] | Record<string, number>) =>
+    coercedTargets.reduce((acc, curr, idx) => {
+      let targetVal = typeof source === 'object' ? (Array.isArray(source) ? source[idx] : source[curr]) : source;
+      if (targetVal === null || targetVal === undefined || isNaN(targetVal) || targetVal <= 0) {
+        warning(
+          new Error(
+            `Received invalid value for ${name} input: '${targetVal}' for target '${curr}', using the default instead`
+          )
+        );
+        targetVal = 3;
+      }
+
+      return { ...acc, [curr]: targetVal };
+    }, {});
+
+  if (isNaN(maybeNumberValue)) {
+    // maybe an object, parse JSON
+    try {
+      return reduceTargetsDistribution(JSON.parse(value));
+    } catch {
+      warning(new Error(`Couldn't parse '${value}' as a valid JSON object, using default value for ${name}`));
+    }
+  }
+
+  return reduceTargetsDistribution(maybeNumberValue);
+}
 
 export function getWorkspaceProjects(): WorkspaceProjects {
   const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
@@ -103,7 +142,7 @@ export async function nxPrintAffected(target: string, exec: Exec): Promise<strin
   return projects.split(', ');
 }
 
-export async function nxRunMany(target: string, inputs: BaseInputs, exec: Exec): Promise<string> {
+export async function nxRunMany(target: string, inputs: BaseInputsWithParallel, exec: Exec): Promise<string> {
   const args = inputs.args ?? [];
 
   if (inputs.nxCloud) {
@@ -118,7 +157,7 @@ export async function nxRunMany(target: string, inputs: BaseInputs, exec: Exec):
     exec.withOptions({ env: { ...process.env, ...env } });
   }
 
-  args.push('--parallel', `--maxParallel=${inputs.maxParallel}`);
+  args.push('--parallel', `--maxParallel=${inputs.maxParallel || 3}`);
 
   return nxCommand('run-many', target, exec, args);
 }
