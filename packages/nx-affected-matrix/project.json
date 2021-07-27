@@ -24,6 +24,7 @@
       "options": {
         "main": "packages/nx-affected-matrix/src/index.ts",
         "tsConfig": "packages/nx-affected-matrix/tsconfig.lib.json",
+        "generatePackageJson": true,
         "outputPath": "dist/packages/nx-affected-matrix",
         "assets": [
           "README.md",

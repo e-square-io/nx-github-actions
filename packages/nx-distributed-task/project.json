@@ -25,6 +25,7 @@
         "main": "packages/nx-distributed-task/src/index.ts",
         "tsConfig": "packages/nx-distributed-task/tsconfig.lib.json",
         "outputPath": "dist/packages/nx-distributed-task",
+        "generatePackageJson": true,
         "assets": [
           "README.md",
           {
