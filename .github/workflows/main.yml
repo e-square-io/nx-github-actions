@@ -32,13 +32,14 @@ jobs:
         run: npm ci --cache .npm
 
       - name: Calculate affected
-        uses: e-square-io/nx-affected-matrix@v1
+        uses: e-square-io/nx-affected-matrix@v2
         id: affected
         with:
           targets: 'test,build'
+          maxDistribution: '1'
 
   execute:
-    name: ${{ matrix.target }} (${{ matrix.bucket }})
+    name: ${{ matrix.target }} (${{ matrix.distribution }})
     if: ${{ needs.setup.outputs.hasChanges }}
     needs: [setup]
     runs-on: ubuntu-latest
@@ -80,15 +81,20 @@ jobs:
 
       - name: Update package.json version
         if: ${{ matrix.target == 'build' && steps.release.outputs.released }}
-        run: npm version --no-git-tag-version ${{ steps.release.outputs.version }}
+        run: |
+          for path in ./packages/*; do
+            if [[ -f "$path/package.json" ]]; then
+              (cd $path && npm version --no-git-tag-version ${{ steps.release.outputs.version }})
+            fi
+          done
 
       - name: Execute target
-        uses: e-square-io/nx-distributed-task@v1
+        uses: e-square-io/nx-distributed-task@v2
         id: run
         with:
           nxCloud: true
           target: ${{ matrix.target }}
-          bucket: ${{ matrix.bucket }}
+          distribution: ${{ matrix.distribution }}
           projects: ${{ matrix.projects }}
 
   coverage:
@@ -134,11 +140,6 @@ jobs:
           TOKEN="$(npx obtain-github-app-installation-access-token ci ${{ secrets.GH_AUTH_SECRET }})"
           echo "::add-mask::$TOKEN"
           echo "::set-output name=token::$TOKEN"
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: build
 
       - name: Run semantic-release
         id: release
