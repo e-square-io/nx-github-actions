@@ -24,12 +24,17 @@
       "options": {
         "main": "packages/nx-affected-matrix/src/index.ts",
         "tsConfig": "packages/nx-affected-matrix/tsconfig.lib.json",
+        "generatePackageJson": true,
         "outputPath": "dist/packages/nx-affected-matrix",
         "assets": [
-          "README.md",
           {
             "input": "packages/nx-affected-matrix",
             "glob": "action.yml",
+            "output": "."
+          },
+          {
+            "input": "packages/nx-affected-matrix",
+            "glob": "README.md",
             "output": "."
           }
         ]

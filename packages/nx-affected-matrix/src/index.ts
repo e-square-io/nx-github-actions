@@ -1,1 +1,3 @@
-import './lib/nx-affected-matrix';
+import { main } from './lib/nx-affected-matrix';
+
+void main();

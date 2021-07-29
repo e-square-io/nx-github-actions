@@ -4,30 +4,34 @@ import { debug, group, info, warning } from '@actions/core';
 
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
-export function getCacheKeys(target: string, bucket: number): [primary: string, restoreKeys: string[]] {
+export function getCacheKeys(target: string, distribution: number): [primary: string, restoreKeys: string[]] {
   const keyParts = [];
+  const restoreKeys = [];
+
+  const addRestoreKey = () => restoreKeys.unshift(keyParts.join('-'));
+
   keyParts.push(`${process.platform}-${process.arch}`);
-  debug(`🐞 key so far: ${keyParts.join('-')}`);
 
   // setting cache limit to 1 month
   const now = new Date();
   keyParts.push(now.getFullYear().toString(), (now.getMonth() + 1).toString());
-  debug(`🐞 key so far: ${keyParts.join('-')}`);
+  addRestoreKey();
 
-  // setting target and bucket
-  keyParts.push(target, bucket);
-  debug(`🐞 key so far: ${keyParts.join('-')}`);
+  // setting target and distribution
+  keyParts.push(`${target}`);
 
-  if (context.eventName === 'pull_request') {
-    keyParts.push(context.payload.pull_request.number.toString());
-    debug(`🐞 key so far: ${keyParts.join('-')}`);
+  if (distribution) {
+    addRestoreKey();
+    keyParts.push(distribution);
   }
 
-  const restoreKeys = [
-    keyParts.slice(0, -1).join('-'),
-    keyParts.slice(0, -2).join('-'),
-    keyParts.slice(0, -3).join('-'),
-  ];
+  if (context.eventName === 'pull_request') {
+    addRestoreKey();
+    keyParts.push(context.payload.pull_request.number.toString());
+  }
+
+  debug(`🐞 primary key is: ${keyParts.join('-')}`);
+  debug(`🐞 restore keys are: ${restoreKeys.join(' | ')}`);
 
   return [keyParts.join('-'), restoreKeys];
 }
@@ -66,12 +70,12 @@ export async function saveNxCache(primaryKey: string): Promise<void> {
   }
 }
 
-export async function withCache(target: string, bucket: number, cb: () => Promise<unknown>): Promise<void> {
-  const cacheParams = getCacheKeys(target, bucket);
+export async function withCache(target: string, distribution: number, cb: () => Promise<unknown>): Promise<void> {
+  const [primary, restoreKeys] = getCacheKeys(target, distribution);
 
-  await group('🚀 Retrieving NX cache', () => restoreNxCache(...cacheParams));
+  await group('🚀 Retrieving NX cache', () => restoreNxCache(primary, restoreKeys));
 
   await cb();
 
-  await group('✅ Saving NX cache', () => saveNxCache(cacheParams[0]));
+  await group('✅ Saving NX cache', () => saveNxCache(primary));
 }

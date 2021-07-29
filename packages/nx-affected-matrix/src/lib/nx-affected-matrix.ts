@@ -1,12 +1,19 @@
 import { Inputs } from './inputs';
-import { getInput, info, setFailed, startGroup, endGroup, setOutput, debug } from '@actions/core';
-import { Exec, retrieveGitBoundaries, nxPrintAffected, assertNxInstalled } from '../../../utils/src';
+import { info, setFailed, startGroup, endGroup, setOutput, debug, getInput } from '@actions/core';
+import {
+  Exec,
+  retrieveGitBoundaries,
+  nxPrintAffected,
+  assertNxInstalled,
+  getStringArrayInput,
+  getMaxDistribution,
+} from '../../../utils/src';
 
 interface NxAffectedMatrix {
-  include: { target: string; bucket: number; projects: string }[];
+  include: { target: string; distribution: number; projects: string }[];
 }
 
-function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
+export function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
   if (numberOfChunks < 2) return [arr];
 
   const len = arr.length;
@@ -29,8 +36,8 @@ function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
   return result;
 }
 
-async function generateAffectedMatrix(
-  { targets, maxParallel, args = [] }: Inputs,
+export async function generateAffectedMatrix(
+  { targets, maxDistribution, args = [] }: Inputs,
   exec: Exec
 ): Promise<NxAffectedMatrix> {
   startGroup(`⚙️ Generating affected matrix for ${targets}`);
@@ -44,7 +51,7 @@ async function generateAffectedMatrix(
     exec.withArgs(`--base=${base}`, `--head=${head}`, ...args);
     debug(`🐞 Calculating affected for "${target}" target`);
     const projects = await nxPrintAffected(target, exec);
-    const affectedTargets = chunkify(projects, maxParallel)
+    const affectedTargets = chunkify(projects, maxDistribution[target])
       .map((projects, idx) => ({
         target,
         bucket: idx + 1,
@@ -64,16 +71,14 @@ async function generateAffectedMatrix(
   return matrix;
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
+  const targets = getStringArrayInput('targets', ',');
+
   const inputs: Inputs = {
-    targets: getInput('targets', { required: true })
-      .split(',')
-      .filter((target) => target.length > 0),
-    maxParallel: isNaN(parseInt(getInput('maxParallel'))) ? 3 : parseInt(getInput('maxParallel')),
+    targets,
+    maxDistribution: getMaxDistribution(targets),
     workingDirectory: getInput('workingDirectory'),
-    args: getInput('args')
-      .split(' ')
-      .filter((arg) => arg.length > 0),
+    args: getStringArrayInput('args'),
   };
 
   if (inputs.workingDirectory && inputs.workingDirectory.length > 0) {
@@ -93,5 +98,3 @@ async function main(): Promise<void> {
     setFailed(e);
   }
 }
-
-void main();

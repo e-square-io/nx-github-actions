@@ -1,10 +1,16 @@
 import { workspaceMock, mergedWorkspaceMock } from './__mocks__/fs';
 
 jest.mock('./fs');
+jest.mock('@actions/core', () => ({
+  ...jest.requireActual('@actions/core'),
+  getInput: jest.fn(),
+}));
 
 import {
   assertNxInstalled,
+  getMaxDistribution,
   getProjectOutputs,
+  getStringArrayInput,
   getWorkspaceProjects,
   NX_BIN_PATH,
   nxCommand,
@@ -14,6 +20,7 @@ import {
 import * as which from 'which';
 import { tree } from './fs';
 import { Exec } from './exec';
+import { getInput } from '@actions/core';
 
 describe('nx', () => {
   describe('assertNxInstalled', () => {
@@ -25,6 +32,32 @@ describe('nx', () => {
     it('should success assertion', async () => {
       (which as jest.Mock).mockReturnValueOnce(Promise.resolve());
       await expect(assertNxInstalled()).resolves.toBeUndefined();
+    });
+  });
+
+  describe('getStringArrayInput', () => {
+    beforeEach(() => {
+      (getInput as jest.Mock).mockReturnValue('test1,test2,test3');
+    });
+
+    it('should return an array of strings from a string input', () => {
+      expect(getStringArrayInput('test', ',')).toEqual(['test1', 'test2', 'test3']);
+    });
+  });
+
+  describe('getMaxDistribution', () => {
+    it('should return an array of strings from a string input', () => {
+      (getInput as jest.Mock).mockReturnValue(2);
+      expect(getMaxDistribution('test')).toEqual({ test: 2 });
+
+      (getInput as jest.Mock).mockReturnValue('{ "test1": 1, "test2": 2 }');
+      expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 2 });
+
+      (getInput as jest.Mock).mockReturnValue('{ "test1": 1 }');
+      expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 3 });
+
+      (getInput as jest.Mock).mockReturnValue('[1,2]');
+      expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 2 });
     });
   });
 
