@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/e-square-io/nx-github-actions/compare/v2.0.0...v2.0.1) (2021-07-29)
+
+### Bug Fixes
+
+- package.json versions ([8f50445](https://github.com/e-square-io/nx-github-actions/commit/8f50445655c48186d90bc039371af8bb9d333c9f))
+
 # [2.0.0](https://github.com/e-square-io/nx-github-actions/compare/v1.3.0...v2.0.0) (2021-07-29)
 
 ### Features
