@@ -27,10 +27,14 @@
         "outputPath": "dist/packages/nx-distributed-task",
         "generatePackageJson": true,
         "assets": [
-          "README.md",
           {
             "input": "packages/nx-distributed-task",
             "glob": "action.yml",
+            "output": "."
+          },
+          {
+            "input": "packages/nx-distributed-task",
+            "glob": "README.md",
             "output": "."
           }
         ]

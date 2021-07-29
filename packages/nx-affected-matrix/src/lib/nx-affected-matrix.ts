@@ -10,7 +10,7 @@ import {
 } from '../../../utils/src';
 
 interface NxAffectedMatrix {
-  include: { target: string; bucket: number; projects: string }[];
+  include: { target: string; distribution: number; projects: string }[];
 }
 
 export function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {

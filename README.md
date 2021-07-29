@@ -32,7 +32,6 @@
 ## Table of Contents
 
 - [Usage](#usage)
-- [FAQ](#faq)
 - [Contributors](#contributors-)
 
 ## Usage
@@ -57,13 +56,13 @@ jobs:
         uses: e-square-io/nx-affected-matrix@v1
         id: affected
         with:
-          targets: 'test,build' # Comma-delimited targets to run, required
-          maxParallel: 3 # Maximum jobs distribution for target's affected projects, optional, default is 3
-          workingDirectory: '' # Path to the Nx workspace, needed if not the repository root, optional
-          args: '' # Space-delimited args to add to nx command execution, optional
+          targets: 'test,build'
+          maxDistribution: 3
+          workingDirectory: ''
+          args: ''
 
   execute:
-    name: ${{ matrix.target }} (${{ matrix.bucket }})
+    name: ${{ matrix.target }} (${{ matrix.distribution }})
     if: ${{ needs.setup.outputs.hasChanges == 'true' }}
     needs: [setup]
     runs-on: ubuntu-latest
@@ -78,17 +77,13 @@ jobs:
         uses: e-square-io/nx-distributed-task@v1
         id: execute
         with:
-          target: ${{ matrix.target }} # Target to run, required
-          bucket: ${{ matrix.bucket }} # Current bucket run, required
-          projects: ${{ matrix.projects }} # Projects to run against target, required
-          uploadOutputs: true # Should upload target's outputs from all distributed jobs, optional, default is true
-          nxCloud: false # Enable support of Nx Cloud, will skip github cache usage, optional
-          args: '' # Space-delimited args to add to nx command execution, optional
+          target: ${{ matrix.target }}
+          projects: ${{ matrix.projects }}
+          distribution: ${{ matrix.distribution }}
+          uploadOutputs: true
+          nxCloud: false
+          args: ''
 ```
-
-## FAQ
-**Q: I don't get the full affected list I expect to see**  
-A: Make sure you checkout with `fetch-depth: 0` for affected-matrix job. It is required in order to pull the full commit history which is needed for the calculation.
 
 ## Contributors ✨
 

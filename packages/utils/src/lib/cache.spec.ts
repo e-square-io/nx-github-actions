@@ -9,7 +9,7 @@ describe('cache', () => {
   });
 
   describe('getCacheKeys', () => {
-    it('should create primary key composed of platform, arch, date, target, bucket and pr', function () {
+    it('should create primary key composed of platform, arch, date, target, distribution and pr', function () {
       const [primary] = getCacheKeys('test', 5);
       const now = new Date();
       expect(primary).toContain(`${process.platform}-`);
@@ -20,7 +20,7 @@ describe('cache', () => {
       expect(primary).toContain(`-${context.payload.pull_request.number.toString()}`);
     });
 
-    it('should create restore keys variations without pr, bucket and target', function () {
+    it('should create restore keys variations without pr, distribution and target', function () {
       const [_, [withoutPR, withoutBucket, withoutTarget]] = getCacheKeys('test', 5);
       // withoutPR
       expect(withoutPR).not.toContain(`-${context.payload.pull_request.number.toString()}`);

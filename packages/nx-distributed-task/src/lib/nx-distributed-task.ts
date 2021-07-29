@@ -1,5 +1,5 @@
 import { endGroup, getInput, info, setFailed, startGroup } from '@actions/core';
-import { Inputs } from './inputs';
+import { getDistribution, Inputs } from './inputs';
 import {
   assertNxInstalled,
   Exec,
@@ -39,7 +39,7 @@ export async function main(): Promise<void> {
 
   const inputs: Inputs = {
     target,
-    bucket: parseInt(getInput('bucket', { required: true })),
+    distribution: getDistribution(),
     projects: getStringArrayInput('projects', ',', { required: true }),
     maxParallel: getMaxDistribution(target, 'maxParallel')[target],
     args: getStringArrayInput('args'),
@@ -56,7 +56,7 @@ export async function main(): Promise<void> {
     await assertNxInstalled();
 
     if (!inputs.nxCloud) {
-      await withCache(inputs.target, inputs.bucket, () => runNxTask(inputs));
+      await withCache(inputs.target, inputs.distribution, () => runNxTask(inputs));
     } else {
       info('❕ Skipped cache due to NX Cloud usage');
       await runNxTask(inputs);
