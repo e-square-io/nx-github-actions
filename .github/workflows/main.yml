@@ -43,7 +43,6 @@ jobs:
     if: ${{ needs.setup.outputs.hasChanges }}
     needs: [setup]
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.target == 'test' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
@@ -204,7 +203,7 @@ jobs:
           split-repository-organization: e-square-io
           split-repository-name: ${{ matrix.package }}
           user-name: e-square-ci
-          user-email: ci@e-sqiaure.io
+          user-email: ci@e-square.io
 
       - name: Update major and patch version tags
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
