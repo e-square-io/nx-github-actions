@@ -1,3 +1,9 @@
+## [2.0.2](https://github.com/e-square-io/nx-github-actions/compare/v2.0.1...v2.0.2) (2021-07-29)
+
+### Bug Fixes
+
+- **nx-affected-matrix:** matrix output missing distribution ([00380e7](https://github.com/e-square-io/nx-github-actions/commit/00380e7ff37cab77a4da47800e9ea8e0a21d0c78))
+
 ## [2.0.1](https://github.com/e-square-io/nx-github-actions/compare/v2.0.0...v2.0.1) (2021-07-29)
 
 ### Bug Fixes
