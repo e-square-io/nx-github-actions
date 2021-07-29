@@ -9,8 +9,14 @@ import {
   getMaxDistribution,
 } from '../../../utils/src';
 
+interface NxAffectedTarget {
+  target: string;
+  distribution: number;
+  projects: string;
+}
+
 interface NxAffectedMatrix {
-  include: { target: string; distribution: number; projects: string }[];
+  include: NxAffectedTarget[];
 }
 
 export function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
@@ -41,7 +47,7 @@ export async function generateAffectedMatrix(
   exec: Exec
 ): Promise<NxAffectedMatrix> {
   startGroup(`⚙️ Generating affected matrix for ${targets}`);
-  const matrix = {
+  const matrix: NxAffectedMatrix = {
     include: [],
   };
 
@@ -51,10 +57,10 @@ export async function generateAffectedMatrix(
     exec.withArgs(`--base=${base}`, `--head=${head}`, ...args);
     debug(`🐞 Calculating affected for "${target}" target`);
     const projects = await nxPrintAffected(target, exec);
-    const affectedTargets = chunkify(projects, maxDistribution[target])
+    const affectedTargets: NxAffectedTarget[] = chunkify(projects, maxDistribution[target])
       .map((projects, idx) => ({
         target,
-        bucket: idx + 1,
+        distribution: idx + 1,
         projects: projects.join(','),
       }))
       .filter((target) => target.projects !== '');
