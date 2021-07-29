@@ -41,17 +41,17 @@ describe('nxAffectedMatrix', () => {
       ).resolves.toEqual({
         include: [
           {
-            bucket: 1,
+            distribution: 1,
             projects: 'project1,project2,project3,project4',
             target: 'test1',
           },
           {
-            bucket: 1,
+            distribution: 1,
             projects: 'project1,project2',
             target: 'test2',
           },
           {
-            bucket: 2,
+            distribution: 2,
             projects: 'project3,project4',
             target: 'test2',
           },
@@ -81,10 +81,10 @@ describe('nxAffectedMatrix', () => {
       expect(setOutput).toHaveBeenCalledTimes(2);
       expect(setOutput).toHaveBeenNthCalledWith(1, 'matrix', {
         include: [
-          { bucket: 1, projects: 'project1,project2', target: 'test' },
-          { bucket: 2, projects: 'project3,project4', target: 'test' },
-          { bucket: 1, projects: 'project1,project2', target: 'build' },
-          { bucket: 2, projects: 'project3,project4', target: 'build' },
+          { distribution: 1, projects: 'project1,project2', target: 'test' },
+          { distribution: 2, projects: 'project3,project4', target: 'test' },
+          { distribution: 1, projects: 'project1,project2', target: 'build' },
+          { distribution: 2, projects: 'project3,project4', target: 'build' },
         ],
       });
       expect(setOutput).toHaveBeenNthCalledWith(2, 'hasChanges', true);
@@ -95,9 +95,9 @@ describe('nxAffectedMatrix', () => {
 
       expect(setOutput).toHaveBeenNthCalledWith(3, 'matrix', {
         include: [
-          { bucket: 1, projects: 'project1,project2', target: 'test' },
-          { bucket: 2, projects: 'project3,project4', target: 'test' },
-          { bucket: 1, projects: 'project1,project2,project3,project4', target: 'build' },
+          { distribution: 1, projects: 'project1,project2', target: 'test' },
+          { distribution: 2, projects: 'project3,project4', target: 'test' },
+          { distribution: 1, projects: 'project1,project2,project3,project4', target: 'build' },
         ],
       });
     });
