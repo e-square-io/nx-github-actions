@@ -1,3 +1,13 @@
+# [2.0.0](https://github.com/e-square-io/nx-github-actions/compare/v1.3.0...v2.0.0) (2021-07-29)
+
+### Features
+
+- support distribution per target (#8) ([8dca630](https://github.com/e-square-io/nx-github-actions/commit/8dca630bafd7562dd7023e644f47aff935840374)), closes [#8](https://github.com/e-square-io/nx-github-actions/issues/8)
+
+### BREAKING CHANGE
+
+- matrix structure changed, bucket was renamed to distribution
+
 # [1.3.0](https://github.com/e-square-io/nx-github-actions/compare/v1.2.0...v1.3.0) (2021-07-11)
 
 ### Features
