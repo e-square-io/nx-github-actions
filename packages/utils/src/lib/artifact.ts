@@ -1,5 +1,6 @@
 import { create as artifactClient } from '@actions/artifact';
 import { create as globClient } from '@actions/glob';
+
 import { logger } from './logger';
 
 export async function uploadArtifact(name: string, paths: string[]): Promise<string | undefined> {
