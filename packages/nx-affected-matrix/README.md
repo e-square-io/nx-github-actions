@@ -7,11 +7,11 @@
 [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)](https://github.com/e-square-io/nx-github-actions/blob/main/LICENSE)
 
 ## Summary
-Github Action that outputs a matrix per supplied target, per slice of projects for that target.  
-This action enables CI level parallelism where each job runs only a fraction of the affected projects for that target
-It was designed to use the outputs of this action with [@e-square/nx-distributed-task](https://github.com/marketplace/actions/nx-distributed-task)
+A GitHub Action that outputs a matrix of NX targets.    
+This action enables CI level parallelism by splitting the affected projects into multiple parallel jobs.
 
-Check out the monorepo's [README](https://github.com/e-square-io/nx-github-actions#usage) for a full usage example of both actions
+It is recommended to use this action's outputs with [@e-square/nx-distributed-task](https://github.com/marketplace/actions/nx-distributed-task),
+check out the monorepo's [README](https://github.com/e-square-io/nx-github-actions#usage) for a full usage example of both actions.
 
 ## Usage
 
@@ -46,7 +46,7 @@ jobs:
       # install node modules, cache etc
 
       - name: Calculate affected projects
-        uses: e-square-io/nx-affected-matrix@v1
+        uses: e-square-io/nx-affected-matrix@v2
         id: affected
         with:
           targets: 'test,build'

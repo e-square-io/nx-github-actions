@@ -10,7 +10,7 @@
 Github Action that runs nx `run-many` for the specified target and projects.  
 This action was designed to consume the outputs of [@e-square/nx-affected-matrix](https://github.com/marketplace/actions/nx-affected-task) in order to distribute jobs with ease.
 
-Check out the monorepo's [README](https://github.com/e-square-io/nx-github-actions#usage) for a full usage example of both actions
+Check out the monorepo's [README](https://github.com/e-square-io/nx-github-actions#usage) for a full usage example of both actions with GitHub Actions' matrix
 
 ## Usage
 
@@ -23,6 +23,7 @@ Check out the monorepo's [README](https://github.com/e-square-io/nx-github-actio
 | maxParallel | Maximum NX cli parallel runs | 3 | &cross; |
 | nxCloud | Enable support of Nx Cloud | false | &cross; |
 | uploadOutputs | Upload target's outputs as workflow artifacts | true | &cross; |
+| workingDirectory | Path to the Nx workspace, needed if not the repository root | - | &cross; |
 | args | Space-delimited args to add to nx command execution | - | &cross; |
 
 ```yaml
@@ -37,7 +38,7 @@ jobs:
       # install node modules, cache etc
 
       - name: Run command
-        uses: e-square-io/nx-distributed-task@v1
+        uses: e-square-io/nx-distributed-task@v2
         with:
           target: 'test'
           projects: 'project1,project2'

@@ -1,7 +1,7 @@
 import { restoreCache, saveCache } from '@actions/cache';
 
 jest.mock('../../../utils/src', () => ({
-  ...jest.requireActual('../../../utils/src'),
+  ...(jest.requireActual('../../../utils/src') as any),
   assertNxInstalled: jest.fn().mockResolvedValue(true),
   nxRunMany: jest.fn().mockResolvedValue(true),
   getWorkspaceProjects: jest.fn(),
@@ -12,7 +12,7 @@ jest.mock('../../../utils/src', () => ({
 
 jest.mock('@actions/cache');
 
-import { assertNxInstalled, nxRunMany, uploadArtifact, withCache } from '../../../utils/src';
+import { assertNxInstalled, nxRunMany, uploadArtifact } from '../../../utils/src';
 import { main } from './nx-distributed-task';
 
 describe('nxDistributedTask', () => {
@@ -22,6 +22,8 @@ describe('nxDistributedTask', () => {
       INPUT_BUCKET: '1',
       INPUT_NXCLOUD: 'false',
       INPUT_PROJECTS: 'project1,project2',
+      INPUT_DEBUG: 'false',
+      INPUT_UPLOADOUTPUTS: 'true',
     };
 
     process.env = { ...process.env, ...env };
@@ -32,7 +34,6 @@ describe('nxDistributedTask', () => {
 
     expect(assertNxInstalled).toHaveBeenCalled();
     expect(restoreCache).toHaveBeenCalled();
-    expect(saveCache).toHaveBeenCalled();
     expect(nxRunMany).toHaveBeenCalledWith(
       'test',
       expect.any(Object),
@@ -40,5 +41,21 @@ describe('nxDistributedTask', () => {
     );
     expect(uploadArtifact).toHaveBeenCalledTimes(2);
     expect(uploadArtifact).toHaveBeenNthCalledWith(1, 'test', 'dist/test');
+  });
+
+  it('should save cache in post job if key is available', async () => {
+    process.env = { ...process.env, [`STATE_isPostJob`]: 'true', STATE_cacheKey: 'test' };
+
+    (saveCache as jest.Mock).mockClear();
+    (assertNxInstalled as jest.Mock).mockClear();
+    (nxRunMany as jest.Mock).mockClear();
+    (uploadArtifact as jest.Mock).mockClear();
+
+    await main();
+
+    expect(saveCache).toHaveBeenCalled();
+    expect(assertNxInstalled).not.toHaveBeenCalled();
+    expect(nxRunMany).not.toHaveBeenCalled();
+    expect(uploadArtifact).not.toHaveBeenCalled();
   });
 });

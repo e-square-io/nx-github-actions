@@ -1,5 +1,7 @@
 import { exec, ExecOptions } from '@actions/exec';
-import { debug, setFailed } from '@actions/core';
+import { setFailed } from '@actions/core';
+
+import { logger } from './logger';
 
 export type ExecWrapper = (args?: string[], options?: ExecOptions) => Promise<string>;
 
@@ -34,7 +36,7 @@ export class Exec {
         },
       };
 
-      debug(`🐞 Running command ${command} - args: ${finalArgs.join(' ')}", options: ${finalOpts}`);
+      logger.debug(`Running command ${command} - args: ${finalArgs.join(' ')}", options: ${finalOpts}`);
 
       return exec(command, finalArgs, finalOpts).then((code) => {
         if (code !== 0) setFailed(stderr);

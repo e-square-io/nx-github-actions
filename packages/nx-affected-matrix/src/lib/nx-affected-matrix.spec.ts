@@ -1,14 +1,14 @@
 import { chunkify, generateAffectedMatrix, main } from './nx-affected-matrix';
 
 jest.mock('../../../utils/src', () => ({
-  ...jest.requireActual('../../../utils/src'),
+  ...(jest.requireActual('../../../utils/src') as any),
   retrieveGitBoundaries: jest.fn().mockResolvedValue(['1', '2']),
   assertNxInstalled: jest.fn().mockResolvedValue(true),
   nxPrintAffected: jest.fn().mockResolvedValue(['project1', 'project2', 'project3', 'project4']),
 }));
 
 jest.mock('@actions/core', () => ({
-  ...jest.requireActual('@actions/core'),
+  ...(jest.requireActual('@actions/core') as any),
   setOutput: jest.fn(),
 }));
 
@@ -34,7 +34,7 @@ describe('nxAffectedMatrix', () => {
           {
             targets: ['test1', 'test2'],
             maxDistribution: { test1: 1, test2: 2 },
-            workingDirectory: '',
+            args: [],
           },
           new Exec()
         )
@@ -68,6 +68,7 @@ describe('nxAffectedMatrix', () => {
         INPUT_MAXPARALLEL: '3',
         INPUT_WORKINGDIRECTORY: '',
         INPUT_ARGS: 'arg1=true arg2=false',
+        INPUT_DEBUG: 'false',
       };
 
       process.env = { ...process.env, ...env };

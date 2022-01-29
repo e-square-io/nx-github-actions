@@ -1,69 +1,87 @@
-import { endGroup, getInput, info, setFailed, startGroup } from '@actions/core';
-import { getDistribution, Inputs } from './inputs';
+import { getState, saveState, setFailed } from '@actions/core';
+import { getInputs, Inputs } from './inputs';
 import {
   assertNxInstalled,
+  CACHE_KEY,
   Exec,
-  getMaxDistribution,
+  getCacheKeys,
   getProjectOutputs,
-  getStringArrayInput,
   getWorkspaceProjects,
   nxRunMany,
+  restoreNxCache,
+  saveNxCache,
   uploadArtifact,
-  withCache,
+  logger,
 } from '../../../utils/src';
+
+const IS_POST_JOB = 'isPostJob';
 
 async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
   if (!inputs.uploadOutputs) return;
 
-  startGroup('⬆️ Uploading artifacts');
-  const projects = getWorkspaceProjects();
-  const artifactName = inputs.target;
+  await logger.group('⬆️ Uploading artifacts', async () => {
+    const projects = getWorkspaceProjects();
+    const artifactName = inputs.target;
 
-  await Promise.all(
-    inputs.projects.map((project) => uploadArtifact(artifactName, getProjectOutputs(projects, project, inputs.target)))
-  );
-
-  endGroup();
+    await Promise.all(
+      inputs.projects.map((project) =>
+        uploadArtifact(artifactName, getProjectOutputs(projects, project, inputs.target))
+      )
+    );
+  });
 }
 
 async function runNxTask(inputs: Inputs): Promise<void> {
-  startGroup('🏃 Running NX target');
-  const exec = new Exec();
-  exec.withArgs(`--projects=${inputs.projects}`);
-  await nxRunMany(inputs.target, inputs, exec);
-  endGroup();
+  await logger.group('🏃 Running NX target', async () => {
+    const exec = new Exec();
+    exec.withArgs(`--projects=${inputs.projects}`);
+    await nxRunMany(inputs.target, inputs, exec);
+  });
+}
+
+async function restoreCache(inputs: Inputs) {
+  if (inputs.nxCloud) return;
+
+  const [primary, restoreKeys] = await getCacheKeys(inputs.target, inputs.distribution);
+
+  await logger.group('🚀 Retrieving NX cache', () => restoreNxCache(primary, restoreKeys));
+
+  if (logger.debugMode) return;
+
+  saveState(CACHE_KEY, primary);
+}
+
+async function saveCache() {
+  const primary = getState(CACHE_KEY);
+  if (!primary) {
+    logger.debug(`Couldn't find primary key in state`);
+  } else {
+    await saveNxCache(primary);
+  }
 }
 
 export async function main(): Promise<void> {
-  const target = getInput('target', { required: true });
+  const inputs = getInputs();
 
-  const inputs: Inputs = {
-    target,
-    distribution: getDistribution(),
-    projects: getStringArrayInput('projects', ',', { required: true }),
-    maxParallel: getMaxDistribution(target, 'maxParallel')[target],
-    args: getStringArrayInput('args'),
-    nxCloud: getInput('nxCloud') === 'true',
-    uploadOutputs: getInput('uploadOutputs') === '' || getInput('uploadOutputs') === 'true',
-  };
+  /* post-job execution */
+  if (getState(IS_POST_JOB) === 'true') {
+    await saveCache();
+    return;
+  }
 
   if (inputs.projects.length === 0) {
-    info('❕ There are no projects to run, completing');
+    logger.info('There are no projects to run, completing');
     return;
   }
 
   try {
     await assertNxInstalled();
-
-    if (!inputs.nxCloud) {
-      await withCache(inputs.target, inputs.distribution, () => runNxTask(inputs));
-    } else {
-      info('❕ Skipped cache due to NX Cloud usage');
-      await runNxTask(inputs);
-    }
-
+    await restoreCache(inputs);
+    await runNxTask(inputs);
     await uploadProjectsOutputs(inputs);
   } catch (e) {
     setFailed(e);
   }
+
+  saveState(IS_POST_JOB, true);
 }

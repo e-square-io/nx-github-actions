@@ -4,8 +4,5 @@
     "nx-affected-matrix": "packages/nx-affected-matrix",
     "nx-distributed-task": "packages/nx-distributed-task",
     "utils": "packages/utils"
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/workspace"
   }
 }

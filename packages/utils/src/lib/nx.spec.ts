@@ -2,15 +2,13 @@ import { workspaceMock, mergedWorkspaceMock } from './__mocks__/fs';
 
 jest.mock('./fs');
 jest.mock('@actions/core', () => ({
-  ...jest.requireActual('@actions/core'),
+  ...(jest.requireActual('@actions/core') as any),
   getInput: jest.fn(),
 }));
 
 import {
   assertNxInstalled,
-  getMaxDistribution,
   getProjectOutputs,
-  getStringArrayInput,
   getWorkspaceProjects,
   NX_BIN_PATH,
   nxCommand,
@@ -20,7 +18,6 @@ import {
 import * as which from 'which';
 import { tree } from './fs';
 import { Exec } from './exec';
-import { getInput } from '@actions/core';
 
 describe('nx', () => {
   describe('assertNxInstalled', () => {
@@ -32,41 +29,6 @@ describe('nx', () => {
     it('should success assertion', async () => {
       (which as jest.Mock).mockReturnValueOnce(Promise.resolve());
       await expect(assertNxInstalled()).resolves.toBeUndefined();
-    });
-  });
-
-  describe('getStringArrayInput', () => {
-    beforeEach(() => {
-      (getInput as jest.Mock).mockReturnValue('test1,test2,test3');
-    });
-
-    it('should return an array of strings from a string input', () => {
-      expect(getStringArrayInput('test', ',')).toEqual(['test1', 'test2', 'test3']);
-    });
-  });
-
-  describe('getMaxDistribution', () => {
-    it('should return an object of targets distribution from a string input', () => {
-      (getInput as jest.Mock).mockReturnValue(2);
-      expect(getMaxDistribution('test')).toEqual({ test: 2 });
-    });
-
-    it('should return an object of targets distribution from a JSON object', () => {
-      (getInput as jest.Mock).mockReturnValue('{ "test1": 1, "test2": 2 }');
-      expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 2 });
-    });
-
-    it('should return an object of targets distribution from a JSON array', () => {
-      (getInput as jest.Mock).mockReturnValue('[1,2]');
-      expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 2 });
-    });
-
-    it('should return an object of targets distribution from a partial JSON object/array', () => {
-      (getInput as jest.Mock).mockReturnValue('{ "test1": 1 }');
-      expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 3 });
-
-      (getInput as jest.Mock).mockReturnValue('[1]');
-      expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 3 });
     });
   });
 
@@ -152,7 +114,9 @@ describe('nx', () => {
     });
 
     it('should call nxRunMany', async () => {
-      await expect(nxRunMany('test', { nxCloud: true, maxParallel: 3 }, exec)).resolves.toBe('');
+      await expect(
+        nxRunMany('test', { args: [], debug: false, workingDirectory: '', nxCloud: true, maxParallel: 3 }, exec)
+      ).resolves.toBe('');
       expect(exec.withCommand).toHaveBeenCalledWith(`${NX_BIN_PATH} run-many`);
       expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--scan', '--parallel', '--maxParallel=3');
       expect(exec.withOptions).toHaveBeenCalledWith(
