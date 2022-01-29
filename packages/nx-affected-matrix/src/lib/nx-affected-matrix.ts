@@ -1,13 +1,7 @@
-import { Inputs } from './inputs';
-import { info, setFailed, startGroup, endGroup, setOutput, debug, getInput } from '@actions/core';
-import {
-  Exec,
-  retrieveGitBoundaries,
-  nxPrintAffected,
-  assertNxInstalled,
-  getStringArrayInput,
-  getMaxDistribution,
-} from '../../../utils/src';
+import { setFailed, setOutput } from '@actions/core';
+
+import { getInputs, Inputs } from './inputs';
+import { Exec, retrieveGitBoundaries, nxPrintAffected, assertNxInstalled, logger } from '../../../utils/src';
 
 interface NxAffectedTarget {
   target: string;
@@ -43,54 +37,44 @@ export function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
 }
 
 export async function generateAffectedMatrix(
-  { targets, maxDistribution, args = [] }: Inputs,
+  { targets, maxDistribution, args = [] }: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>,
   exec: Exec
 ): Promise<NxAffectedMatrix> {
-  startGroup(`⚙️ Generating affected matrix for ${targets}`);
-  const matrix: NxAffectedMatrix = {
-    include: [],
-  };
+  return logger.group(`⚙️ Generating affected matrix for ${targets}`, async () => {
+    const matrix: NxAffectedMatrix = {
+      include: [],
+    };
 
-  const [base, head] = await retrieveGitBoundaries(exec);
+    const [base, head] = await retrieveGitBoundaries(exec);
 
-  for (const target of targets) {
-    exec.withArgs(`--base=${base}`, `--head=${head}`, ...args);
-    debug(`🐞 Calculating affected for "${target}" target`);
-    const projects = await nxPrintAffected(target, exec);
-    const affectedTargets: NxAffectedTarget[] = chunkify(projects, maxDistribution[target])
-      .map((projects, idx) => ({
-        target,
-        distribution: idx + 1,
-        projects: projects.join(','),
-      }))
-      .filter((target) => target.projects !== '');
+    for (const target of targets) {
+      exec.withArgs(`--base=${base}`, `--head=${head}`, ...args);
 
-    if (affectedTargets.length) {
-      matrix.include.push(...affectedTargets);
+      logger.debug(`Calculating affected for "${target}" target`);
+
+      const projects = await nxPrintAffected(target, exec);
+      const affectedTargets: NxAffectedTarget[] = chunkify(projects, maxDistribution[target])
+        .map((projects, idx) => ({
+          target,
+          distribution: idx + 1,
+          projects: projects.join(','),
+        }))
+        .filter((target) => target.projects !== '');
+
+      if (affectedTargets.length) {
+        matrix.include.push(...affectedTargets);
+      }
     }
-  }
 
-  debug(`🐞 matrix: ${matrix}`);
-  info(`✅ Generated affected matrix`);
-  endGroup();
+    logger.debug(`matrix: ${matrix}`);
+    logger.success(`Generated affected matrix`);
 
-  return matrix;
+    return matrix;
+  });
 }
 
 export async function main(): Promise<void> {
-  const targets = getStringArrayInput('targets', ',');
-
-  const inputs: Inputs = {
-    targets,
-    maxDistribution: getMaxDistribution(targets),
-    workingDirectory: getInput('workingDirectory'),
-    args: getStringArrayInput('args'),
-  };
-
-  if (inputs.workingDirectory && inputs.workingDirectory.length > 0) {
-    info(`🏃 Working in custom directory: ${inputs.workingDirectory}`);
-    process.chdir(inputs.workingDirectory);
-  }
+  const inputs = getInputs();
 
   try {
     await assertNxInstalled();

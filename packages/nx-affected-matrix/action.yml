@@ -23,11 +23,15 @@ inputs:
   workingDirectory:
     description: "Path to the Nx workspace, needed if not the repository root"
     required: false
+  debug:
+    description: "Enable Debug mode"
+    required: false
+    default: 'false'
 outputs:
   matrix:
     description: "The matrix that should be used in next job's matrix strategy"
   hasChanges:
     description: "Returns true when there are changes, can be used to skip next steps"
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'index.js'

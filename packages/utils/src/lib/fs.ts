@@ -1,32 +1,35 @@
-import { Tree } from '@nrwl/devkit';
-import { cp, rmRF } from '@actions/io';
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync } from 'fs';
 import { resolve } from 'path';
+
+import type { Tree } from '@nrwl/devkit';
+import { cp, rmRF } from '@actions/io';
+
+import { logger } from './logger';
 
 export class GHTree implements Tree {
   readonly root: string;
 
   constructor(root?: string) {
-    this.root = root ?? process.cwd();
+    this.root = root ?? process.env.GITHUB_WORKSPACE ?? process.cwd();
   }
 
   children(dirPath: string): string[] {
-    if (statSync(resolve(this.root, dirPath)).isDirectory()) {
-      return readdirSync(resolve(this.root, dirPath));
+    if (statSync(this.resolve(dirPath)).isDirectory()) {
+      return readdirSync(this.resolve(dirPath));
     }
     return [];
   }
 
   delete(filePath: string): void {
-    void rmRF(resolve(this.root, filePath));
+    void rmRF(this.resolve(filePath));
   }
 
   exists(filePath: string): boolean {
-    return existsSync(resolve(this.root, filePath));
+    return existsSync(this.resolve(filePath));
   }
 
   isFile(filePath: string): boolean {
-    return statSync(resolve(this.root, filePath)).isFile();
+    return statSync(this.resolve(filePath)).isFile();
   }
 
   listChanges() {
@@ -36,15 +39,33 @@ export class GHTree implements Tree {
   read(filePath: string): Buffer | null;
   read(filePath: string, encoding: BufferEncoding): string | null;
   read(filePath: string, encoding?: BufferEncoding): string | Buffer | null {
-    return readFileSync(resolve(this.root, filePath), { encoding });
+    return readFileSync(this.resolve(filePath), { encoding });
   }
 
   async rename(from: string, to: string): Promise<void> {
-    await cp(resolve(this.root, from), resolve(this.root, to));
+    await cp(this.resolve(from), resolve(this.root, to));
   }
 
   write(filePath: string, content: Buffer | string): void {
-    writeFileSync(resolve(this.root, filePath), content);
+    writeFileSync(this.resolve(filePath), content);
+  }
+
+  resolve(path: string): string {
+    return resolve(this.root, path);
+  }
+
+  getLockFilePath(): string | void {
+    const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'pnpm-lock.yml'];
+    const lockFile = lockFiles.find((file) => this.exists(file));
+    if (!lockFile) {
+      logger.info(`Couldn't find any lock file`);
+      return;
+    }
+    return this.resolve(lockFile);
+  }
+
+  changePermissions(filePath: string, mode: string | number): void {
+    chmodSync(tree.resolve(filePath), mode);
   }
 }
 

@@ -1,7 +1,3 @@
-module.exports = {
-  projects: [
-    '<rootDir>/packages/nx-affected-matrix',
-    '<rootDir>/packages/nx-distributed-task',
-    '<rootDir>/packages/utils',
-  ],
-};
+const { getJestProjects } = require('@nrwl/jest');
+
+module.exports = { projects: getJestProjects() };
