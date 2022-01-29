@@ -1,3 +1,25 @@
+# [2.1.0](https://github.com/e-square-io/nx-github-actions/compare/v2.0.2...v2.1.0) (2022-01-29)
+
+### Continuous Integration
+
+- fail workflow on failing execute jobs [skip ci] ([c36372c](https://github.com/e-square-io/nx-github-actions/commit/c36372cbffee81e60654202b3c1a8bd5c792dbb4))
+- skip publish tags if no release [skip ci] ([6644223](https://github.com/e-square-io/nx-github-actions/commit/6644223cf0290404ce22df5c622ecb6191b9f81d))
+- trigger change ([6c8fe0d](https://github.com/e-square-io/nx-github-actions/commit/6c8fe0dc5c4d4702ed6bfeb1c3ead3d46b9cd46c))
+- trigger change ([aa9ac31](https://github.com/e-square-io/nx-github-actions/commit/aa9ac3126b3eb4f27c3ab957a7155ee0acc7cf7a))
+
+### Documentation
+
+- update readme [skip ci] ([a0c3fef](https://github.com/e-square-io/nx-github-actions/commit/a0c3fef9da8725fbb5b0c93488940df37ec4e2f5))
+
+### Features
+
+- **nx-distributed-task:** move caching to post job ([d0ed98d](https://github.com/e-square-io/nx-github-actions/commit/d0ed98d3badfb7a4c600aeb0db63f7c7d3120334))
+- **nx-distributed-task:** move caching to post job ([ea36e4a](https://github.com/e-square-io/nx-github-actions/commit/ea36e4a4f7fb16a70d6e833e0713d363492645e4))
+
+### Tests
+
+- **nx-affected-matrix:** fix failing tests ([9313b2d](https://github.com/e-square-io/nx-github-actions/commit/9313b2de2c68602a63603837103d671dba44ee81))
+
 ## [2.0.2](https://github.com/e-square-io/nx-github-actions/compare/v2.0.1...v2.0.2) (2021-07-29)
 
 ### Bug Fixes
