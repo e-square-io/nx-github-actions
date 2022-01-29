@@ -1,4 +1,5 @@
 import { getBooleanInput, getInput } from '@actions/core';
+
 import { BaseInputs, getBaseInputs, getStringArrayInput, getMaxDistribution } from '../../../utils/src';
 
 export interface Inputs extends BaseInputs {

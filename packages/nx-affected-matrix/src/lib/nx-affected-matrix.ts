@@ -1,7 +1,7 @@
 import { setFailed, setOutput } from '@actions/core';
 
-import { getInputs, Inputs } from './inputs';
 import { Exec, retrieveGitBoundaries, nxPrintAffected, assertNxInstalled, logger } from '../../../utils/src';
+import { getInputs, Inputs } from './inputs';
 
 interface NxAffectedTarget {
   target: string;

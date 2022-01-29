@@ -1,5 +1,5 @@
 import { getState, saveState, setFailed } from '@actions/core';
-import { getInputs, Inputs } from './inputs';
+
 import {
   assertNxInstalled,
   CACHE_KEY,
@@ -13,6 +13,7 @@ import {
   uploadArtifact,
   logger,
 } from '../../../utils/src';
+import { getInputs, Inputs } from './inputs';
 
 const IS_POST_JOB = 'isPostJob';
 
