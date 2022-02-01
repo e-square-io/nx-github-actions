@@ -1,7 +1,13 @@
 import { info, debug, warning, error, notice, AnnotationProperties, group, isDebug } from '@actions/core';
 
 class Logger {
-  debugMode = false;
+  private _debugMode = false;
+  set debugMode(value: boolean) {
+    this._debugMode = value;
+  }
+  get debugMode(): boolean {
+    return this._debugMode;
+  }
 
   log(message: string) {
     info(message);

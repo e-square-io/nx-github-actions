@@ -2,9 +2,7 @@ import { getState, saveState, setFailed } from '@actions/core';
 
 import {
   assertNxInstalled,
-  CACHE_KEY,
   Exec,
-  getCacheKeys,
   getProjectOutputs,
   getWorkspaceProjects,
   nxRunMany,
@@ -17,10 +15,10 @@ import { getInputs, Inputs } from './inputs';
 
 const IS_POST_JOB = 'isPostJob';
 
-async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
+function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
   if (!inputs.uploadOutputs) return;
 
-  await logger.group('⬆️ Uploading artifacts', async () => {
+  return logger.group('⬆️ Uploading artifacts', async () => {
     const projects = getWorkspaceProjects();
     const artifactName = inputs.target;
 
@@ -32,43 +30,28 @@ async function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
   });
 }
 
-async function runNxTask(inputs: Inputs): Promise<void> {
-  await logger.group('🏃 Running NX target', async () => {
+function runNxTask(inputs: Inputs): Promise<void> {
+  return logger.group('🏃 Running NX target', async () => {
     const exec = new Exec();
     exec.withArgs(`--projects=${inputs.projects}`);
     await nxRunMany(inputs.target, inputs, exec);
   });
 }
 
-async function restoreCache(inputs: Inputs) {
-  if (inputs.nxCloud) return;
+function restoreCache({ target, distribution, nxCloud }: Inputs): Promise<void> {
+  if (nxCloud) return;
 
-  const [primary, restoreKeys] = await getCacheKeys(inputs.target, inputs.distribution);
-
-  await logger.group('🚀 Retrieving NX cache', () => restoreNxCache(primary, restoreKeys));
-
-  if (logger.debugMode) return;
-
-  saveState(CACHE_KEY, primary);
-}
-
-async function saveCache() {
-  const primary = getState(CACHE_KEY);
-  if (!primary) {
-    logger.debug(`Couldn't find primary key in state`);
-  } else {
-    await saveNxCache(primary);
-  }
+  return logger.group('🚀 Retrieving NX cache', () => restoreNxCache(target, distribution));
 }
 
 export async function main(): Promise<void> {
-  const inputs = getInputs();
-
   /* post-job execution */
   if (getState(IS_POST_JOB) === 'true') {
-    await saveCache();
+    await saveNxCache();
     return;
   }
+
+  const inputs = getInputs();
 
   if (inputs.projects.length === 0) {
     logger.info('There are no projects to run, completing');
