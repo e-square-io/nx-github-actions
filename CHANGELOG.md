@@ -1,3 +1,9 @@
+## [2.1.1](https://github.com/e-square-io/nx-github-actions/compare/v2.1.0...v2.1.1) (2022-02-01)
+
+### Bug Fixes
+
+- **utils:** resolve restore cache path ([7ecf381](https://github.com/e-square-io/nx-github-actions/commit/7ecf3818c6fe321de57f51c50c0e1a5e00044a9e))
+
 # [2.1.0](https://github.com/e-square-io/nx-github-actions/compare/v2.0.2...v2.1.0) (2022-01-29)
 
 ### Continuous Integration
