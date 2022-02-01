@@ -45,4 +45,5 @@ export const tree = {
         ['workspace.json', 'angular.json'].some((file) => path.includes(file)) ? workspaceMock : projectConfigMock
       )
     ),
+  getLockFilePath: jest.fn().mockReturnValue('package-lock.json'),
 };

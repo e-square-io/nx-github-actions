@@ -30,4 +30,14 @@ describe('exec', () => {
       listeners: { stdout: expect.any(Function), stderr: expect.any(Function) },
     });
   });
+
+  it('should throw if no command is specified', async () => {
+    exec = new Exec();
+
+    try {
+      exec.build();
+    } catch (e) {
+      expect(e.message).toBe('No command given to Exec');
+    }
+  });
 });

@@ -7,13 +7,8 @@ jest.mock('../../../utils/src', () => ({
   nxPrintAffected: jest.fn().mockResolvedValue(['project1', 'project2', 'project3', 'project4']),
 }));
 
-jest.mock('@actions/core', () => ({
-  ...(jest.requireActual('@actions/core') as any),
-  setOutput: jest.fn(),
-}));
-
 import { assertNxInstalled, Exec, nxPrintAffected } from '../../../utils/src';
-import { setOutput } from '@actions/core';
+import * as core from '@actions/core';
 
 describe('nxAffectedMatrix', () => {
   describe('chunkify', () => {
@@ -61,6 +56,7 @@ describe('nxAffectedMatrix', () => {
   });
 
   describe('main', () => {
+    let setOutput;
     beforeEach(() => {
       const env = {
         INPUT_TARGETS: 'test,build',
@@ -72,6 +68,9 @@ describe('nxAffectedMatrix', () => {
       };
 
       process.env = { ...process.env, ...env };
+      setOutput = jest.spyOn(core, 'setOutput');
+
+      jest.clearAllMocks();
     });
 
     it('should output the generated matrix and if there are changes', async () => {
@@ -101,6 +100,14 @@ describe('nxAffectedMatrix', () => {
           { distribution: 1, projects: 'project1,project2,project3,project4', target: 'build' },
         ],
       });
+    });
+
+    it('should set job as failed if any unhandled error occurs', async () => {
+      (assertNxInstalled as jest.Mock).mockRejectedValue('test');
+      const spy = jest.spyOn(core, 'setFailed');
+      await main();
+
+      expect(spy).toHaveBeenCalledWith('test');
     });
   });
 });

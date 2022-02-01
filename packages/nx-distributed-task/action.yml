@@ -9,7 +9,8 @@ inputs:
     required: true
   projects:
     description: "Comma-delimited list of projects to run against target"
-    required: true
+    required: false
+    default: ''
   distribution:
     description: "Current distribution run, required when running in a matrix"
     required: false

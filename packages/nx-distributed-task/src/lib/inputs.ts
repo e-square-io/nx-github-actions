@@ -22,7 +22,7 @@ export function getInputs(): Inputs {
     ...getBaseInputs(),
     target,
     distribution: getDistribution(),
-    projects: getStringArrayInput('projects', ',', { required: true }),
+    projects: getStringArrayInput('projects', ','),
     maxParallel: getMaxDistribution(target, 'maxParallel')[target],
     nxCloud: getBooleanInput('nxCloud'),
     uploadOutputs: getBooleanInput('uploadOutputs'),
