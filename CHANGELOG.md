@@ -1,3 +1,9 @@
+## [2.1.2](https://github.com/e-square-io/nx-github-actions/compare/v2.1.1...v2.1.2) (2022-02-13)
+
+### Build System
+
+- change ncc libs to node apps ([44de734](https://github.com/e-square-io/nx-github-actions/commit/44de7346eb3f677ee9b222d83185ed48a95d873a))
+
 ## [2.1.1](https://github.com/e-square-io/nx-github-actions/compare/v2.1.0...v2.1.1) (2022-02-01)
 
 ### Bug Fixes
