@@ -2,24 +2,24 @@ name: 'Nx distributed task'
 branding:
   icon: chevron-right
   color: white
-description: "Executes Nx task"
+description: 'Executes Nx task'
 inputs:
   target:
-    description: "Target to run"
+    description: 'Target to run'
     required: true
   projects:
-    description: "Comma-delimited list of projects to run against target"
+    description: 'Comma-delimited list of projects to run against target'
     required: false
     default: ''
   distribution:
-    description: "Current distribution run, required when running in a matrix"
+    description: 'Current distribution run, required when running in a matrix'
     required: false
   bucket:
-    description: "Current distribution run, required when running in a matrix"
+    description: 'Current distribution run, required when running in a matrix'
     required: false
-    deprecationMessage: "deprecated, use distribution input instead"
+    deprecationMessage: 'deprecated, use distribution input instead'
   maxParallel:
-    description: "Maximum NX cli parallel runs"
+    description: 'Maximum NX cli parallel runs'
     required: false
     default: '3'
   uploadOutputs:
@@ -34,13 +34,13 @@ inputs:
     required: false
     default: 'false'
   workingDirectory:
-    description: "Path to the Nx workspace, needed if not the repository root"
+    description: 'Path to the Nx workspace, needed if not the repository root'
     required: false
   debug:
-    description: "Enable Debug mode. Will not execute the target"
+    description: 'Enable Debug mode. Will not execute the target'
     required: false
     default: 'false'
 runs:
   using: 'node16'
-  main: 'index.js'
-  post: 'index.js'
+  main: 'main.js'
+  post: 'main.js'

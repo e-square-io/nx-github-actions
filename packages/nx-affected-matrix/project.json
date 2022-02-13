@@ -1,10 +1,53 @@
 {
   "root": "packages/nx-affected-matrix",
   "sourceRoot": "packages/nx-affected-matrix/src",
-  "projectType": "library",
+  "projectType": "application",
   "targets": {
+    "build": {
+      "executor": "@nrwl/node:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/nx-affected-matrix",
+        "main": "packages/nx-affected-matrix/src/main.ts",
+        "tsConfig": "packages/nx-affected-matrix/tsconfig.app.json",
+        "externalDependencies": "none",
+        "generatePackageJson": true,
+        "assets": [
+          {
+            "input": "packages/nx-affected-matrix/src/assets",
+            "glob": "*",
+            "output": "."
+          },
+          {
+            "input": "packages/nx-affected-matrix",
+            "glob": "README.md",
+            "output": "."
+          }
+        ]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "packages/nx-affected-matrix/src/environments/environment.ts",
+              "with": "packages/nx-affected-matrix/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:execute",
+      "options": {
+        "buildTarget": "nx-affected-matrix:build"
+      }
+    },
     "lint": {
       "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["packages/nx-affected-matrix/**/*.ts"]
       }
@@ -16,28 +59,6 @@
         "jestConfig": "packages/nx-affected-matrix/jest.config.js",
         "passWithNoTests": true,
         "codeCoverage": true
-      }
-    },
-    "build": {
-      "executor": "@e-square/nx-ncc:build",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "main": "packages/nx-affected-matrix/src/index.ts",
-        "tsConfig": "packages/nx-affected-matrix/tsconfig.lib.json",
-        "generatePackageJson": true,
-        "outputPath": "dist/packages/nx-affected-matrix",
-        "assets": [
-          {
-            "input": "packages/nx-affected-matrix",
-            "glob": "action.yml",
-            "output": "."
-          },
-          {
-            "input": "packages/nx-affected-matrix",
-            "glob": "README.md",
-            "output": "."
-          }
-        ]
       }
     }
   },

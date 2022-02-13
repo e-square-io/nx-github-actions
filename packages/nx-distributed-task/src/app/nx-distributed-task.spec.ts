@@ -1,8 +1,8 @@
 import { restoreCache, saveCache } from '@actions/cache';
 import { logger } from '../../../utils/src/lib/__mocks__/logger';
 
-jest.mock('../../../utils/src', () => ({
-  ...(jest.requireActual('../../../utils/src') as any),
+jest.mock('@e-square/utils', () => ({
+  ...(jest.requireActual('@e-square/utils') as any),
   assertNxInstalled: jest.fn().mockResolvedValue(true),
   nxRunMany: jest.fn().mockResolvedValue(true),
   getWorkspaceProjects: jest.fn(),
@@ -14,7 +14,7 @@ jest.mock('../../../utils/src', () => ({
 
 jest.mock('@actions/cache');
 
-import { assertNxInstalled, nxRunMany, PRIMARY_KEY, uploadArtifact } from '../../../utils/src';
+import { assertNxInstalled, nxRunMany, PRIMARY_KEY, uploadArtifact } from '@e-square/utils';
 import { main } from './nx-distributed-task';
 import * as core from '@actions/core';
 

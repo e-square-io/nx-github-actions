@@ -1,6 +1,6 @@
 import { setFailed, setOutput } from '@actions/core';
 
-import { Exec, retrieveGitBoundaries, nxPrintAffected, assertNxInstalled, logger } from '../../../utils/src';
+import { Exec, retrieveGitBoundaries, nxPrintAffected, assertNxInstalled, logger } from '@e-square/utils';
 import { getInputs, Inputs } from './inputs';
 
 interface NxAffectedTarget {
