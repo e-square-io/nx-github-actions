@@ -44,13 +44,13 @@
     "@actions/github": "^5.0.0",
     "@actions/glob": "^0.2.0",
     "@actions/io": "^1.1.1",
+    "tslib": "^2.0.0",
     "which": "^2.0.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-angular": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
-    "@e-square/nx-ncc": "^1.1.0",
     "@nrwl/cli": "13.5.3",
     "@nrwl/devkit": "13.5.3",
     "@nrwl/eslint-plugin-nx": "13.5.3",
@@ -64,7 +64,6 @@
     "@types/node": "14.14.33",
     "@typescript-eslint/eslint-plugin": "5.3.1",
     "@typescript-eslint/parser": "5.3.1",
-    "@vercel/ncc": "^0.33.1",
     "all-contributors-cli": "^6.19.0",
     "cross-env": "^7.0.3",
     "dotenv": "10.0.0",

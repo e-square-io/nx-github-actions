@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/e-square-io/nx-github-actions.git"
+    "url": "git+https://github.com/e-square-io/nx-github-actions.git",
+    "directory": "packages/nx-affected-matrix"
+  },
+  "bugs": {
+    "url": "https://github.com/e-square-io/nx-github-actions/issues"
   }
 }

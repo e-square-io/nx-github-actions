@@ -1,4 +1,4 @@
-import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } from '../../../utils/src/lib/inputs';
+import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } from '@e-square/utils';
 
 export interface Inputs extends BaseInputs {
   targets: string[];

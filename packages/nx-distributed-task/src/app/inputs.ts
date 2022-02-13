@@ -1,6 +1,6 @@
 import { getBooleanInput, getInput } from '@actions/core';
 
-import { BaseInputs, getBaseInputs, getStringArrayInput, getMaxDistribution } from '../../../utils/src';
+import { BaseInputs, getBaseInputs, getStringArrayInput, getMaxDistribution } from '@e-square/utils';
 
 export interface Inputs extends BaseInputs {
   target: string;

@@ -10,7 +10,7 @@ import {
   saveNxCache,
   uploadArtifact,
   logger,
-} from '../../../utils/src';
+} from '@e-square/utils';
 import { getInputs, Inputs } from './inputs';
 
 const IS_POST_JOB = 'isPostJob';

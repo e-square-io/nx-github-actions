@@ -1,13 +1,13 @@
 import { chunkify, generateAffectedMatrix, main } from './nx-affected-matrix';
 
-jest.mock('../../../utils/src', () => ({
-  ...(jest.requireActual('../../../utils/src') as any),
+jest.mock('@e-square/utils', () => ({
+  ...(jest.requireActual('@e-square/utils') as any),
   retrieveGitBoundaries: jest.fn().mockResolvedValue(['1', '2']),
   assertNxInstalled: jest.fn().mockResolvedValue(true),
   nxPrintAffected: jest.fn().mockResolvedValue(['project1', 'project2', 'project3', 'project4']),
 }));
 
-import { assertNxInstalled, Exec, nxPrintAffected } from '../../../utils/src';
+import { assertNxInstalled, Exec, nxPrintAffected } from '@e-square/utils';
 import * as core from '@actions/core';
 
 describe('nxAffectedMatrix', () => {

@@ -1,10 +1,53 @@
 {
   "root": "packages/nx-distributed-task",
   "sourceRoot": "packages/nx-distributed-task/src",
-  "projectType": "library",
+  "projectType": "application",
   "targets": {
+    "build": {
+      "executor": "@nrwl/node:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/nx-distributed-task",
+        "main": "packages/nx-distributed-task/src/main.ts",
+        "tsConfig": "packages/nx-distributed-task/tsconfig.app.json",
+        "externalDependencies": "none",
+        "generatePackageJson": true,
+        "assets": [
+          {
+            "input": "packages/nx-distributed-task/src/assets",
+            "glob": "*",
+            "output": "."
+          },
+          {
+            "input": "packages/nx-distributed-task",
+            "glob": "README.md",
+            "output": "."
+          }
+        ]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "packages/nx-distributed-task/src/environments/environment.ts",
+              "with": "packages/nx-distributed-task/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:execute",
+      "options": {
+        "buildTarget": "nx-distributed-task:build"
+      }
+    },
     "lint": {
       "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["packages/nx-distributed-task/**/*.ts"]
       }
@@ -16,28 +59,6 @@
         "jestConfig": "packages/nx-distributed-task/jest.config.js",
         "passWithNoTests": true,
         "codeCoverage": true
-      }
-    },
-    "build": {
-      "executor": "@e-square/nx-ncc:build",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "main": "packages/nx-distributed-task/src/index.ts",
-        "tsConfig": "packages/nx-distributed-task/tsconfig.lib.json",
-        "outputPath": "dist/packages/nx-distributed-task",
-        "generatePackageJson": true,
-        "assets": [
-          {
-            "input": "packages/nx-distributed-task",
-            "glob": "action.yml",
-            "output": "."
-          },
-          {
-            "input": "packages/nx-distributed-task",
-            "glob": "README.md",
-            "output": "."
-          }
-        ]
       }
     }
   },
