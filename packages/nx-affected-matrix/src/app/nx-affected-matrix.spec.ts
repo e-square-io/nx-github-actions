@@ -69,8 +69,6 @@ describe('nxAffectedMatrix', () => {
 
       process.env = { ...process.env, ...env };
       setOutput = jest.spyOn(core, 'setOutput');
-
-      jest.clearAllMocks();
     });
 
     it('should output the generated matrix and if there are changes', async () => {

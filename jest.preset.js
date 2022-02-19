@@ -2,5 +2,6 @@ const nxPreset = require('@nrwl/jest/preset');
 
 module.exports = {
   ...nxPreset,
-  coverageReporters: ['json-summary', 'text', 'lcov'],
+  clearMocks: true,
+  coverageReporters: ['json-summary', 'text', 'lcovonly'],
 };

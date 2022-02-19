@@ -1,11 +1,13 @@
 import { uploadArtifact } from './artifact';
 import { create } from '@actions/glob';
 import { create as aCreate } from '@actions/artifact';
+
+jest.mock('./logger');
+
 import { logger } from './logger';
 
 describe('artifact', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     (create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue(['dis/test1', 'dist/test2']) });
   });
 
@@ -40,10 +42,9 @@ describe('artifact', () => {
     (aCreate as jest.Mock).mockImplementationOnce(() => ({
       uploadArtifact: jest.fn().mockRejectedValue('test'),
     }));
-    const loggerSpy = jest.spyOn(logger, 'warning');
 
     await uploadArtifact('test', ['dist']);
 
-    expect(loggerSpy).toHaveBeenCalled();
+    expect(logger.warning).toHaveBeenCalled();
   });
 });

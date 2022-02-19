@@ -1,10 +1,7 @@
 import { workspaceMock, mergedWorkspaceMock } from './__mocks__/fs';
 
 jest.mock('./fs');
-jest.mock('@actions/core', () => ({
-  ...(jest.requireActual('@actions/core') as any),
-  getInput: jest.fn(),
-}));
+jest.mock('./logger');
 
 import {
   assertNxInstalled,
