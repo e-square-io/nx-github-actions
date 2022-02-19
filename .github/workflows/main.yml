@@ -44,6 +44,7 @@ jobs:
         if: ${{ matrix.target == 'build' }}
         uses: e-square-io/.github/.github/actions/semantic-release@main
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           dry-run: true
 
       - name: Execute target
@@ -61,10 +62,69 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           path: coverage/packages
 
+  e2e-distribute:
+    name: E2E nx-affected-matrix
+    if: ${{ needs.setup.outputs.hasChanges == 'true'  && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')  }}
+    needs: [setup, execute]
+    runs-on: ubuntu-latest
+    outputs:
+      hasChanges: ${{ steps.affected.outputs.hasChanges || needs.setup.outputs.hasChanges }}
+      matrix: ${{ steps.affected.outputs.matrix || needs.setup.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: e-square-io/.github/.github/actions/npm-ci@main
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+
+      - name: Run local matrix action
+        if: ${{ contains(needs.setup.outputs.matrix, 'nx-affected-matrix') }}
+        uses: ./dist/packages/nx-affected-matrix
+        id: affected
+        with:
+          targets: 'build'
+          maxDistribution: 1
+          debug: true
+
+  e2e-execute:
+    name: 'E2E nx-distributed-task [${{ matrix.target }} (${{ matrix.distribution }})]'
+    if: ${{ needs.e2e-distribute.outputs.hasChanges == 'true' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
+    needs: [setup,e2e-distribute]
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.target == 'test' }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.e2e-distribute.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: e-square-io/.github/.github/actions/npm-ci@main
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+
+      - name: Run local distributed task action
+        uses: ./dist/packages/nx-distributed-task
+        id: run
+        with:
+          target: ${{ matrix.target }}
+          distribution: ${{ matrix.distribution }}
+          projects: ${{ matrix.projects }}
+          debug: true
+
   release:
     name: Release version
     runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.hasChanges && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ needs.setup.outputs.hasChanges == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [setup, execute]
     outputs:
       released: ${{ steps.release.outputs.released }}
@@ -94,7 +154,7 @@ jobs:
         id: release
         uses: e-square-io/.github/.github/actions/semantic-release@main
         with:
-          token: ${{ steps.githubAppAuth.outputs.github-token }}
+          github-token: ${{ steps.githubAppAuth.outputs.github-token }}
           npm-token: ${{ secrets.NPM_TOKEN }}
 
   publish:
@@ -123,6 +183,6 @@ jobs:
         uses: e-square-io/.github/.github/actions/push-to-repo@main
         with:
           path: 'dist/packages/${{ matrix.package }}'
-          token: ${{ needs.release.outputs.gh-app-token }}
+          github-token: ${{ needs.release.outputs.gh-app-token }}
           version: ${{ needs.release.outputs.version }}
           repository: ${{ matrix.package }}
