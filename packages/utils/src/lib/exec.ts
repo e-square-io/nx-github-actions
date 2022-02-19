@@ -1,5 +1,5 @@
-import { exec, ExecOptions } from '@actions/exec';
 import { setFailed } from '@actions/core';
+import { exec, ExecOptions } from '@actions/exec';
 
 import { logger } from './logger';
 

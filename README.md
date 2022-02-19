@@ -63,7 +63,7 @@ jobs:
 
   execute:
     name: ${{ matrix.target }} (${{ matrix.distribution }})
-    if: ${{ needs.setup.outputs.hasChanges == 'true' }}
+    if: ${{ fromJSON(needs.setup.outputs.hasChanges) }}
     needs: [setup]
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.target == 'test' }}
