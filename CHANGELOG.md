@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/e-square-io/nx-github-actions/compare/v2.1.2...v2.1.3) (2022-02-19)
+
+### Continuous Integration
+
+- add missing e2e jobs (#24) ([389b419](https://github.com/e-square-io/nx-github-actions/commit/389b41949aeb917ccb779b22d6d3b5e7f5ec37e4)), closes [#24](https://github.com/e-square-io/nx-github-actions/issues/24)
+- update workflows (#23) ([887758c](https://github.com/e-square-io/nx-github-actions/commit/887758c40cde5878a4e3a77d50bfd6ea7df3494b)), closes [#23](https://github.com/e-square-io/nx-github-actions/issues/23)
+
 ## [2.1.2](https://github.com/e-square-io/nx-github-actions/compare/v2.1.1...v2.1.2) (2022-02-13)
 
 ### Build System
