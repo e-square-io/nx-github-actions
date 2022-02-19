@@ -29,7 +29,7 @@ jobs:
 
   execute:
     name: Run ${{ matrix.target }} ${{ matrix.distribution }}
-    if: ${{ needs.setup.outputs.hasChanges == 'true' }}
+    if: ${{ fromJSON(needs.setup.outputs.hasChanges) }}
     runs-on: ubuntu-latest
     needs: [ setup ]
     strategy:
@@ -64,7 +64,7 @@ jobs:
 
   e2e-distribute:
     name: E2E nx-affected-matrix
-    if: ${{ needs.setup.outputs.hasChanges == 'true'  && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')  }}
+    if: ${{ fromJSON(needs.setup.outputs.hasChanges) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')  }}
     needs: [setup, execute]
     runs-on: ubuntu-latest
     outputs:
@@ -94,7 +94,7 @@ jobs:
 
   e2e-execute:
     name: 'E2E nx-distributed-task [${{ matrix.target }} (${{ matrix.distribution }})]'
-    if: ${{ needs.e2e-distribute.outputs.hasChanges == 'true' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
+    if: ${{ fromJSON(needs.e2e-distribute.outputs.hasChanges) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
     needs: [setup,e2e-distribute]
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.target == 'test' }}
@@ -124,7 +124,7 @@ jobs:
   release:
     name: Release version
     runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.hasChanges == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ fromJSON(needs.setup.outputs.hasChanges) && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [setup, execute]
     outputs:
       released: ${{ steps.release.outputs.released }}
@@ -159,7 +159,7 @@ jobs:
 
   publish:
     name: Publish actions
-    if: ${{ needs.release.outputs.released }}
+    if: ${{ fromJSON(needs.release.outputs.released) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
