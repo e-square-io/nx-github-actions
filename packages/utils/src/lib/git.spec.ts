@@ -1,7 +1,9 @@
 import { retrieveGitBoundaries, retrieveGitSHA } from './git';
 import { Exec } from './exec';
-import * as core from '@actions/core';
 import { context } from '@actions/github';
+import * as core from '@actions/core';
+
+jest.mock('./logger');
 
 describe('git', () => {
   let exec: Exec;
@@ -34,7 +36,6 @@ describe('git', () => {
     it('should fail pipeline if throws', async () => {
       jest.spyOn(context, 'eventName', 'get').mockReturnValueOnce('push');
       execWrapper.mockReturnValueOnce(Promise.reject());
-      jest.spyOn(core, 'setFailed');
 
       await retrieveGitBoundaries(exec);
       expect(core.setFailed).toHaveBeenCalled();

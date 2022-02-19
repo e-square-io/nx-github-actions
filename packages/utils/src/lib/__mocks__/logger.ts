@@ -1,4 +1,5 @@
 export const logger = {
+  ...(jest.requireActual('../logger') as any),
   log: jest.fn(),
   info: jest.fn(),
   success: jest.fn(),

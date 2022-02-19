@@ -1,4 +1,3 @@
-import { restoreCache, saveCache } from '@actions/cache';
 import { logger } from '../../../utils/src/lib/__mocks__/logger';
 
 jest.mock('@e-square/utils', () => ({
@@ -14,14 +13,13 @@ jest.mock('@e-square/utils', () => ({
 
 jest.mock('@actions/cache');
 
+import { restoreCache, saveCache } from '@actions/cache';
 import { assertNxInstalled, nxRunMany, PRIMARY_KEY, uploadArtifact } from '@e-square/utils';
 import { main } from './nx-distributed-task';
 import * as core from '@actions/core';
 
 describe('nxDistributedTask', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     const env = {
       INPUT_TARGET: 'test',
       INPUT_BUCKET: '1',

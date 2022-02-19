@@ -1,8 +1,10 @@
 import { NX_CACHE_PATH, restoreNxCache, saveNxCache, PRIMARY_KEY, CACHE_KEY } from './cache';
 import { resolve } from 'path';
 import { tree } from './fs';
-
 import { saveCache, restoreCache, ReserveCacheError } from '@actions/cache';
+
+jest.mock('./logger');
+
 import { logger } from './logger';
 
 describe('cache', () => {
@@ -13,7 +15,6 @@ describe('cache', () => {
 
   beforeEach(() => {
     jest.spyOn(tree, 'getLockFilePath').mockReturnValue('package-lock.json');
-    jest.clearAllMocks();
   });
 
   describe('restoreNxCache', () => {
@@ -28,20 +29,16 @@ describe('cache', () => {
 
     it('should fail silently', async () => {
       (restoreCache as jest.Mock).mockRejectedValueOnce('');
-      const warningSpy = jest.spyOn(logger, 'warning');
-
       await restoreNxCache('test', 2);
 
-      expect(warningSpy).toHaveBeenCalledWith('');
+      expect(logger.warning).toHaveBeenCalledWith('');
     });
 
     it('should report cache miss', async () => {
       (restoreCache as jest.Mock).mockResolvedValueOnce('');
-      const infoSpy = jest.spyOn(logger, 'info');
-
       await restoreNxCache('test', 2);
 
-      expect(infoSpy).toHaveBeenCalledWith('Cache miss');
+      expect(logger.info).toHaveBeenCalledWith('Cache miss');
     });
 
     it('should not restore cache if in debug mode', async () => {
@@ -58,7 +55,6 @@ describe('cache', () => {
   describe('saveNxCache', () => {
     beforeEach(() => {
       process.env[`STATE_${PRIMARY_KEY}`] = 'test';
-      jest.clearAllMocks();
     });
 
     it('should save cache with primary key', async () => {

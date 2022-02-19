@@ -1,0 +1,15 @@
+module.exports = {
+  ...jest.requireActual('@actions/core'),
+  setFailed: jest.fn(),
+  saveState: jest.fn(),
+  setOutput: jest.fn(),
+  getState: jest.fn().mockImplementation((key) => process.env[`STATE_${key}`]),
+  info: jest.fn(),
+  error: jest.fn(),
+  warning: jest.fn(),
+  notice: jest.fn(),
+  debug: jest.fn(),
+  group: jest.fn().mockImplementation(async (title, cb) => await cb()),
+  startGroup: jest.fn(),
+  endGroup: jest.fn(),
+};

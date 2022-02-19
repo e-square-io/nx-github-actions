@@ -1,18 +1,18 @@
-import { workspaceMock, mergedWorkspaceMock } from './__mocks__/fs';
-
 jest.mock('./fs');
-jest.mock('@actions/core', () => ({
-  ...(jest.requireActual('@actions/core') as any),
-  getInput: jest.fn(),
-}));
 
-import { getInput } from '@actions/core';
+import * as core from '@actions/core';
 import { getMaxDistribution, getStringArrayInput } from './inputs';
 
 describe('inputs', () => {
+  let spy: jest.SpyInstance;
+
+  beforeEach(() => {
+    spy = jest.spyOn(core, 'getInput');
+  });
+
   describe('getStringArrayInput', () => {
     beforeEach(() => {
-      (getInput as jest.Mock).mockReturnValue('test1,test2,test3');
+      spy.mockReturnValueOnce('test1,test2,test3');
     });
 
     it('should return an array of strings from a string input', () => {
@@ -22,25 +22,25 @@ describe('inputs', () => {
 
   describe('getMaxDistribution', () => {
     it('should return an object of targets distribution from a string input', () => {
-      (getInput as jest.Mock).mockReturnValue(2);
+      spy.mockReturnValueOnce(2);
       expect(getMaxDistribution('test')).toEqual({ test: 2 });
     });
 
     it('should return an object of targets distribution from a JSON object', () => {
-      (getInput as jest.Mock).mockReturnValue('{ "test1": 1, "test2": 2 }');
+      spy.mockReturnValueOnce('{ "test1": 1, "test2": 2 }');
       expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 2 });
     });
 
     it('should return an object of targets distribution from a JSON array', () => {
-      (getInput as jest.Mock).mockReturnValue('[1,2]');
+      spy.mockReturnValueOnce('[1,2]');
       expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 2 });
     });
 
     it('should return an object of targets distribution from a partial JSON object/array', () => {
-      (getInput as jest.Mock).mockReturnValue('{ "test1": 1 }');
+      spy.mockReturnValueOnce('{ "test1": 1 }');
       expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 3 });
 
-      (getInput as jest.Mock).mockReturnValue('[1]');
+      spy.mockReturnValueOnce('[1]');
       expect(getMaxDistribution(['test1', 'test2'])).toEqual({ test1: 1, test2: 3 });
     });
   });
