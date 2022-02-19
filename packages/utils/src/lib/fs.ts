@@ -1,8 +1,8 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync } from 'fs';
 import { resolve } from 'path';
 
-import type { Tree } from '@nrwl/devkit';
 import { cp, rmRF } from '@actions/io';
+import type { Tree } from '@nrwl/devkit';
 
 import { logger } from './logger';
 

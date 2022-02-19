@@ -4,8 +4,8 @@ import { context } from '@actions/github';
 import type { ProjectConfiguration } from '@nrwl/devkit';
 
 import { Exec } from './exec';
-import { tree } from './fs';
 import { BaseInputs } from './inputs';
+import { tree } from './fs';
 import { logger } from './logger';
 
 export const NX_BIN_PATH = 'node_modules/.bin/nx';

@@ -183,6 +183,6 @@ jobs:
         uses: e-square-io/.github/.github/actions/push-to-repo@main
         with:
           path: 'dist/packages/${{ matrix.package }}'
-          github-token: ${{ needs.release.outputs.gh-app-token }}
+          github-token: ${{ needs.release.outputs.github-token }}
           version: ${{ needs.release.outputs.version }}
           repository: ${{ matrix.package }}
