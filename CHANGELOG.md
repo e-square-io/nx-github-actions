@@ -1,3 +1,9 @@
+## [2.1.4](https://github.com/e-square-io/nx-github-actions/compare/v2.1.3...v2.1.4) (2022-02-19)
+
+### Continuous Integration
+
+- fix wrong inputs in publish job (#25) ([17db531](https://github.com/e-square-io/nx-github-actions/commit/17db531300fc2c76fe5f54ff8368b951a6d83295)), closes [#25](https://github.com/e-square-io/nx-github-actions/issues/25)
+
 ## [2.1.3](https://github.com/e-square-io/nx-github-actions/compare/v2.1.2...v2.1.3) (2022-02-19)
 
 ### Continuous Integration
