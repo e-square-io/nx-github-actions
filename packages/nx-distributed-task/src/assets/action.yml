@@ -1,7 +1,8 @@
 name: 'Nx distributed task'
 branding:
-  icon: chevron-right
+  icon: command
   color: white
+author: 'e-square.io'
 description: 'Executes Nx task'
 inputs:
   target:

@@ -2,6 +2,7 @@ name: 'Nx affected matrix'
 branding:
   icon: grid
   color: white
+author: 'e-square.io'
 description: "Calculates changes in NX workspace and outputs a JSON that can be used as GitHub's job matrix"
 inputs:
   targets:
