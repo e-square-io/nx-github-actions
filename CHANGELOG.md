@@ -1,3 +1,9 @@
+## [2.2.5](https://github.com/e-square-io/nx-github-actions/compare/v2.2.4...v2.2.5) (2022-03-01)
+
+### Continuous Integration
+
+- push to repo path is wrong ([1f7f3d2](https://github.com/e-square-io/nx-github-actions/commit/1f7f3d268c212db48c82e0a6f8502b88918eddf5))
+
 ## [2.2.4](https://github.com/e-square-io/nx-github-actions/compare/v2.2.3...v2.2.4) (2022-03-01)
 
 ### Continuous Integration
