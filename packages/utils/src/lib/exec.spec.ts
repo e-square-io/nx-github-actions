@@ -1,9 +1,9 @@
+import { exec as ghExec } from '@actions/exec';
+
 import { Exec } from './exec';
 
 jest.mock('@actions/exec');
 jest.mock('./logger');
-
-import { exec as ghExec } from '@actions/exec';
 
 describe('exec', () => {
   let exec: Exec;
