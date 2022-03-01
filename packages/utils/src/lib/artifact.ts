@@ -9,24 +9,24 @@ export async function uploadArtifact(glob: typeof Glob, name: string, paths: str
   const globPaths = paths.map((path) => `${path}/*`).join('\n');
   debug(`Upload paths: ${globPaths}`);
 
-  const files = await glob.create(globPaths).then((glob) => glob.glob());
-
-  if (!files.length) {
-    info(`Couldn't find files to upload in ${paths.join(', ')}`);
-    return;
-  }
-
-  debug(`Found ${files.length} files to upload`);
-
-  if (logger().debugMode) {
-    debug(`Debug mode is on, skipping uploading artifacts`);
-    return;
-  }
-
   try {
-    const { failedItems, artifactName, size } = await artifactClient().uploadArtifact(name, files, process.cwd());
-    debug(`name: ${artifactName}, size: ${size}, failedItems: ${failedItems.join(', ')}`);
+    const files = await glob.create(globPaths).then((glob) => glob.glob());
 
+    if (!files.length) {
+      info(`Couldn't find files to upload in ${paths.join(', ')}`);
+      return;
+    }
+
+    debug(`Found ${files.length} files to upload`);
+
+    if (logger().debugMode) {
+      debug(`Debug mode is on, skipping uploading artifacts`);
+      return;
+    }
+
+    const { failedItems, artifactName, size } = await artifactClient().uploadArtifact(name, files, process.cwd());
+
+    debug(`name: ${artifactName}, size: ${size}, failedItems: ${failedItems.join(', ')}`);
     success(`Successfully uploaded ${artifactName}`);
     return artifactName;
   } catch (e) {
