@@ -8,7 +8,7 @@ jest.mock('./logger');
 
 describe('artifact', () => {
   beforeEach(() => {
-    (glob.create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue(['dis/test1', 'dist/test2']) });
+    (glob.create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue(['dist/test1', 'dist/test2']) });
   });
 
   it('should not upload if no paths', async () => {
@@ -16,7 +16,7 @@ describe('artifact', () => {
   });
 
   it('should not upload if not found files', async () => {
-    (glob.create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue([]) });
+    (glob.create as jest.Mock).mockResolvedValueOnce({ glob: jest.fn().mockResolvedValue([]) });
     await expect(uploadArtifact(glob, 'test', ['dist'])).resolves.toBeUndefined();
   });
 
@@ -38,9 +38,17 @@ describe('artifact', () => {
     logger().debugMode = false;
   });
 
+  it('should fail globbing silently', async () => {
+    (glob.create as jest.Mock).mockRejectedValueOnce('error');
+
+    await uploadArtifact(glob, 'test', ['dist']);
+
+    expect(warning).toHaveBeenCalledWith('error');
+  });
+
   it('should fail uploading silently', async () => {
     (aCreate as jest.Mock).mockImplementationOnce(() => ({
-      uploadArtifact: jest.fn().mockRejectedValue('test'),
+      uploadArtifact: jest.fn().mockRejectedValue('error'),
     }));
 
     await uploadArtifact(glob, 'test', ['dist']);
