@@ -124,6 +124,7 @@ jobs:
     if: ${{ fromJSON(needs.setup.outputs.hasChanges) && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [setup, execute]
     outputs:
+      github-token: ${{ steps.githubAppAuth.outputs.github-token }}
       released: ${{ steps.release.outputs.released }}
       version: ${{ steps.release.outputs.version }}
       major: ${{ steps.release.outputs.major }}
