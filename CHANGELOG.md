@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/e-square-io/nx-github-actions/compare/v2.2.0...v2.2.1) (2022-03-01)
+
+### Bug Fixes
+
+- wrong badge in readme (#28) ([9a834c6](https://github.com/e-square-io/nx-github-actions/commit/9a834c6eece52b13a46fe314379bf1ee37aae27e)), closes [#28](https://github.com/e-square-io/nx-github-actions/issues/28)
+
 # [2.2.0](https://github.com/e-square-io/nx-github-actions/compare/v2.1.5...v2.2.0) (2022-03-01)
 
 ### Features
