@@ -10,7 +10,7 @@
         "outputPath": "dist/packages/nx-affected-matrix",
         "main": "packages/nx-affected-matrix/src/main.ts",
         "tsConfig": "packages/nx-affected-matrix/tsconfig.app.json",
-        "externalDependencies": ["@actions/core", "@actions/glob", "@actions/exec", "@actions/github", "@actions/io"],
+        "externalDependencies": "none",
         "additionalEntryPoints": [
           {
             "entryName": "set-env",
