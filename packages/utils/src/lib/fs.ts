@@ -1,10 +1,9 @@
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync, renameSync, rmSync } from 'fs';
 import { resolve } from 'path';
 
-import { cp, rmRF } from '@actions/io';
 import type { Tree } from '@nrwl/devkit';
 
-import { logger } from './logger';
+import { info } from './logger';
 
 export class GHTree implements Tree {
   readonly root: string;
@@ -21,7 +20,7 @@ export class GHTree implements Tree {
   }
 
   delete(filePath: string): void {
-    void rmRF(this.resolve(filePath));
+    void rmSync(this.resolve(filePath), { recursive: true });
   }
 
   exists(filePath: string): boolean {
@@ -43,7 +42,7 @@ export class GHTree implements Tree {
   }
 
   async rename(from: string, to: string): Promise<void> {
-    await cp(this.resolve(from), resolve(this.root, to));
+    renameSync(this.resolve(from), resolve(this.root, to));
   }
 
   write(filePath: string, content: Buffer | string): void {
@@ -58,7 +57,7 @@ export class GHTree implements Tree {
     const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'pnpm-lock.yml'];
     const lockFile = lockFiles.find((file) => this.exists(file));
     if (!lockFile) {
-      logger.info(`Couldn't find any lock file`);
+      info(`Couldn't find any lock file`);
       return;
     }
     return this.resolve(lockFile);

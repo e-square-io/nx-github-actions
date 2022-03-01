@@ -1,6 +1,6 @@
-import { getBooleanInput, getInput, InputOptions } from '@actions/core';
+import type * as Core from '@actions/core';
 
-import { logger } from './logger';
+import { log, logger, warning } from './logger';
 
 export interface BaseInputs {
   args: string[];
@@ -8,14 +8,24 @@ export interface BaseInputs {
   workingDirectory: string;
 }
 
-export function getStringArrayInput(name: string, separator = ' ', options?: InputOptions): string[] {
-  return getInput(name, options)
+export function getStringArrayInput(
+  core: typeof Core,
+  name: string,
+  separator = ' ',
+  options?: Core.InputOptions
+): string[] {
+  return core
+    .getInput(name, options)
     .split(separator)
     .filter((value) => value.length > 0);
 }
 
-export function getMaxDistribution(targets: string | string[], name?: string): Record<string, number> {
-  const value = name ? getInput(name) : getInput('maxDistribution') || getInput('maxParallel');
+export function getMaxDistribution(
+  core: typeof Core,
+  targets: string | string[],
+  name?: string
+): Record<string, number> {
+  const value = name ? core.getInput(name) : core.getInput('maxDistribution') || core.getInput('maxParallel');
   const coercedTargets = [].concat(targets);
   const maybeNumberValue = parseInt(value);
 
@@ -23,7 +33,7 @@ export function getMaxDistribution(targets: string | string[], name?: string): R
     coercedTargets.reduce((acc, curr, idx) => {
       let targetVal = typeof source === 'object' ? (Array.isArray(source) ? source[idx] : source[curr]) : source;
       if (targetVal === null || targetVal === undefined || isNaN(targetVal) || targetVal <= 0) {
-        logger.warning(
+        warning(
           new Error(
             `Received invalid value for ${name} input: '${targetVal}' for target '${curr}', using the default instead`
           )
@@ -39,26 +49,26 @@ export function getMaxDistribution(targets: string | string[], name?: string): R
     try {
       return reduceTargetsDistribution(JSON.parse(value));
     } catch {
-      logger.warning(new Error(`Couldn't parse '${value}' as a valid JSON object, using default value for ${name}`));
+      warning(new Error(`Couldn't parse '${value}' as a valid JSON object, using default value for ${name}`));
     }
   }
 
   return reduceTargetsDistribution(maybeNumberValue);
 }
 
-export function getBaseInputs(): BaseInputs {
-  const debug = getBooleanInput('debug');
-  const workingDirectory = getInput('workingDirectory');
+export function getBaseInputs(core: typeof Core): BaseInputs {
+  const debug = core.getBooleanInput('debug');
+  const workingDirectory = core.getInput('workingDirectory');
 
-  logger.debugMode = debug;
+  logger(core).debugMode = debug;
 
   if (workingDirectory?.length > 0) {
-    logger.log(`🏃 Working in custom directory: ${workingDirectory}`);
+    log(`🏃 Working in custom directory: ${workingDirectory}`);
     process.chdir(workingDirectory);
   }
 
   return {
-    args: getStringArrayInput('args'),
+    args: getStringArrayInput(core, 'args'),
     debug,
     workingDirectory,
   };

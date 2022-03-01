@@ -1,27 +1,27 @@
-import { uploadArtifact } from './artifact';
-import { create } from '@actions/glob';
 import { create as aCreate } from '@actions/artifact';
+import * as glob from '@actions/glob';
+
+import { uploadArtifact } from './artifact';
+import { logger, warning } from './logger';
 
 jest.mock('./logger');
 
-import { logger } from './logger';
-
 describe('artifact', () => {
   beforeEach(() => {
-    (create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue(['dis/test1', 'dist/test2']) });
+    (glob.create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue(['dis/test1', 'dist/test2']) });
   });
 
   it('should not upload if no paths', async () => {
-    await expect(uploadArtifact('test', [])).resolves.toBeUndefined();
+    await expect(uploadArtifact(glob, 'test', [])).resolves.toBeUndefined();
   });
 
   it('should not upload if not found files', async () => {
-    (create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue([]) });
-    await expect(uploadArtifact('test', ['dist'])).resolves.toBeUndefined();
+    (glob.create as jest.Mock).mockResolvedValue({ glob: jest.fn().mockResolvedValue([]) });
+    await expect(uploadArtifact(glob, 'test', ['dist'])).resolves.toBeUndefined();
   });
 
   it('should upload files', async () => {
-    await expect(uploadArtifact('test', ['dist'])).resolves.toBe('test');
+    await expect(uploadArtifact(glob, 'test', ['dist'])).resolves.toBe('test');
   });
 
   it('should skip upload if debug mode is on', async () => {
@@ -30,12 +30,12 @@ describe('artifact', () => {
       uploadArtifact: uploadSpy,
     }));
 
-    logger.debugMode = true;
+    logger().debugMode = true;
 
-    await expect(uploadArtifact('test', ['dist'])).resolves.toBeUndefined();
+    await expect(uploadArtifact(glob, 'test', ['dist'])).resolves.toBeUndefined();
     expect(uploadSpy).not.toHaveBeenCalled();
 
-    logger.debugMode = false;
+    logger().debugMode = false;
   });
 
   it('should fail uploading silently', async () => {
@@ -43,8 +43,8 @@ describe('artifact', () => {
       uploadArtifact: jest.fn().mockRejectedValue('test'),
     }));
 
-    await uploadArtifact('test', ['dist']);
+    await uploadArtifact(glob, 'test', ['dist']);
 
-    expect(logger.warning).toHaveBeenCalled();
+    expect(warning).toHaveBeenCalled();
   });
 });

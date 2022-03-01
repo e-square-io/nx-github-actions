@@ -1,0 +1,68 @@
+name: 'Nx affected matrix'
+branding:
+  icon: grid
+  color: white
+author: 'e-square.io'
+description: "Calculates changes in NX workspace and outputs a JSON that can be used as GitHub's job matrix"
+inputs:
+  targets:
+    description: 'comma-delimited targets to run'
+    required: true
+    default: 'test,build'
+  args:
+    description: 'space-delimited args to add to nx command execution'
+    required: false
+  maxDistribution:
+    description: "Maximum distribution of jobs per target"
+    required: false
+    default: '3'
+  maxParallel:
+    description: "Maximum distribution of jobs per target"
+    deprecationMessage: "Deprecated. Use maxDistribution instead"
+    required: false
+    default: '3'
+  workingDirectory:
+    description: "Path to the Nx workspace, needed if not the repository root"
+    required: false
+  main-branch:
+    description: "The 'main' branch of your repository (the base branch which you target with PRs)."
+    required: false
+    default: main
+  workflow-id:
+    description: "The ID of the github action workflow to check for successful run or the name of the file name containing the workflow."
+    required: false
+  debug:
+    description: "Enable Debug mode"
+    required: false
+    default: 'false'
+outputs:
+  matrix:
+    description: "The matrix that should be used in next job's matrix strategy"
+    value: ${{ steps.calculate.outputs.matrix }}
+  hasChanges:
+    description: "Returns true when there are changes, can be used to skip next steps"
+    value: ${{ steps.calculate.outputs.hasChanges }}
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        clean: false
+
+    - name: Derive appropriate SHAs for base and head for `nx affected` commands
+      uses: nrwl/nx-set-shas@v2
+      with:
+        main-branch-name: ${{ inputs.main-branch }}
+        workflow-id: ${{ inputs.workflow-id }}
+
+    - name: Calculate affected
+      id: calculate
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { default: setEnv } = require('${{ github.action_path }}/set-env.js');
+          const { default: main } = require('${{ github.action_path }}/main.js');
+
+          setEnv(${{ toJSON(inputs) }}, process);
+          await main(context, core, exec, io, require);

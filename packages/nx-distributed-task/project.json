@@ -10,33 +10,25 @@
         "outputPath": "dist/packages/nx-distributed-task",
         "main": "packages/nx-distributed-task/src/main.ts",
         "tsConfig": "packages/nx-distributed-task/tsconfig.app.json",
-        "externalDependencies": "none",
+        "externalDependencies": ["@actions/core", "@actions/glob", "@actions/exec", "@actions/github"],
+        "additionalEntryPoints": [
+          {
+            "entryName": "set-env",
+            "entryPath": "packages/utils/src/lib/set-env.ts"
+          }
+        ],
         "generatePackageJson": true,
+        "optimization": true,
+        "extractLicenses": false,
+        "sourceMap": false,
+        "inspect": false,
         "assets": [
           {
-            "input": "packages/nx-distributed-task/src/assets",
-            "glob": "*",
-            "output": "."
-          },
-          {
             "input": "packages/nx-distributed-task",
-            "glob": "README.md",
+            "glob": "*.@(yml|md)",
             "output": "."
           }
         ]
-      },
-      "configurations": {
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false,
-          "fileReplacements": [
-            {
-              "replace": "packages/nx-distributed-task/src/environments/environment.ts",
-              "with": "packages/nx-distributed-task/src/environments/environment.prod.ts"
-            }
-          ]
-        }
       }
     },
     "serve": {

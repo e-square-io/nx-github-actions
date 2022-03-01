@@ -1,5 +1,6 @@
 module.exports = {
   ...jest.requireActual('@actions/core'),
+  isDebug: jest.fn().mockReturnValue(false),
   setFailed: jest.fn(),
   saveState: jest.fn(),
   setOutput: jest.fn(),

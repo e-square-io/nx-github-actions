@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
-    "types": ["node"]
+    "target": "ES2021",
+    "types": ["ES2021", "node"]
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "__mocks__/**/*", "**/*/__mocks__/**/*"],
   "include": ["**/*.ts"]

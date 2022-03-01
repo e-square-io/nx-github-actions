@@ -1,31 +1,37 @@
 import { workspaceMock, mergedWorkspaceMock } from './__mocks__/fs';
 
-jest.mock('./fs');
-jest.mock('./logger');
-
 import {
   assertNxInstalled,
   getProjectOutputs,
   getWorkspaceProjects,
-  NX_BIN_PATH,
   nxCommand,
   nxPrintAffected,
   nxRunMany,
 } from './nx';
-import * as which from 'which';
+import * as npm from './npm';
 import { tree } from './fs';
 import { Exec } from './exec';
+import { context } from '@actions/github';
+
+jest.mock('./fs');
+jest.mock('./logger');
+jest.mock('@actions/github');
 
 describe('nx', () => {
   describe('assertNxInstalled', () => {
     it('should fail to assert and throw error', async () => {
-      (which as jest.Mock).mockReturnValueOnce(Promise.reject());
-      await expect(assertNxInstalled()).rejects.toThrow("Couldn't find Nx binary, Have you run npm/yarn install?");
+      const exec = new Exec(jest.fn().mockResolvedValueOnce(0));
+      await expect(assertNxInstalled(exec)).rejects.toThrow("Couldn't find Nx binary, Have you run npm/yarn install?");
     });
 
     it('should success assertion', async () => {
-      (which as jest.Mock).mockReturnValueOnce(Promise.resolve());
-      await expect(assertNxInstalled()).resolves.toBeUndefined();
+      const exec = new Exec(
+        jest.fn().mockImplementation(async (_, __, opts) => {
+          opts.listeners.stdout('test');
+          return Promise.resolve(0);
+        })
+      );
+      await expect(assertNxInstalled(exec)).resolves.toBeUndefined();
     });
   });
 
@@ -91,30 +97,40 @@ describe('nx', () => {
     let exec: Exec;
 
     beforeEach(() => {
-      exec = new Exec();
+      exec = new Exec(jest.fn());
       jest.spyOn(exec, 'build').mockReturnValue(() => Promise.resolve(''));
       jest.spyOn(exec, 'withCommand');
       jest.spyOn(exec, 'withArgs');
       jest.spyOn(exec, 'withOptions');
+      jest.spyOn(npm, 'getNpmVersion').mockResolvedValue('6.8.0');
     });
 
     it('should call nxCommand', async () => {
       await expect(nxCommand('test', 'build', exec, [])).resolves.toBe('');
-      expect(exec.withCommand).toHaveBeenCalledWith(`${NX_BIN_PATH} test`);
+      expect(exec.withCommand).toHaveBeenCalledWith(`npx -p @nrwl/cli nx test`);
       expect(exec.withArgs).toHaveBeenCalledWith('--target=build');
+
+      jest.spyOn(npm, 'getNpmVersion').mockResolvedValueOnce('7.0.0');
+      await expect(nxCommand('test', 'build', exec, [])).resolves.toBe('');
+      expect(exec.withCommand).toHaveBeenCalledWith(`npx --no -p @nrwl/cli nx test`);
     });
 
     it('should call nxPrintAffected', async () => {
       await expect(nxPrintAffected('test', exec)).resolves.toEqual(['']);
-      expect(exec.withCommand).toHaveBeenCalledWith(`${NX_BIN_PATH} print-affected`);
+      expect(exec.withCommand).toHaveBeenCalledWith(`npx -p @nrwl/cli nx print-affected`);
       expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--select=tasks.target.project');
     });
 
     it('should call nxRunMany', async () => {
       await expect(
-        nxRunMany('test', { args: [], debug: false, workingDirectory: '', nxCloud: true, maxParallel: 3 }, exec)
+        nxRunMany(
+          context,
+          'test',
+          { args: [], debug: false, workingDirectory: '', nxCloud: true, maxParallel: 3 },
+          exec
+        )
       ).resolves.toBe('');
-      expect(exec.withCommand).toHaveBeenCalledWith(`${NX_BIN_PATH} run-many`);
+      expect(exec.withCommand).toHaveBeenCalledWith(`npx -p @nrwl/cli nx run-many`);
       expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--scan', '--parallel', '--maxParallel=3');
       expect(exec.withOptions).toHaveBeenCalledWith(
         expect.objectContaining({
