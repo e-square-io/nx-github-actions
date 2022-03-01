@@ -1,9 +1,3 @@
-## [2.1.5](https://github.com/e-square-io/nx-github-actions/compare/v2.1.4...v2.1.5) (2022-02-22)
-
-### Build System
-
-- update nx packages (#26) ([75aec2c](https://github.com/e-square-io/nx-github-actions/commit/75aec2cad472aa19729c15af1c11b6f3cd1936cf)), closes [#26](https://github.com/e-square-io/nx-github-actions/issues/26)
-
 ## [2.1.4](https://github.com/e-square-io/nx-github-actions/compare/v2.1.3...v2.1.4) (2022-02-19)
 
 ### Continuous Integration

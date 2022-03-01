@@ -11,5 +11,4 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/packages/utils',
-  testEnvironment: 'node',
 };

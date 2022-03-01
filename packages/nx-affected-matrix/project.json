@@ -10,33 +10,25 @@
         "outputPath": "dist/packages/nx-affected-matrix",
         "main": "packages/nx-affected-matrix/src/main.ts",
         "tsConfig": "packages/nx-affected-matrix/tsconfig.app.json",
-        "externalDependencies": "none",
+        "externalDependencies": ["@actions/core", "@actions/glob", "@actions/exec", "@actions/github", "@actions/io"],
+        "additionalEntryPoints": [
+          {
+            "entryName": "set-env",
+            "entryPath": "packages/utils/src/lib/set-env.ts"
+          }
+        ],
         "generatePackageJson": true,
+        "optimization": true,
+        "extractLicenses": false,
+        "sourceMap": false,
+        "inspect": false,
         "assets": [
           {
-            "input": "packages/nx-affected-matrix/src/assets",
-            "glob": "*",
-            "output": "."
-          },
-          {
             "input": "packages/nx-affected-matrix",
-            "glob": "README.md",
+            "glob": "*.@(yml|md)",
             "output": "."
           }
         ]
-      },
-      "configurations": {
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false,
-          "fileReplacements": [
-            {
-              "replace": "packages/nx-affected-matrix/src/environments/environment.ts",
-              "with": "packages/nx-affected-matrix/src/environments/environment.prod.ts"
-            }
-          ]
-        }
       }
     },
     "serve": {

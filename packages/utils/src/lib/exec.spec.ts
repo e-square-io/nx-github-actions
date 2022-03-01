@@ -1,15 +1,27 @@
 import { Exec } from './exec';
+
+jest.mock('@actions/exec');
+jest.mock('./logger');
+
 import { exec as ghExec } from '@actions/exec';
 
 describe('exec', () => {
   let exec: Exec;
 
   beforeEach(() => {
-    exec = new Exec();
+    exec = new Exec(ghExec);
 
     exec.withCommand('test');
 
     jest.spyOn(exec, 'build');
+  });
+
+  it('should be possible to create new instance from another one', async () => {
+    const newExec = new Exec(exec);
+
+    await newExec.withCommand('test').build()();
+
+    expect(ghExec).toHaveBeenCalledWith('test', expect.anything(), expect.anything());
   });
 
   it('should add command', async () => {
@@ -32,7 +44,7 @@ describe('exec', () => {
   });
 
   it('should throw if no command is specified', async () => {
-    exec = new Exec();
+    exec = new Exec(ghExec);
 
     try {
       exec.build();

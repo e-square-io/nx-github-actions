@@ -1,71 +1,79 @@
-import { getState, saveState, setFailed } from '@actions/core';
+import type * as Core from '@actions/core';
+import type * as _Exec from '@actions/exec';
+import type * as Glob from '@actions/glob';
+import type * as Io from '@actions/io';
+import type { context as Context } from '@actions/github';
 
-import {
-  assertNxInstalled,
-  Exec,
-  getProjectOutputs,
-  getWorkspaceProjects,
-  nxRunMany,
-  restoreNxCache,
-  saveNxCache,
-  uploadArtifact,
-  logger,
-} from '@e-square/utils';
+import { uploadArtifact } from '@e-square/utils/artifact';
+import { restoreNxCache, saveNxCache } from '@e-square/utils/cache';
+import { Exec } from '@e-square/utils/exec';
+import { group, info } from '@e-square/utils/logger';
+import { assertNxInstalled, getProjectOutputs, getWorkspaceProjects, nxRunMany } from '@e-square/utils/nx';
+
 import { getInputs, Inputs } from './inputs';
 
-const IS_POST_JOB = 'isPostJob';
-
-function uploadProjectsOutputs(inputs: Inputs): Promise<void> {
+function uploadProjectsOutputs(glob: typeof Glob, inputs: Inputs): Promise<void> {
   if (!inputs.uploadOutputs) return;
 
-  return logger.group('⬆️ Uploading artifacts', async () => {
+  return group('⬆️ Uploading artifacts', async () => {
     const projects = getWorkspaceProjects();
     const artifactName = inputs.target;
 
     await Promise.all(
       inputs.projects.map((project) =>
-        uploadArtifact(artifactName, getProjectOutputs(projects, project, inputs.target))
+        uploadArtifact(glob, artifactName, getProjectOutputs(projects, project, inputs.target))
       )
     );
   });
 }
 
-function runNxTask(inputs: Inputs): Promise<void> {
-  return logger.group('🏃 Running NX target', async () => {
-    const exec = new Exec();
-    exec.withArgs(`--projects=${inputs.projects}`);
-    await nxRunMany(inputs.target, inputs, exec);
+function runNxTask(context: typeof Context, exec: typeof _Exec, inputs: Inputs): Promise<void> {
+  return group('🏃 Running NX target', async () => {
+    const _exec = new Exec(exec.exec);
+    _exec.withArgs(`--projects=${inputs.projects}`);
+    await nxRunMany(context, inputs.target, inputs, _exec);
   });
 }
 
-function restoreCache({ target, distribution, nxCloud }: Inputs): Promise<void> {
+function restoreCache(
+  context: typeof Context,
+  glob: typeof Glob,
+  core: typeof Core,
+  { target, distribution, nxCloud }: Inputs
+): Promise<void> {
   if (nxCloud) return;
 
-  return logger.group('🚀 Retrieving NX cache', () => restoreNxCache(target, distribution));
+  return group('🚀 Retrieving NX cache', () => restoreNxCache(context, glob, core, target, distribution));
 }
 
-export async function main(): Promise<void> {
-  /* post-job execution */
-  if (getState(IS_POST_JOB) === 'true') {
-    await saveNxCache();
-    return;
-  }
+function saveCache(core: typeof Core, { nxCloud }: Inputs): Promise<void> {
+  if (nxCloud) return;
 
-  const inputs = getInputs();
+  return group('🚀 Saving NX cache', () => saveNxCache(core));
+}
 
-  if (inputs.projects.length === 0) {
-    logger.info('There are no projects to run, completing');
+export async function main(
+  context: typeof Context,
+  core: typeof Core,
+  exec: typeof _Exec,
+  glob: typeof Glob,
+  io: typeof Io,
+  require?
+): Promise<void> {
+  const parsedInputs = getInputs(core);
+
+  if (parsedInputs.projects.length === 0) {
+    info('There are no projects to run, completing');
     return;
   }
 
   try {
-    await assertNxInstalled();
-    await restoreCache(inputs);
-    await runNxTask(inputs);
-    await uploadProjectsOutputs(inputs);
+    await assertNxInstalled(new Exec(exec.exec));
+    await restoreCache(context, glob, core, parsedInputs);
+    await runNxTask(context, exec, parsedInputs);
+    await uploadProjectsOutputs(glob, parsedInputs);
+    await saveCache(core, parsedInputs);
   } catch (e) {
-    setFailed(e);
+    core.setFailed(e);
   }
-
-  saveState(IS_POST_JOB, true);
 }

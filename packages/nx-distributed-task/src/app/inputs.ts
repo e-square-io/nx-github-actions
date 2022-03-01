@@ -1,6 +1,6 @@
-import { getBooleanInput, getInput } from '@actions/core';
+import type * as Core from '@actions/core';
 
-import { BaseInputs, getBaseInputs, getStringArrayInput, getMaxDistribution } from '@e-square/utils';
+import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } from '@e-square/utils/inputs';
 
 export interface Inputs extends BaseInputs {
   target: string;
@@ -11,20 +11,20 @@ export interface Inputs extends BaseInputs {
   nxCloud: boolean;
 }
 
-function getDistribution(): number {
-  return parseInt(getInput('distribution') || getInput('bucket') || '0');
+function getDistribution(core: typeof Core): number {
+  return parseInt(core.getInput('distribution') || core.getInput('bucket') || '0');
 }
 
-export function getInputs(): Inputs {
-  const target = getInput('target', { required: true });
+export function getInputs(core: typeof Core): Inputs {
+  const target = core.getInput('target', { required: true });
 
   return {
-    ...getBaseInputs(),
+    ...getBaseInputs(core),
     target,
-    distribution: getDistribution(),
-    projects: getStringArrayInput('projects', ','),
-    maxParallel: getMaxDistribution(target, 'maxParallel')[target],
-    nxCloud: getBooleanInput('nxCloud'),
-    uploadOutputs: getBooleanInput('uploadOutputs'),
+    distribution: getDistribution(core),
+    projects: getStringArrayInput(core, 'projects', ','),
+    maxParallel: getMaxDistribution(core, target, 'maxParallel')[target],
+    nxCloud: core.getBooleanInput('nxCloud'),
+    uploadOutputs: core.getBooleanInput('uploadOutputs'),
   };
 }

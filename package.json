@@ -1,6 +1,6 @@
 {
   "name": "@e-square/nx-github-actions",
-  "version": "2.1.5",
+  "version": "2.1.4",
   "license": "MIT",
   "scripts": {
     "nx": "nx",
@@ -39,15 +39,14 @@
   "dependencies": {
     "@actions/artifact": "^0.6.1",
     "@actions/cache": "^1.0.8",
+    "tslib": "^2.0.0"
+  },
+  "devDependencies": {
     "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.0",
     "@actions/github": "^5.0.0",
     "@actions/glob": "^0.2.0",
     "@actions/io": "^1.1.1",
-    "tslib": "^2.0.0",
-    "which": "^2.0.2"
-  },
-  "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-angular": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",

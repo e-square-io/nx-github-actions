@@ -26,9 +26,10 @@ jobs:
         id: affected
         with:
           targets: 'test,build'
+          maxDistribution: 1
 
   execute:
-    name: Run ${{ matrix.target }} ${{ matrix.distribution }}
+    name: Run ${{ matrix.target }}
     if: ${{ fromJSON(needs.setup.outputs.hasChanges) }}
     runs-on: ubuntu-latest
     needs: [ setup ]
@@ -52,7 +53,6 @@ jobs:
         id: execute
         with:
           target: ${{ matrix.target }}
-          distribution: ${{ matrix.distribution }}
           projects: ${{ matrix.projects }}
           nxCloud: true
 
@@ -71,10 +71,7 @@ jobs:
       hasChanges: ${{ steps.affected.outputs.hasChanges || needs.setup.outputs.hasChanges }}
       matrix: ${{ steps.affected.outputs.matrix || needs.setup.outputs.matrix }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v2
 
       - uses: e-square-io/.github/.github/actions/npm-ci@main
 
@@ -88,12 +85,12 @@ jobs:
         uses: ./dist/packages/nx-affected-matrix
         id: affected
         with:
-          targets: 'build'
+          targets: build
           maxDistribution: 1
           debug: true
 
   e2e-execute:
-    name: 'E2E nx-distributed-task [${{ matrix.target }} (${{ matrix.distribution }})]'
+    name: E2E nx-distributed-task [${{ matrix.target }} (${{ matrix.distribution }})]
     if: ${{ fromJSON(needs.e2e-distribute.outputs.hasChanges) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
     needs: [setup,e2e-distribute]
     runs-on: ubuntu-latest
@@ -182,7 +179,7 @@ jobs:
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
         uses: e-square-io/.github/.github/actions/push-to-repo@main
         with:
-          path: 'dist/packages/${{ matrix.package }}'
+          path: dist/packages/${{ matrix.package }}
           github-token: ${{ needs.release.outputs.github-token }}
           version: ${{ needs.release.outputs.version }}
           repository: ${{ matrix.package }}

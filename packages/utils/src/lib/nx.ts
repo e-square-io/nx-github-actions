@@ -1,14 +1,11 @@
-import * as which from 'which';
-
-import { context } from '@actions/github';
+import type { context as Context } from '@actions/github';
 import type { ProjectConfiguration } from '@nrwl/devkit';
 
 import { Exec } from './exec';
 import { BaseInputs } from './inputs';
 import { tree } from './fs';
-import { logger } from './logger';
-
-export const NX_BIN_PATH = 'node_modules/.bin/nx';
+import { debug, logger, warning } from './logger';
+import { getNpmVersion } from './npm';
 
 export interface WorkspaceJsonConfiguration {
   projects: Record<string, ProjectConfiguration | string>;
@@ -18,7 +15,7 @@ export type WorkspaceProjects = Record<string, ProjectConfiguration>;
 
 export function getWorkspaceProjects(): WorkspaceProjects {
   const workspaceFile = tree.exists('angular.json') ? 'angular.json' : 'workspace.json';
-  logger.debug(`Found ${workspaceFile} as nx workspace`);
+  debug(`Found ${workspaceFile} as nx workspace`);
 
   const workspaceContent: WorkspaceJsonConfiguration = JSON.parse(
     tree
@@ -57,7 +54,7 @@ export function getProjectOutputs(projects: WorkspaceProjects, project: string, 
     const [scope, prop] = path.replace(/[{}]/g, '').split('.');
 
     if (!projectTarget?.[scope]?.[prop]) {
-      logger.warning(
+      warning(
         new Error(
           `Couldn't find output value for ${project}. full path: project.${project}.targets.${target}.${scope}.${prop}`
         )
@@ -69,24 +66,25 @@ export function getProjectOutputs(projects: WorkspaceProjects, project: string, 
   };
 
   const resolvedOutputs = outputs.map(replaceExpressions);
-  logger.debug(`Found ${resolvedOutputs} as outputs for ${target}`);
+  debug(`Found ${resolvedOutputs} as outputs for ${target}`);
 
   return resolvedOutputs;
 }
 
-export async function assertNxInstalled() {
-  try {
-    logger.debug(`Checking existence of nx`);
+export async function assertNxInstalled(exec: Exec) {
+  debug(`Checking existence of nx`);
 
-    await which(NX_BIN_PATH);
-  } catch {
-    throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
-  }
+  const path = await exec.withCommand('npm ls @nrwl/cli -p --depth 1').build()();
+  debug(`NX bin path: ${path}`);
+
+  if (!path) throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
 }
 
 export async function nxCommand(command: string, target: string, exec: Exec, args: string[]): Promise<string> {
+  const npxVersion = (await getNpmVersion(exec)).split('.');
+
   const wrapper = exec
-    .withCommand(`${NX_BIN_PATH} ${command}`)
+    .withCommand(`npx ${+npxVersion[0] > 6 ? '--no ' : ''}-p @nrwl/cli nx ${command}`)
     .withArgs(`--target=${target}`, ...args)
     .build();
 
@@ -95,12 +93,13 @@ export async function nxCommand(command: string, target: string, exec: Exec, arg
 
 export async function nxPrintAffected(target: string, exec: Exec): Promise<string[]> {
   const projects = (await nxCommand('print-affected', target, exec, ['--select=tasks.target.project'])).trim();
-  logger.debug(`Affected project for ${target}: ${projects}`);
+  debug(`Affected project for ${target}: ${projects}`);
 
   return projects.split(', ');
 }
 
 export async function nxRunMany(
+  context: typeof Context,
   target: string,
   inputs: BaseInputs & { nxCloud?: boolean; maxParallel?: number },
   exec: Exec
@@ -121,8 +120,8 @@ export async function nxRunMany(
 
   args.push('--parallel', `--maxParallel=${inputs.maxParallel || 3}`);
 
-  if (logger.debugMode) {
-    logger.debug(`Debug mode is on, skipping target execution`);
+  if (logger().debugMode) {
+    debug(`Debug mode is on, skipping target execution`);
     return Promise.resolve('[DEBUG MODE] skipping execution');
   }
 

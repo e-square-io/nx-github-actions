@@ -1,4 +1,5 @@
-import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } from '@e-square/utils';
+import type * as Core from '@actions/core';
+import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } from '@e-square/utils/inputs';
 
 export interface Inputs extends BaseInputs {
   targets: string[];
@@ -7,12 +8,12 @@ export interface Inputs extends BaseInputs {
   maxParallel?: number;
 }
 
-export function getInputs(): Inputs {
-  const targets = getStringArrayInput('targets', ',');
+export function getInputs(core: typeof Core): Inputs {
+  const targets = getStringArrayInput(core, 'targets', ',');
 
   return {
-    ...getBaseInputs(),
+    ...getBaseInputs(core),
     targets,
-    maxDistribution: getMaxDistribution(targets),
+    maxDistribution: getMaxDistribution(core, targets),
   };
 }

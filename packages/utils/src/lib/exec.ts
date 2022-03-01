@@ -1,7 +1,6 @@
-import { setFailed } from '@actions/core';
-import { exec, ExecOptions } from '@actions/exec';
+import type { ExecOptions, exec as __exec } from '@actions/exec';
 
-import { logger } from './logger';
+import { debug } from './logger';
 
 export type ExecWrapper = (args?: string[], options?: ExecOptions) => Promise<string>;
 
@@ -9,6 +8,12 @@ export class Exec {
   private command = '';
   private options: ExecOptions = {};
   private args: string[] = [];
+
+  private get exec(): typeof __exec {
+    return this._exec instanceof Exec ? this._exec.exec : this._exec;
+  }
+
+  constructor(private _exec: typeof __exec | Exec) {}
 
   build(): ExecWrapper {
     const command = this.command;
@@ -36,10 +41,10 @@ export class Exec {
         },
       };
 
-      logger.debug(`Running command ${command} - args: ${finalArgs.join(' ')}", options: ${finalOpts}`);
+      debug(`Running command ${command} - args: ${finalArgs.join(' ')}", options: ${finalOpts}`);
 
-      return exec(command, finalArgs, finalOpts).then((code) => {
-        if (code !== 0) setFailed(stderr);
+      return this.exec(command, finalArgs, finalOpts).then((code) => {
+        if (code !== 0) throw stderr;
         return stdout;
       });
     };

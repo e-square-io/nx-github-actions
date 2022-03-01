@@ -1,6 +1,12 @@
-import { setFailed, setOutput } from '@actions/core';
+import type * as Core from '@actions/core';
+import type * as _Exec from '@actions/exec';
+import * as Io from '@actions/io';
+import type { context as Context } from '@actions/github';
 
-import { Exec, retrieveGitBoundaries, nxPrintAffected, assertNxInstalled, logger } from '@e-square/utils';
+import { Exec } from '@e-square/utils/exec';
+import { assertNxInstalled, nxPrintAffected } from '@e-square/utils/nx';
+import { debug, group, success } from '@e-square/utils/logger';
+
 import { getInputs, Inputs } from './inputs';
 
 interface NxAffectedTarget {
@@ -40,17 +46,15 @@ export function generateAffectedMatrix(
   { targets, maxDistribution, args = [] }: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>,
   exec: Exec
 ): Promise<NxAffectedMatrix> {
-  return logger.group(`⚙️ Generating affected matrix for ${targets}`, async () => {
+  return group(`⚙️ Generating affected matrix for ${targets}`, async () => {
     const matrix: NxAffectedMatrix = {
       include: [],
     };
 
-    const [base, head] = await retrieveGitBoundaries(exec);
-
     for (const target of targets) {
-      exec.withArgs(`--base=${base}`, `--head=${head}`, ...args);
+      exec.withArgs(...args);
 
-      logger.debug(`Calculating affected for "${target}" target`);
+      debug(`Calculating affected for "${target}" target`);
 
       const projects = await nxPrintAffected(target, exec);
       const affectedTargets: NxAffectedTarget[] = chunkify(projects, maxDistribution[target])
@@ -66,25 +70,29 @@ export function generateAffectedMatrix(
       }
     }
 
-    logger.debug(`matrix: ${matrix}`);
-    logger.success(`Generated affected matrix`);
+    debug(`matrix: ${matrix}`);
+    success(`Generated affected matrix`);
 
     return matrix;
   });
 }
 
-export async function main(): Promise<void> {
-  const inputs = getInputs();
-
+export async function main(
+  context: typeof Context,
+  core: typeof Core,
+  exec: typeof _Exec,
+  io: typeof Io,
+  require?
+): Promise<void> {
   try {
-    await assertNxInstalled();
+    const parsedInputs = getInputs(core);
 
-    const exec = new Exec();
-    const matrix = await generateAffectedMatrix(inputs, exec);
+    await assertNxInstalled(new Exec(exec.exec));
+    const matrix = await generateAffectedMatrix(parsedInputs, new Exec(exec.exec));
 
-    setOutput('matrix', matrix);
-    setOutput('hasChanges', !!matrix.include.find((target) => target.projects.length));
+    core.setOutput('matrix', matrix);
+    core.setOutput('hasChanges', !!matrix.include.find((target) => target.projects.length));
   } catch (e) {
-    setFailed(e);
+    core.setFailed(e);
   }
 }

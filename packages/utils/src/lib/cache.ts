@@ -1,10 +1,10 @@
 import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
-import { getState, saveState } from '@actions/core';
-import { context } from '@actions/github';
-import { hashFiles } from '@actions/glob';
+import type * as Core from '@actions/core';
+import type * as Glob from '@actions/glob';
+import type { context as Context } from '@actions/github';
 
 import { tree } from './fs';
-import { logger } from './logger';
+import { debug, info, logger, success, warning } from './logger';
 
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 export const CACHE_KEY = 'CACHE_KEY';
@@ -20,7 +20,12 @@ function isExactKeyMatch(key: string, cacheKey?: string): boolean {
   );
 }
 
-async function getCacheKeys(target: string, distribution: number): Promise<[primary: string, restoreKeys: string[]]> {
+async function getCacheKeys(
+  context: typeof Context,
+  glob: typeof Glob,
+  target: string,
+  distribution: number
+): Promise<[primary: string, restoreKeys: string[]]> {
   const keyParts = [];
   const restoreKeys = [];
 
@@ -29,7 +34,7 @@ async function getCacheKeys(target: string, distribution: number): Promise<[prim
 
   const lockFile = tree.getLockFilePath();
   if (lockFile) {
-    keyParts.push(await hashFiles(lockFile));
+    keyParts.push(await glob.hashFiles(lockFile));
     addRestoreKey();
   }
 
@@ -51,67 +56,73 @@ async function getCacheKeys(target: string, distribution: number): Promise<[prim
     keyParts.push(context.payload.pull_request.number.toString());
   }
 
-  logger.debug(`primary key is: ${keyParts.join('-')}`);
-  logger.debug(`restore keys are: ${restoreKeys.join(' | ')}`);
+  debug(`primary key is: ${keyParts.join('-')}`);
+  debug(`restore keys are: ${restoreKeys.join(' | ')}`);
 
   return [keyParts.join('-'), restoreKeys];
 }
 
-export async function restoreNxCache(target: string, distribution: number): Promise<void> {
-  if (logger.debugMode) {
-    logger.debug(`Debug mode is on, skipping restoring cache`);
+export async function restoreNxCache(
+  context: typeof Context,
+  glob: typeof Glob,
+  core: typeof Core,
+  target: string,
+  distribution: number
+): Promise<void> {
+  if (logger().debugMode) {
+    debug(`Debug mode is on, skipping restoring cache`);
     return;
   }
 
-  const [primaryKey, restoreKeys] = await getCacheKeys(target, distribution);
+  const [primaryKey, restoreKeys] = await getCacheKeys(context, glob, target, distribution);
 
-  saveState(PRIMARY_KEY, primaryKey);
-  logger.debug(`Restoring NX cache for ${primaryKey}`);
+  core.saveState(PRIMARY_KEY, primaryKey);
+  debug(`Restoring NX cache for ${primaryKey}`);
 
   try {
     const key = await restoreCache([tree.resolve(NX_CACHE_PATH)], primaryKey, restoreKeys);
 
     if (key) {
-      logger.success(`Cache hit: ${key}`);
+      success(`Cache hit: ${key}`);
 
-      saveState(CACHE_KEY, key);
+      core.saveState(CACHE_KEY, key);
     } else {
-      logger.info(`Cache miss`);
+      info(`Cache miss`);
     }
   } catch (e) {
-    logger.warning(e);
+    warning(e);
   }
 }
 
-export async function saveNxCache(): Promise<void> {
-  if (logger.debugMode) {
-    logger.debug(`Debug mode is on, skipping saving cache`);
+export async function saveNxCache(core: typeof Core): Promise<void> {
+  if (logger().debugMode) {
+    debug(`Debug mode is on, skipping saving cache`);
     return;
   }
 
-  const cacheKey = getState(CACHE_KEY);
-  const primaryKey = getState(PRIMARY_KEY);
+  const cacheKey = core.getState(CACHE_KEY);
+  const primaryKey = core.getState(PRIMARY_KEY);
 
   if (!primaryKey) {
-    logger.info(`Couldn't find the primary key, skipping saving cache`);
+    info(`Couldn't find the primary key, skipping saving cache`);
     return;
   }
 
   if (isExactKeyMatch(primaryKey, cacheKey)) {
-    logger.info(`Cache hit occurred on the primary key ${cacheKey}, not saving cache.`);
+    info(`Cache hit occurred on the primary key ${cacheKey}, not saving cache.`);
     return;
   }
 
-  logger.debug(`Saving NX cache to ${primaryKey}`);
+  debug(`Saving NX cache to ${primaryKey}`);
 
   try {
     await saveCache([tree.resolve(NX_CACHE_PATH)], primaryKey);
 
-    logger.success(`Successfully saved cache to ${primaryKey}`);
+    success(`Successfully saved cache to ${primaryKey}`);
   } catch (err) {
     // don't throw an error if cache already exists, which may happen due to concurrency
     if (err instanceof ReserveCacheError) {
-      logger.warning(err);
+      warning(err);
       return;
     }
     // otherwise re-throw
