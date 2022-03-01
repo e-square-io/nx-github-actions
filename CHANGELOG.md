@@ -1,3 +1,11 @@
+## [2.2.4](https://github.com/e-square-io/nx-github-actions/compare/v2.2.3...v2.2.4) (2022-03-01)
+
+### Continuous Integration
+
+- fix failing pipeline ([bb984df](https://github.com/e-square-io/nx-github-actions/commit/bb984dfac92684db5d2baf2ccaf68a1a5630b3c6))
+- fix failing pipeline ([7e8b5ff](https://github.com/e-square-io/nx-github-actions/commit/7e8b5ff0a450e5452e17b4023f3c03bc534ecab3))
+- publish dir not found ([aaab743](https://github.com/e-square-io/nx-github-actions/commit/aaab7437d5b26451e872be8707aae26a86b53ac5))
+
 ## [2.2.3](https://github.com/e-square-io/nx-github-actions/compare/v2.2.2...v2.2.3) (2022-03-01)
 
 ### Bug Fixes
