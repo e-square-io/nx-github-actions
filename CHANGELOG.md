@@ -1,3 +1,9 @@
+## [2.2.6](https://github.com/e-square-io/nx-github-actions/compare/v2.2.5...v2.2.6) (2022-03-01)
+
+### Bug Fixes
+
+- missing deps of deps in final build (#32) ([cdf3de0](https://github.com/e-square-io/nx-github-actions/commit/cdf3de08da8c1c6ae61b49c5a5563ffa0468a27c)), closes [#32](https://github.com/e-square-io/nx-github-actions/issues/32)
+
 ## [2.2.5](https://github.com/e-square-io/nx-github-actions/compare/v2.2.4...v2.2.5) (2022-03-01)
 
 ### Continuous Integration
