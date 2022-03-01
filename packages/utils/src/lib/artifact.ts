@@ -25,8 +25,8 @@ export async function uploadArtifact(glob: typeof Glob, name: string, paths: str
     }
 
     const { failedItems, artifactName, size } = await artifactClient().uploadArtifact(name, files, process.cwd());
-
     debug(`name: ${artifactName}, size: ${size}, failedItems: ${failedItems.join(', ')}`);
+
     success(`Successfully uploaded ${artifactName}`);
     return artifactName;
   } catch (e) {
