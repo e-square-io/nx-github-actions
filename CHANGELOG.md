@@ -1,3 +1,9 @@
+## [2.2.2](https://github.com/e-square-io/nx-github-actions/compare/v2.2.1...v2.2.2) (2022-03-01)
+
+### Continuous Integration
+
+- missing github token (#29) ([c52bc3b](https://github.com/e-square-io/nx-github-actions/commit/c52bc3bec77b31e717df9365b7b6a300a0e674a6)), closes [#29](https://github.com/e-square-io/nx-github-actions/issues/29)
+
 ## [2.2.1](https://github.com/e-square-io/nx-github-actions/compare/v2.2.0...v2.2.1) (2022-03-01)
 
 ### Bug Fixes
