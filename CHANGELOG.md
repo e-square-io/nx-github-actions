@@ -1,3 +1,9 @@
+# [2.2.0](https://github.com/e-square-io/nx-github-actions/compare/v2.1.5...v2.2.0) (2022-03-01)
+
+### Features
+
+- migrate to composite actions (#27) ([026026e](https://github.com/e-square-io/nx-github-actions/commit/026026e52156735f0a620b25b0d494e20e5e1145)), closes [#27](https://github.com/e-square-io/nx-github-actions/issues/27) [#21](https://github.com/e-square-io/nx-github-actions/issues/21) [#22](https://github.com/e-square-io/nx-github-actions/issues/22)
+
 ## [2.1.4](https://github.com/e-square-io/nx-github-actions/compare/v2.1.3...v2.1.4) (2022-02-19)
 
 ### Continuous Integration
