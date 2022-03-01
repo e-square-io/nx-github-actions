@@ -1,3 +1,13 @@
+## [2.2.3](https://github.com/e-square-io/nx-github-actions/compare/v2.2.2...v2.2.3) (2022-03-01)
+
+### Bug Fixes
+
+- **utils:** glob error is not handled silently (#31) ([4b659cc](https://github.com/e-square-io/nx-github-actions/commit/4b659cc53de6969817be591bed1594cd49e49742)), closes [#31](https://github.com/e-square-io/nx-github-actions/issues/31) [#9](https://github.com/e-square-io/nx-github-actions/issues/9)
+
+### Continuous Integration
+
+- missing github app token [skip ci] (#30) ([e874871](https://github.com/e-square-io/nx-github-actions/commit/e874871e065f89a88180bbbced77205f5dffe2dc)), closes [#30](https://github.com/e-square-io/nx-github-actions/issues/30)
+
 ## [2.2.2](https://github.com/e-square-io/nx-github-actions/compare/v2.2.1...v2.2.2) (2022-03-01)
 
 ### Continuous Integration
