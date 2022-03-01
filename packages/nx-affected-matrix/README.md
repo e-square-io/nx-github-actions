@@ -1,4 +1,4 @@
-# @e-square/nx-affected-matrix-lib
+# @e-square/nx-affected-matrix
 
 [![NPM](https://img.shields.io/github/package-json/v/e-square-io/nx-affected-matrix?&logo=npm&style=flat-square)]()
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/e-square-io/nx-github-actions/Main%20Workflow/main?event=push&logo=github&style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
@@ -49,7 +49,7 @@ jobs:
       # install node modules, cache etc
 
       - name: Calculate affected projects
-        uses: e-square-io/nx-affected-matrix-lib@v2
+        uses: e-square-io/nx-affected-matrix@v2
         id: affected
         with:
           targets: 'test,build'
@@ -88,7 +88,7 @@ In some cases it might be useful to change the distribution only for a particula
 
 ---
 - name: Calculate affected projects
-  uses: e-square-io/nx-affected-matrix-lib@v1
+  uses: e-square-io/nx-affected-matrix@v2
   id: affected
   with:
     targets: 'test,build'

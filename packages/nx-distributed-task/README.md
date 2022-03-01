@@ -1,4 +1,4 @@
-# @e-square/nx-distributed-task-lib
+# @e-square/nx-distributed-task
 
 [![NPM](https://img.shields.io/github/package-json/v/e-square-io/nx-distributed-task?&logo=npm&style=flat-square)]()
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/e-square-io/nx-github-actions/Main%20Workflow/main?event=push&logo=github&style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
@@ -40,7 +40,7 @@ jobs:
       # install node modules, cache etc
 
       - name: Run command
-        uses: e-square-io/nx-distributed-task-lib@v2
+        uses: e-square-io/nx-distributed-task@v2
         with:
           target: 'test'
           projects: 'project1,project2'
