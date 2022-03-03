@@ -2,21 +2,21 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
-
 import { context } from '@actions/github';
-import { restoreCache, saveCache } from '@actions/cache';
 
 import { PRIMARY_KEY } from '@e-square/utils/cache';
-import { uploadArtifact } from '@e-square/utils/artifact';
-import { assertNxInstalled, nxRunMany } from '@e-square/utils/nx';
 
-import { main } from './nx-distributed-task';
+import { assertNxInstalled, runNxTask } from './app/nx';
+import { restoreCache, saveCache } from './app/cache';
+import { uploadProjectsOutputs } from './app/upload';
+import main from './main';
 
-jest.mock('@e-square/utils/nx');
-jest.mock('@e-square/utils/artifact');
+jest.mock('./app/nx');
+jest.mock('./app/upload');
+jest.mock('./app/cache');
 jest.mock('@e-square/utils/logger');
 
-describe('nxDistributedTask', () => {
+describe('main', () => {
   beforeEach(() => {
     const env = {
       INPUT_TARGET: 'test',
@@ -37,15 +37,13 @@ describe('nxDistributedTask', () => {
 
     expect(assertNxInstalled).toHaveBeenCalled();
     expect(restoreCache).toHaveBeenCalled();
-    expect(saveCache).toHaveBeenCalled();
-    expect(nxRunMany).toHaveBeenCalledWith(
+    expect(runNxTask).toHaveBeenCalledWith(
       context,
-      'test',
-      expect.any(Object),
-      expect.objectContaining({ args: ['--projects=project1,project2'] })
+      exec,
+      expect.objectContaining({ target: 'test', projects: ['project1', 'project2'] })
     );
-    expect(uploadArtifact).toHaveBeenCalledTimes(2);
-    expect(uploadArtifact).toHaveBeenNthCalledWith(1, glob, 'test', 'dist/test');
+    expect(uploadProjectsOutputs).toHaveBeenCalled();
+    expect(saveCache).toHaveBeenCalled();
   });
 
   it('should exit if no projects to run', async () => {
@@ -54,15 +52,6 @@ describe('nxDistributedTask', () => {
     await main(context, core, exec, glob, io);
 
     expect(assertNxInstalled).not.toHaveBeenCalled();
-  });
-
-  it('should not upload artifacts', async () => {
-    process.env['INPUT_UPLOADOUTPUTS'] = 'false';
-
-    await main(context, core, exec, glob, io);
-
-    expect(assertNxInstalled).toHaveBeenCalled();
-    expect(uploadArtifact).not.toHaveBeenCalled();
   });
 
   it('should set job as failed if any unhandled error occurs', async () => {

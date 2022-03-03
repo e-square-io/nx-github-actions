@@ -39,6 +39,8 @@
   "dependencies": {
     "@actions/artifact": "^0.6.1",
     "@actions/cache": "^1.0.8",
+    "@nrwl/devkit": "13.8.4",
+    "@nrwl/workspace": "13.8.4",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
@@ -50,17 +52,16 @@
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-angular": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
-    "@nrwl/cli": "13.8.3",
-    "@nrwl/devkit": "13.8.3",
-    "@nrwl/eslint-plugin-nx": "13.8.3",
-    "@nrwl/jest": "13.8.3",
-    "@nrwl/linter": "13.8.3",
-    "@nrwl/node": "13.8.3",
-    "@nrwl/nx-cloud": "13.1.5",
-    "@nrwl/tao": "13.8.3",
-    "@nrwl/workspace": "13.8.3",
+    "@nrwl/cli": "13.8.4",
+    "@nrwl/eslint-plugin-nx": "13.8.4",
+    "@nrwl/jest": "13.8.4",
+    "@nrwl/linter": "13.8.4",
+    "@nrwl/node": "13.8.4",
+    "@nrwl/nx-cloud": "13.1.6",
+    "@nrwl/tao": "13.8.4",
     "@types/jest": "27.0.2",
     "@types/node": "14.14.33",
+    "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "5.10.2",
     "@typescript-eslint/parser": "5.10.2",
     "all-contributors-cli": "^6.19.0",
@@ -73,10 +74,11 @@
     "jest": "27.2.3",
     "lint-staged": "^11.0.0",
     "prettier": "2.5.1",
+    "string-replace-loader": "^3.1.0",
     "ts-jest": "27.0.5",
     "ts-node": "9.1.1",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "4.3.5"
+    "typescript": "4.5.5"
   },
   "config": {
     "commitizen": {

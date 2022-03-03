@@ -42,7 +42,7 @@ export class GHTree implements Tree {
   }
 
   async rename(from: string, to: string): Promise<void> {
-    renameSync(this.resolve(from), resolve(this.root, to));
+    renameSync(this.resolve(from), this.resolve(to));
   }
 
   write(filePath: string, content: Buffer | string): void {

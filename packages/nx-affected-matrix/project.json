@@ -4,12 +4,13 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:build",
+      "executor": "@nrwl/node:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/nx-affected-matrix",
         "main": "packages/nx-affected-matrix/src/main.ts",
         "tsConfig": "packages/nx-affected-matrix/tsconfig.app.json",
+        "webpackConfig": "webpack.config.js",
         "externalDependencies": "none",
         "additionalEntryPoints": [
           {
