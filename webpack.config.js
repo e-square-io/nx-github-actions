@@ -25,7 +25,7 @@ module.exports = (config, context) => {
   config.module.parser = {
     javascript: { commonjsMagicComments: true },
   };
-  config.module.rules.unshift(dynamicRequireRule);
+  // config.module.rules.unshift(dynamicRequireRule);
   config.module.noParse = /typescript|prettier/; //generators|compat|ngcli-adapter|nx-plugin
   config.externals = [
     'typescript',
