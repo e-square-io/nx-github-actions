@@ -19,27 +19,27 @@ const dynamicRequireRule = {
 };
 
 module.exports = (config, context) => {
-  // config.resolve.alias = {
-  //   '@angular-devkit/build-angular/src/utils/version': '__mocks__/@angular-devkit/build-angular/src/utils/version.js',
-  // };
   config.module.parser = {
     javascript: { commonjsMagicComments: true },
   };
+  config.module.noParse =
+    /enquirer|typescript|nx-plugins|daemon|generators|executors|ngcli-adapter|compat|convert-nx-executor/;
   // config.module.rules.unshift(dynamicRequireRule);
-  config.module.noParse = /typescript|prettier/; //generators|compat|ngcli-adapter|nx-plugin
-  config.externals = [
-    'typescript',
-    'prettier',
-    '@angular-devkit/schematics',
-    '@angular-devkit/schematics/tools',
-    '@angular-devkit/architect',
-    '@angular-devkit/architect/node',
-    '@angular-devkit/core',
-    '@angular-devkit/core/node',
-    '@angular-devkit/build-angular/src/utils/version',
-    ...(config.externals ?? []),
-  ];
+  // config.externals = [
+  //   'typescript',
+  //   'prettier',
+  //   '@nrwl/node',
+  //   '@nrwl/jest',
+  //   '@nrwl/nx-cloud',
+  //   '@nrwl/eslint-plugin-nx',
+  //   '@nrwl/workspace',
+  //   '@nrwl/tao',
+  //   '@nrwl/devkit',
+  //   '@nrwl/cli',
+  //   '@nrwl/nx',
+  //   ...(config.externals ?? []),
+  // ];
 
-  console.log(JSON.stringify(config, null, 2));
+  // console.log(JSON.stringify(config, null, 2));
   return config;
 };

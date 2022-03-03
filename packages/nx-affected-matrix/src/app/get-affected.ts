@@ -1,17 +1,11 @@
 import type { Arguments } from 'yargs';
 
-import type { Task } from '@nrwl/tao/src/shared/tasks';
+import type { Task, ProjectGraphProjectNode, ProjectGraph } from '@nrwl/devkit';
 import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
 import { createTask } from '@nrwl/workspace/src/tasks-runner/run-command';
 import { getCommandAsString, getOutputs } from '@nrwl/workspace/src/tasks-runner/utils';
 import { projectHasTarget } from '@nrwl/workspace/src/utilities/project-graph-utils';
-import {
-  createProjectGraphAsync,
-  ProjectGraph,
-  ProjectGraphNodeRecords,
-  ProjectGraphProjectNode,
-  withDeps,
-} from '@nrwl/workspace/src/core/project-graph';
+import { createProjectGraphAsync, withDeps } from '@nrwl/workspace/src/core/project-graph';
 
 import { getAffectedProjectGraph } from './project-graph';
 
@@ -31,7 +25,7 @@ function createTasks(
     })
   );
 
-  return tasks.map((task, index) => ({
+  return tasks.map((task) => ({
     id: task.id,
     overrides,
     target: task.target,
@@ -48,7 +42,7 @@ function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraph
 
   if (nxArgs.exclude) {
     const excludedProjects = new Set(nxArgs.exclude);
-    return Object.entries(affectedGraph.nodes as ProjectGraphNodeRecords)
+    return Object.entries(affectedGraph.nodes as Record<string, ProjectGraphProjectNode>)
       .filter(([projectName]) => !excludedProjects.has(projectName))
       .map(([, project]) => project);
   }
