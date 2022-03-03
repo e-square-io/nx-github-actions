@@ -22,8 +22,7 @@ module.exports = (config, context) => {
   config.module.parser = {
     javascript: { commonjsMagicComments: true },
   };
-  config.module.noParse =
-    /enquirer|typescript|nx-plugins|daemon|generators|executors|ngcli-adapter|compat|convert-nx-executor/;
+  config.module.noParse = /enquirer|typescript|prettier|ngcli-adapter|compat|convert-nx-executor/;
   // config.module.rules.unshift(dynamicRequireRule);
   // config.externals = [
   //   'typescript',

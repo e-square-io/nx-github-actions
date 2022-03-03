@@ -1,4 +1,4 @@
-import { ProjectGraphProjectNode, readProjectConfiguration } from '@nrwl/devkit';
+import type { ProjectGraphProjectNode } from '@nrwl/devkit';
 import { tree } from '@e-square/utils/fs';
 import { createTask } from '@nrwl/workspace/src/tasks-runner/run-command';
 import * as Glob from '@actions/glob';
@@ -6,6 +6,7 @@ import { Inputs } from './inputs';
 import { group } from '@e-square/utils/logger';
 import { uploadArtifact } from '@e-square/utils/artifact';
 import { getOutputsForTargetAndConfiguration } from '@nrwl/workspace/src/tasks-runner/utils';
+import { readProjectConfiguration } from '@nrwl/devkit/src/generators/project-configuration';
 
 export function getProjectOutputs(project: string, target: string, configuration?: string): string[] {
   const config = readProjectConfiguration(tree, project);
