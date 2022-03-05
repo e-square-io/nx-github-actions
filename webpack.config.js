@@ -25,22 +25,18 @@ module.exports = (config, context) => {
   config.module.parser = {
     javascript: { commonjsMagicComments: true },
   };
-  config.module.noParse = /enquirer|typescript|prettier|ngcli-adapter|compat|convert-nx-executor/;
+  // config.module.noParse = /typescript|prettier/;
   // config.module.rules.unshift(dynamicRequireRule);
-  // config.externals = [
-  //   'typescript',
-  //   'prettier',
-  //   '@nrwl/node',
-  //   '@nrwl/jest',
-  //   '@nrwl/nx-cloud',
-  //   '@nrwl/eslint-plugin-nx',
-  //   '@nrwl/workspace',
-  //   '@nrwl/tao',
-  //   '@nrwl/devkit',
-  //   '@nrwl/cli',
-  //   '@nrwl/nx',
-  //   ...(config.externals ?? []),
-  // ];
+  config.externals = [
+    '@angular-devkit/schematics',
+    '@angular-devkit/schematics/tools',
+    '@angular-devkit/core/node',
+    '@angular-devkit/core',
+    '@angular-devkit/build-angular/src/utils/version',
+    '@angular-devkit/architect',
+    '@angular-devkit/architect/node',
+    ...(config.externals ?? []),
+  ];
 
   // console.log(JSON.stringify(config, null, 2));
   return config;
