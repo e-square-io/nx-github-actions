@@ -1,7 +1,5 @@
 import type * as Core from '@actions/core';
 
-let _logger: Logger;
-
 class Logger {
   private _debugMode = false;
   set debugMode(value: boolean) {
@@ -46,6 +44,8 @@ class Logger {
     return await this.core.group<T>(name, cb);
   }
 }
+
+let _logger: Logger;
 
 export function initializeLogger(core: typeof Core) {
   _logger = new Logger(core);
