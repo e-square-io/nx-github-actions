@@ -1,8 +1,9 @@
 import { assertNxInstalled, nxCommand, nxRunMany } from './nx';
-import * as npm from '@e-square/utils/npm';
 import { Exec } from '@e-square/utils/exec';
 import { context } from '@actions/github';
+import * as pm from '@nrwl/tao/src/shared/package-manager';
 
+jest.mock('@e-square/utils/fs');
 jest.mock('@e-square/utils/fs');
 jest.mock('@e-square/utils/logger');
 jest.mock('@actions/github');
@@ -34,7 +35,7 @@ describe('nx', () => {
       jest.spyOn(exec, 'withCommand');
       jest.spyOn(exec, 'withArgs');
       jest.spyOn(exec, 'withOptions');
-      jest.spyOn(npm, 'getNpmVersion').mockResolvedValue('6.8.0');
+      jest.spyOn(pm, 'getPackageManagerVersion').mockReturnValue('6.8.0');
     });
 
     it('should call nxCommand', async () => {
@@ -42,7 +43,7 @@ describe('nx', () => {
       expect(exec.withCommand).toHaveBeenCalledWith(`npx -p @nrwl/cli nx test`);
       expect(exec.withArgs).toHaveBeenCalledWith('--target=build');
 
-      jest.spyOn(npm, 'getNpmVersion').mockResolvedValueOnce('7.0.0');
+      jest.spyOn(pm, 'getPackageManagerVersion').mockReturnValueOnce('7.0.0');
       await expect(nxCommand('test', 'build', exec, [])).resolves.toBe('');
       expect(exec.withCommand).toHaveBeenCalledWith(`npx --no -p @nrwl/cli nx test`);
     });

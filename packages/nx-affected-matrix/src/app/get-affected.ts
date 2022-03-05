@@ -2,12 +2,12 @@ import type { Arguments } from 'yargs';
 
 import type { Task, ProjectGraphProjectNode, ProjectGraph } from '@nrwl/devkit';
 import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
-import { createTask } from '@nrwl/workspace/src/tasks-runner/run-command';
-import { getCommandAsString, getOutputs } from '@nrwl/workspace/src/tasks-runner/utils';
 import { projectHasTarget } from '@nrwl/workspace/src/utilities/project-graph-utils';
-import { createProjectGraphAsync, withDeps } from '@nrwl/workspace/src/core/project-graph';
+import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph/project-graph';
+import { withDeps } from '@nrwl/workspace/src/core/project-graph/operators';
 
 import { getAffectedProjectGraph } from './project-graph';
+import { targetToTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
 
 function createTasks(
   affectedProjectsWithTargetAndConfig: ProjectGraphProjectNode[],
@@ -15,22 +15,14 @@ function createTasks(
   nxArgs: NxArgs,
   overrides: Arguments
 ): Task[] {
-  const tasks: Task[] = affectedProjectsWithTargetAndConfig.map((affectedProject) =>
-    createTask({
-      project: affectedProject,
+  return affectedProjectsWithTargetAndConfig.map((affectedProject) => ({
+    id: targetToTargetString({
+      project: affectedProject.name,
       target: nxArgs.target,
       configuration: nxArgs.configuration,
-      overrides,
-      errorIfCannotFindConfiguration: false,
-    })
-  );
-
-  return tasks.map((task) => ({
-    id: task.id,
+    }),
+    target: { project: affectedProject.name, target: nxArgs.target, configuration: nxArgs.configuration },
     overrides,
-    target: task.target,
-    command: getCommandAsString(task),
-    outputs: getOutputs(projectGraph.nodes, task),
   }));
 }
 

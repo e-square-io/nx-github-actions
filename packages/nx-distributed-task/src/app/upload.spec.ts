@@ -6,8 +6,7 @@ import { Inputs } from './inputs';
 
 jest.mock('@e-square/utils/artifact');
 jest.mock('@e-square/utils/logger');
-jest.mock('@nrwl/devkit', () => ({
-  ...(jest.requireActual('@nrwl/devkit') as any),
+jest.mock('@nrwl/devkit/src/generators/project-configuration', () => ({
   readProjectConfiguration: jest.fn().mockReturnValue({
     name: 'test',
     root: 'packages/nx-distributed-task',

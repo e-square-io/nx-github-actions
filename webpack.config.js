@@ -19,6 +19,9 @@ const dynamicRequireRule = {
 };
 
 module.exports = (config, context) => {
+  config.resolve.alias = {
+    prettier: '__mocks__/prettier/index.js',
+  };
   config.module.parser = {
     javascript: { commonjsMagicComments: true },
   };

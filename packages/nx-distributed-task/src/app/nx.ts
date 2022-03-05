@@ -3,9 +3,9 @@ import type { context as Context } from '@actions/github';
 import { Exec } from '@e-square/utils/exec';
 import { BaseInputs } from '@e-square/utils/inputs';
 import { debug, group, logger } from '@e-square/utils/logger';
-import { getNpmVersion } from '@e-square/utils/npm';
 import * as _Exec from '@actions/exec';
 import { Inputs } from './inputs';
+import { getPackageManagerCommand, getPackageManagerVersion } from '@nrwl/tao/src/shared/package-manager';
 
 export async function assertNxInstalled(exec: Exec) {
   debug(`Checking existence of nx`);
@@ -16,11 +16,13 @@ export async function assertNxInstalled(exec: Exec) {
   if (!path) throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
 }
 
-export async function nxCommand(command: string, target: string, exec: Exec, args: string[]): Promise<string> {
-  const npxVersion = (await getNpmVersion(exec)).split('.');
+export async function nxCommand(nxCommand: string, target: string, exec: Exec, args: string[]): Promise<string> {
+  const pmVersion = getPackageManagerVersion().split('.');
+  let command = getPackageManagerCommand().exec;
+  if (command === 'npx' && Number(pmVersion[0]) > 6) command += ' --no';
 
   const wrapper = exec
-    .withCommand(`npx ${+npxVersion[0] > 6 ? '--no ' : ''}-p @nrwl/cli nx ${command}`)
+    .withCommand(`${command} -p @nrwl/cli nx ${nxCommand}`)
     .withArgs(`--target=${target}`, ...args)
     .build();
 
