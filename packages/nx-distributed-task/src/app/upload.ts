@@ -14,8 +14,8 @@ function targetToTargetString({ project, target, configuration }: Target): strin
 export function getProjectOutputs(project: string, target: string, configuration?: string): string[] {
   const config = readProjectConfiguration(tree, project);
   const projectNode: ProjectGraphProjectNode = {
-    name: config.name,
-    type: config.projectType === 'application' ? (config.name.endsWith('-e2e') ? 'e2e' : 'app') : 'lib',
+    name: project,
+    type: config.projectType === 'application' ? (project.endsWith('-e2e') ? 'e2e' : 'app') : 'lib',
     data: {
       ...config,
     },

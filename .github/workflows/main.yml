@@ -73,8 +73,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: e-square-io/.github/.github/actions/npm-ci@main
-
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
