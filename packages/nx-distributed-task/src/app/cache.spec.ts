@@ -8,6 +8,7 @@ import { restoreCache, saveCache } from './cache';
 import { context } from '@actions/github';
 
 jest.mock('@e-square/utils/cache');
+jest.mock('@e-square/utils/logger');
 
 describe('cache', () => {
   it('should not use cache if nx cloud is used', async () => {
@@ -16,5 +17,13 @@ describe('cache', () => {
 
     expect(saveNxCache).not.toHaveBeenCalled();
     expect(restoreNxCache).not.toHaveBeenCalled();
+  });
+
+  it('should call cache utils', async () => {
+    await restoreCache(context, glob, core, { target: 'build', distribution: 1, nxCloud: false } as Inputs);
+    await saveCache(core, { nxCloud: false } as Inputs);
+
+    expect(saveNxCache).toHaveBeenCalled();
+    expect(restoreNxCache).toHaveBeenCalled();
   });
 });

@@ -1,10 +1,11 @@
-import { assertNxInstalled, nxCommand, nxRunMany } from './nx';
-import { Exec } from '@e-square/utils/exec';
-import { context } from '@actions/github';
 import * as pm from '@nrwl/tao/src/shared/package-manager';
+import { context } from '@actions/github';
 
-jest.mock('@e-square/utils/fs');
-jest.mock('@e-square/utils/fs');
+import { Exec } from '@e-square/utils/exec';
+import { logger } from '@e-square/utils/logger';
+
+import { assertNxInstalled, nxCommand, nxRunMany } from './nx';
+
 jest.mock('@e-square/utils/logger');
 jest.mock('@actions/github');
 
@@ -67,6 +68,20 @@ describe('nx', () => {
           }),
         })
       );
+    });
+
+    it('should not call nxCommand when in debug mode', async () => {
+      logger().debugMode = true;
+
+      await expect(
+        nxRunMany(
+          context,
+          'test',
+          { args: {}, debug: false, workingDirectory: '', nxCloud: true, maxParallel: 3 },
+          exec
+        )
+      ).resolves.toBe('[DEBUG MODE] skipping execution');
+      expect(exec.build).not.toHaveBeenCalled();
     });
   });
 });
