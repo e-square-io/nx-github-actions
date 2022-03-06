@@ -1,3 +1,9 @@
+# [2.3.0](https://github.com/e-square-io/nx-github-actions/compare/v2.2.6...v2.3.0) (2022-03-06)
+
+### Features
+
+- use nx devkit (#33) ([93c39e7](https://github.com/e-square-io/nx-github-actions/commit/93c39e7b9d768b199a1634239b5809594a007db9)), closes [#33](https://github.com/e-square-io/nx-github-actions/issues/33)
+
 ## [2.2.6](https://github.com/e-square-io/nx-github-actions/compare/v2.2.5...v2.2.6) (2022-03-01)
 
 ### Bug Fixes
