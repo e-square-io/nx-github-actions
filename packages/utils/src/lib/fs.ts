@@ -50,6 +50,8 @@ export class GHTree implements Tree {
   }
 
   resolve(path: string): string {
+    path = path.startsWith('/') ? path.slice(1) : path;
+
     return resolve(this.root, path);
   }
 
