@@ -1,3 +1,9 @@
+## [2.3.3](https://github.com/e-square-io/nx-github-actions/compare/v2.3.2...v2.3.3) (2022-03-06)
+
+### Bug Fixes
+
+- **utils:** configuration is not parsed from args & args name format (#36) ([c84c6f7](https://github.com/e-square-io/nx-github-actions/commit/c84c6f78599cbbd65a172fcfb9c1dd109bd9a262)), closes [#36](https://github.com/e-square-io/nx-github-actions/issues/36)
+
 ## [2.3.2](https://github.com/e-square-io/nx-github-actions/compare/v2.3.1...v2.3.2) (2022-03-06)
 
 ### Bug Fixes
