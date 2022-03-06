@@ -8,12 +8,19 @@ export class Exec {
   private command = '';
   private options: ExecOptions = {};
   private args: string[] = [];
+  private readonly _exec: typeof __exec;
 
   private get exec(): typeof __exec {
-    return this._exec instanceof Exec ? this._exec.exec : this._exec;
+    return this._exec;
   }
 
-  constructor(private _exec: typeof __exec | Exec) {}
+  constructor(exec: typeof __exec | Exec) {
+    if ((exec as Exec).exec && typeof (exec as Exec).exec === 'function') {
+      this._exec = (exec as Exec).exec;
+    } else {
+      this._exec = exec as typeof __exec;
+    }
+  }
 
   build(): ExecWrapper {
     const command = this.command;

@@ -1,9 +1,9 @@
 import type * as Core from '@actions/core';
-
 import { log, logger, warning } from './logger';
+import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
 
 export interface BaseInputs {
-  args: string[];
+  args: NxArgs;
   debug: boolean;
   workingDirectory: string;
 }
@@ -11,13 +11,26 @@ export interface BaseInputs {
 export function getStringArrayInput(
   core: typeof Core,
   name: string,
-  separator = ' ',
+  separator: string | RegExp = ' ',
   options?: Core.InputOptions
 ): string[] {
   return core
     .getInput(name, options)
     .split(separator)
     .filter((value) => value.length > 0);
+}
+
+export function getArgsInput(
+  core: typeof Core,
+  mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1] = 'print-affected',
+  options?: Core.InputOptions
+): NxArgs {
+  const args = getStringArrayInput(core, 'args', /[= ]/g, options);
+  return (
+    splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
+      printWarnings: false,
+    })?.nxArgs || {}
+  );
 }
 
 export function getMaxDistribution(
@@ -56,7 +69,10 @@ export function getMaxDistribution(
   return reduceTargetsDistribution(maybeNumberValue);
 }
 
-export function getBaseInputs(core: typeof Core): BaseInputs {
+export function getBaseInputs(
+  core: typeof Core,
+  mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1]
+): BaseInputs {
   const debug = core.getBooleanInput('debug');
   const workingDirectory = core.getInput('workingDirectory');
 
@@ -68,7 +84,7 @@ export function getBaseInputs(core: typeof Core): BaseInputs {
   }
 
   return {
-    args: getStringArrayInput(core, 'args'),
+    args: getArgsInput(core, mode),
     debug,
     workingDirectory,
   };

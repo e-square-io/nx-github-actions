@@ -8,7 +8,7 @@
 
 ## Summary
 
-A GitHub Action that outputs a matrix of NX targets.  
+A GitHub Action that outputs a matrix of NX targets (with some other useful [outputs](#outputs).  
 This action enables CI level parallelism by splitting the affected projects into multiple parallel jobs.
 
 It is recommended to use this action's outputs with [@e-square/nx-distributed-task](https://github.com/marketplace/actions/nx-distributed-task),
@@ -19,17 +19,22 @@ check out the monorepo's [README](https://github.com/e-square-io/nx-github-actio
 ### Inputs
 
 | name             | description                                                                                                                                 | default | required |
-| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :-----: | :------: |
+|:-----------------|:--------------------------------------------------------------------------------------------------------------------------------------------|:-------:|:--------:|
 | targets          | Comma-delimited targets to run                                                                                                              |    -    | &check;  |
 | maxDistribution  | Maximum distribution of jobs per target. Can be number that will be used for all targets, or an array/object that matches the targets input |    3    | &cross;  |
 | workingDirectory | Path to the Nx workspace, needed if not the repository root                                                                                 |    -    | &cross;  |
-| args             | Space-delimited args to add to nx command execution                                                                                         |    -    | &cross;  |
+| main-branch      | `nx-set-shas` action input. The 'main' branch of your repository (the base branch which you target with PRs)                                | 'main'  | &cross;  |
+| workflow-id      | The ID of the github action workflow to check for successful run or the name of the file name containing the workflow                       |    -    | &cross;  |
+| checkout         | Should the action do git checkout                                                                                                           |  true   | &cross;  |
+| args             | Space-delimited args to add to nx `affected` command                                                                                        |    -    | &cross;  |
 
 ### Outputs
 
-|    name    |                                   description                                   |
-| :--------: | :-----------------------------------------------------------------------------: |
-|   matrix   |                       The affected matrix to be consumed                        |
+| name       | description                                                                     |
+|:-----------|:--------------------------------------------------------------------------------|
+| matrix     | The affected matrix to be consumed                                              |
+| apps       | A comma-delimited list of the affected apps                                     |
+| libs       | A comma-delimited list of the affected libs (including non buildable libs)      |
 | hasChanges | boolean that will be true when there is at least one job in the affected matrix |
 
 ```yaml
@@ -41,21 +46,12 @@ jobs:
       hasChanges: ${{ steps.affected.outputs.hasChanges }}
       matrix: ${{ steps.affected.outputs.matrix }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # important to have history for affected calculation
-
-      # install node modules, cache etc
-
       - name: Calculate affected projects
         uses: e-square-io/nx-affected-matrix@v2
         id: affected
         with:
           targets: 'test,build'
           maxDistribution: 3
-          workingDirectory: ''
-          args: ''
 ```
 
 For each supplied target, the action will slice the list of affected projects into multiple groups.  
@@ -85,8 +81,6 @@ In some cases it might be useful to change the distribution only for a particula
 `maxDistribution` input can receive an object with keys matching to the supplied targets or an array that will match by index. e.g:
 
 ```yaml
-
----
 - name: Calculate affected projects
   uses: e-square-io/nx-affected-matrix@v2
   id: affected
@@ -100,5 +94,6 @@ _Note: The action allows to set a partial distribution config, any target that i
 
 ## FAQ
 
-**Q: I don't get the full affected list I expect to see**  
-A: Make sure you checkout with `fetch-depth: 0` for affected-matrix job. It is required in order to pull the full commit history which is needed for the calculation.
+**Q: Can I use this action without any prior actions? (checkout, npm ci, etc)**  
+A: Yes! The action is already bundled with everything needed to run NX's affected command.  
+Also, the action will do the checkout for you with `clean: false` & `fetch-depth: 0` (which is required in order to calculate the changes).

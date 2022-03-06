@@ -1,7 +1,9 @@
 import * as core from '@actions/core';
+import { splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
 
-import { getMaxDistribution, getStringArrayInput } from './inputs';
+import { getArgsInput, getMaxDistribution, getStringArrayInput } from './inputs';
 
+jest.mock('@nrwl/workspace/src/command-line/utils');
 jest.mock('./fs');
 jest.mock('./logger');
 
@@ -19,6 +21,21 @@ describe('inputs', () => {
 
     it('should return an array of strings from a string input', () => {
       expect(getStringArrayInput(core, 'test', ',')).toEqual(['test1', 'test2', 'test3']);
+    });
+  });
+  describe('getArgsInput', () => {
+    beforeEach(() => {
+      spy.mockReturnValueOnce('-f b --foo=bar --baz false');
+    });
+
+    it('should call splitArgsIntoNxArgsAndOverrides with array of raw args', () => {
+      getArgsInput(core, 'print-affected');
+
+      expect(splitArgsIntoNxArgsAndOverrides).toHaveBeenCalledWith(
+        expect.objectContaining({ _: ['-f', 'b', '--foo', 'bar', '--baz', 'false'] }),
+        'print-affected',
+        expect.anything()
+      );
     });
   });
 

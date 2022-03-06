@@ -44,13 +44,6 @@ jobs:
       hasChanges: ${{ steps.affected.outputs.hasChanges }}
       matrix: ${{ steps.affected.outputs.matrix }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # important to have history for affected calculation
-          
-      # install node modules, cache etc
-
       - name: Calculate affected projects
         uses: e-square-io/nx-affected-matrix@v2
         id: affected

@@ -1,18 +1,39 @@
-import type * as Core from '@actions/core';
-import type * as Exec from '@actions/exec';
-import type * as Glob from '@actions/glob';
-import type * as Io from '@actions/io';
+import type * as _core from '@actions/core';
+import type * as _exec from '@actions/exec';
+import type * as _glob from '@actions/glob';
+import type * as _io from '@actions/io';
 import type { context as Context } from '@actions/github';
 
-import { main } from './app/nx-distributed-task';
+import { Exec } from '@e-square/utils/exec';
+import { info } from '@e-square/utils/logger';
+
+import { getInputs } from './app/inputs';
+import { assertNxInstalled, runNxTask } from './app/nx';
+import { uploadProjectsOutputs } from './app/upload';
+import { restoreCache, saveCache } from './app/cache';
 
 export default async function (
   context: typeof Context,
-  core: typeof Core,
-  exec: typeof Exec,
-  glob: typeof Glob,
-  io: typeof Io,
+  core: typeof _core,
+  exec: typeof _exec,
+  glob: typeof _glob,
+  io: typeof _io,
   require?
 ) {
-  await main(context, core, exec, glob, io, require);
+  const parsedInputs = getInputs(core);
+
+  if (parsedInputs.projects.length === 0) {
+    info('There are no projects to run, completing');
+    return;
+  }
+
+  try {
+    await assertNxInstalled(new Exec(exec.exec));
+    await restoreCache(context, glob, core, parsedInputs);
+    await runNxTask(context, exec, parsedInputs);
+    await uploadProjectsOutputs(glob, parsedInputs);
+    await saveCache(core, parsedInputs);
+  } catch (e) {
+    core.setFailed(e);
+  }
 }

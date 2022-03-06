@@ -31,6 +31,10 @@ inputs:
   workflow-id:
     description: "The ID of the github action workflow to check for successful run or the name of the file name containing the workflow."
     required: false
+  checkout:
+    description: "Should the action do git checkout"
+    required: false
+    default: 'true'
   debug:
     description: "Enable Debug mode"
     required: false
@@ -39,6 +43,12 @@ outputs:
   matrix:
     description: "The matrix that should be used in next job's matrix strategy"
     value: ${{ steps.calculate.outputs.matrix }}
+  apps:
+    description: "A comma-delimited list of the affected apps"
+    value: ${{ steps.calculate.outputs.apps }}
+  libs:
+    description: "A comma-delimited list of the affected libs (including non buildable libs)"
+    value: ${{ steps.calculate.outputs.libs }}
   hasChanges:
     description: "Returns true when there are changes, can be used to skip next steps"
     value: ${{ steps.calculate.outputs.hasChanges }}
@@ -46,6 +56,7 @@ runs:
   using: 'composite'
   steps:
     - uses: actions/checkout@v2
+      if: ${{ fromJSON(inputs.checkout) }}
       with:
         fetch-depth: 0
         clean: false
@@ -65,4 +76,4 @@ runs:
           const { default: main } = require('${{ github.action_path }}/main.js');
 
           setEnv(${{ toJSON(inputs) }}, process);
-          await main(context, core, exec, io, require);
+          await main(context, core);

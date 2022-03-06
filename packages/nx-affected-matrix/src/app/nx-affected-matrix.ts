@@ -1,13 +1,7 @@
-import type * as Core from '@actions/core';
-import type * as _Exec from '@actions/exec';
-import * as Io from '@actions/io';
-import type { context as Context } from '@actions/github';
-
-import { Exec } from '@e-square/utils/exec';
-import { assertNxInstalled, nxPrintAffected } from '@e-square/utils/nx';
 import { debug, group, success } from '@e-square/utils/logger';
 
-import { getInputs, Inputs } from './inputs';
+import { Inputs } from './inputs';
+import { getAffected } from './get-affected';
 
 interface NxAffectedTarget {
   target: string;
@@ -42,21 +36,30 @@ export function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
   return result;
 }
 
-export function generateAffectedMatrix(
-  { targets, maxDistribution, args = [] }: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>,
-  exec: Exec
-): Promise<NxAffectedMatrix> {
+export function generateAffectedMatrix({
+  targets,
+  maxDistribution,
+  args = {},
+}: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>): Promise<{
+  matrix: NxAffectedMatrix;
+  apps: string;
+  libs: string;
+}> {
   return group(`⚙️ Generating affected matrix for ${targets}`, async () => {
+    const affectedApps = [];
+    const affectedLibs = [];
     const matrix: NxAffectedMatrix = {
       include: [],
     };
 
     for (const target of targets) {
-      exec.withArgs(...args);
-
       debug(`Calculating affected for "${target}" target`);
 
-      const projects = await nxPrintAffected(target, exec);
+      const { projects, apps, libs } = await getAffected(target, args);
+
+      affectedApps.push(...apps);
+      affectedLibs.push(...libs);
+
       const affectedTargets: NxAffectedTarget[] = chunkify(projects, maxDistribution[target])
         .map((projects, idx) => ({
           target,
@@ -70,29 +73,13 @@ export function generateAffectedMatrix(
       }
     }
 
-    debug(`matrix: ${matrix}`);
+    debug(`matrix: ${JSON.stringify(matrix, null, 2)}`);
     success(`Generated affected matrix`);
 
-    return matrix;
+    return {
+      matrix,
+      apps: Array.from(new Set(affectedApps)).join(','),
+      libs: Array.from(new Set(affectedLibs)).join(','),
+    };
   });
-}
-
-export async function main(
-  context: typeof Context,
-  core: typeof Core,
-  exec: typeof _Exec,
-  io: typeof Io,
-  require?
-): Promise<void> {
-  try {
-    const parsedInputs = getInputs(core);
-
-    await assertNxInstalled(new Exec(exec.exec));
-    const matrix = await generateAffectedMatrix(parsedInputs, new Exec(exec.exec));
-
-    core.setOutput('matrix', matrix);
-    core.setOutput('hasChanges', !!matrix.include.find((target) => target.projects.length));
-  } catch (e) {
-    core.setFailed(e);
-  }
 }

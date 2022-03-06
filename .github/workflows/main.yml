@@ -22,7 +22,7 @@ jobs:
       - uses: e-square-io/.github/.github/actions/npm-ci@main
 
       - name: Calculate Affected Projects
-        uses: e-square-io/nx-affected-matrix@v2.1
+        uses: e-square-io/nx-affected-matrix@v2
         id: affected
         with:
           targets: 'test,build'
@@ -49,7 +49,7 @@ jobs:
           dry-run: true
 
       - name: Execute target
-        uses: e-square-io/nx-distributed-task@v2.1
+        uses: e-square-io/nx-distributed-task@v2
         id: execute
         with:
           target: ${{ matrix.target }}
@@ -72,8 +72,6 @@ jobs:
       matrix: ${{ steps.affected.outputs.matrix || needs.setup.outputs.matrix }}
     steps:
       - uses: actions/checkout@v2
-
-      - uses: e-square-io/.github/.github/actions/npm-ci@main
 
       - name: Download artifacts
         uses: actions/download-artifact@v2

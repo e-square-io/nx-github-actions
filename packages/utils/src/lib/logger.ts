@@ -1,7 +1,5 @@
 import type * as Core from '@actions/core';
 
-let _logger: Logger;
-
 class Logger {
   private _debugMode = false;
   set debugMode(value: boolean) {
@@ -12,6 +10,10 @@ class Logger {
   }
 
   constructor(private core: typeof Core) {}
+
+  async group<T>(name: string, cb: () => Promise<T>): Promise<T> {
+    return await this.core.group<T>(name, cb);
+  }
 
   log(message: string) {
     this.core.info(message);
@@ -41,11 +43,9 @@ class Logger {
   error(message: string | Error, properties?: Core.AnnotationProperties) {
     this.core.error(message, properties);
   }
-
-  async group<T>(name: string, cb: () => Promise<T>): Promise<T> {
-    return await this.core.group<T>(name, cb);
-  }
 }
+
+let _logger: Logger;
 
 export function initializeLogger(core: typeof Core) {
   _logger = new Logger(core);
