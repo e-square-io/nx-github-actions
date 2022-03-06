@@ -1,3 +1,9 @@
+## [2.3.1](https://github.com/e-square-io/nx-github-actions/compare/v2.3.0...v2.3.1) (2022-03-06)
+
+### Bug Fixes
+
+- **utils:** workspace file path is not resolved (#34) ([b67e4c0](https://github.com/e-square-io/nx-github-actions/commit/b67e4c0e6df5d266f17ceae1b6d26264313076d8)), closes [#34](https://github.com/e-square-io/nx-github-actions/issues/34)
+
 # [2.3.0](https://github.com/e-square-io/nx-github-actions/compare/v2.2.6...v2.3.0) (2022-03-06)
 
 ### Features
