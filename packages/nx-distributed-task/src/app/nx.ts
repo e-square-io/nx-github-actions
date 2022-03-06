@@ -1,12 +1,14 @@
+import * as _Exec from '@actions/exec';
 import type { context as Context } from '@actions/github';
+import { getPackageManagerCommand, getPackageManagerVersion } from '@nrwl/tao/src/shared/package-manager';
+import { NxArgs } from '@nrwl/workspace/src/command-line/utils';
+import { names } from '@nrwl/devkit/src/utils/names';
 
 import { Exec } from '@e-square/utils/exec';
 import { BaseInputs } from '@e-square/utils/inputs';
 import { debug, group, logger } from '@e-square/utils/logger';
-import * as _Exec from '@actions/exec';
+
 import { Inputs } from './inputs';
-import { getPackageManagerCommand, getPackageManagerVersion } from '@nrwl/tao/src/shared/package-manager';
-import { NxArgs } from '@nrwl/workspace/src/command-line/utils';
 
 export async function assertNxInstalled(exec: Exec) {
   debug(`Checking existence of nx`);
@@ -26,7 +28,9 @@ export async function nxCommand(nxCommand: string, target: string, exec: Exec, a
     .withCommand(`${command} -p @nrwl/cli nx ${nxCommand}`)
     .withArgs(
       `--target=${target}`,
-      ...Object.entries(args).map(([k, v]) => (typeof v === 'boolean' && v ? `--${k}` : `--${k}=${v}`))
+      ...Object.entries(args).map(([k, v]) =>
+        typeof v === 'boolean' && v ? `--${names(k).fileName}` : `--${names(k).fileName}=${v}`
+      )
     )
     .build();
 

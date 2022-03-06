@@ -25,7 +25,9 @@ export function getArgsInput(
   mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1] = 'print-affected',
   options?: Core.InputOptions
 ): NxArgs {
-  const args = getStringArrayInput(core, 'args', /[= ]/g, options);
+  const args = getStringArrayInput(core, 'args', /[= ]/g, options).map((arg) =>
+    arg === '-c' ? '--configuration' : arg
+  );
   return (
     splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
       printWarnings: false,
