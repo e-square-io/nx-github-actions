@@ -61,9 +61,6 @@ jobs:
     if: ${{ fromJSON(needs.setup.outputs.hasChanges) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')  }}
     needs: [setup, execute]
     runs-on: ubuntu-latest
-    outputs:
-      hasChanges: ${{ steps.affected.outputs.hasChanges || needs.setup.outputs.hasChanges }}
-      matrix: ${{ steps.affected.outputs.matrix || needs.setup.outputs.matrix }}
     steps:
       - uses: actions/checkout@v2
 
@@ -83,13 +80,9 @@ jobs:
 
   e2e-execute:
     name: E2E nx-distributed-task [${{ matrix.target }} (${{ matrix.distribution }})]
-    if: ${{ fromJSON(needs.e2e-distribute.outputs.hasChanges) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
-    needs: [setup,e2e-distribute]
+    if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
+    needs: [setup, execute]
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.target == 'test' }}
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.e2e-distribute.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -105,9 +98,9 @@ jobs:
         uses: ./dist/packages/nx-distributed-task
         id: run
         with:
-          target: ${{ matrix.target }}
-          distribution: ${{ matrix.distribution }}
-          projects: ${{ matrix.projects }}
+          target: build
+          distribution: 1
+          projects: 'nx-affected-matrix'
           debug: true
 
   release:
