@@ -39,7 +39,7 @@ export function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
 export function generateAffectedMatrix({
   targets,
   maxDistribution,
-  args = [],
+  args = {},
 }: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>): Promise<NxAffectedMatrix> {
   return group(`⚙️ Generating affected matrix for ${targets}`, async () => {
     const matrix: NxAffectedMatrix = {

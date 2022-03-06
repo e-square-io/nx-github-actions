@@ -48,7 +48,7 @@ describe('upload', () => {
         projects: ['test', 'test2'],
         nxCloud: false,
         uploadOutputs: true,
-        args: [],
+        args: {},
         debug: false,
         distribution: 1,
         maxParallel: 1,

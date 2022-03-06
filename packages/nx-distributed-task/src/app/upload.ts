@@ -36,12 +36,9 @@ export function uploadProjectsOutputs(glob: typeof Glob, inputs: Inputs): Promis
   if (!inputs.uploadOutputs) return;
 
   return group('⬆️ Uploading artifacts', async () => {
-    const artifactName = inputs.target;
-    const configuration = inputs.args.find((arg) => arg.search(/-c/))?.split('=')?.[1];
-
     await Promise.all(
       inputs.projects.map((project) =>
-        uploadArtifact(glob, artifactName, getProjectOutputs(project, inputs.target, configuration))
+        uploadArtifact(glob, inputs.target, getProjectOutputs(project, inputs.target, inputs.args.configuration))
       )
     );
   });

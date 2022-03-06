@@ -6,6 +6,7 @@ import { debug, group, logger } from '@e-square/utils/logger';
 import * as _Exec from '@actions/exec';
 import { Inputs } from './inputs';
 import { getPackageManagerCommand, getPackageManagerVersion } from '@nrwl/tao/src/shared/package-manager';
+import { NxArgs } from '@nrwl/workspace/src/command-line/utils';
 
 export async function assertNxInstalled(exec: Exec) {
   debug(`Checking existence of nx`);
@@ -16,14 +17,17 @@ export async function assertNxInstalled(exec: Exec) {
   if (!path) throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
 }
 
-export async function nxCommand(nxCommand: string, target: string, exec: Exec, args: string[]): Promise<string> {
+export async function nxCommand(nxCommand: string, target: string, exec: Exec, args: NxArgs): Promise<string> {
   const pmVersion = getPackageManagerVersion().split('.');
   let command = getPackageManagerCommand().exec;
   if (command === 'npx' && Number(pmVersion[0]) > 6) command += ' --no';
 
   const wrapper = exec
     .withCommand(`${command} -p @nrwl/cli nx ${nxCommand}`)
-    .withArgs(`--target=${target}`, ...args)
+    .withArgs(
+      `--target=${target}`,
+      ...Object.entries(args).map(([k, v]) => (typeof v === 'boolean' && v ? `--${k}` : `--${k}=${v}`))
+    )
     .build();
 
   return wrapper();
@@ -35,10 +39,10 @@ export async function nxRunMany(
   inputs: BaseInputs & { nxCloud?: boolean; maxParallel?: number },
   exec: Exec
 ): Promise<string> {
-  const args = inputs.args ?? [];
+  const args = inputs.args;
 
   if (inputs.nxCloud) {
-    args.push('--scan');
+    args.scan = true;
     const env: Record<string, string> = {};
     env.NX_RUN_GROUP = context.runId.toString();
 
@@ -49,7 +53,7 @@ export async function nxRunMany(
     exec.withOptions({ env: { ...process.env, ...env } });
   }
 
-  args.push('--parallel', `--maxParallel=${inputs.maxParallel || 3}`);
+  args.parallel = inputs.maxParallel || 3;
 
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping target execution`);

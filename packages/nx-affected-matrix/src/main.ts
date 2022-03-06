@@ -6,13 +6,7 @@ import type * as _io from '@actions/io';
 import { generateAffectedMatrix } from './app/nx-affected-matrix';
 import { getInputs } from './app/inputs';
 
-export default async function (
-  context: typeof Context,
-  core: typeof _core,
-  exec: typeof _exec,
-  io: typeof _io,
-  require?
-) {
+export default async function (context: typeof Context, core: typeof _core) {
   try {
     const parsedInputs = getInputs(core);
     const matrix = await generateAffectedMatrix(parsedInputs);

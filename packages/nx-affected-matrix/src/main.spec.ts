@@ -1,7 +1,5 @@
 import { context } from '@actions/github';
 import * as core from '@actions/core';
-import * as exec from '@actions/exec';
-import * as io from '@actions/io';
 import main from './main';
 import { getAffected } from './app/get-affected';
 
@@ -26,7 +24,7 @@ describe('main', () => {
   });
 
   it('should output the generated matrix and if there are changes', async () => {
-    await main(context, core, exec, io);
+    await main(context, core);
 
     expect(core.setOutput).toHaveBeenCalledTimes(2);
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'matrix', {
@@ -41,7 +39,7 @@ describe('main', () => {
 
     process.env.INPUT_MAXDISTRIBUTION = '{"test": 2, "build": 1}';
 
-    await main(context, core, exec, io);
+    await main(context, core);
 
     expect(core.setOutput).toHaveBeenNthCalledWith(3, 'matrix', {
       include: [
@@ -54,7 +52,7 @@ describe('main', () => {
 
   it('should set job as failed if any unhandled error occurs', async () => {
     (getAffected as jest.Mock).mockRejectedValueOnce('test');
-    await main(context, core, exec, io);
+    await main(context, core);
 
     expect(core.setFailed).toHaveBeenCalledWith('test');
   });

@@ -19,7 +19,7 @@ export function getInputs(core: typeof Core): Inputs {
   const target = core.getInput('target', { required: true });
 
   return {
-    ...getBaseInputs(core),
+    ...getBaseInputs(core, 'run-one'),
     target,
     distribution: getDistribution(core),
     projects: getStringArrayInput(core, 'projects', ','),

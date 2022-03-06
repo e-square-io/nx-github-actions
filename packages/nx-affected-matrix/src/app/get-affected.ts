@@ -1,7 +1,5 @@
-import type { Arguments } from 'yargs';
-
 import type { Task, ProjectGraphProjectNode, ProjectGraph } from '@nrwl/devkit';
-import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
+import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
 import { projectHasTarget } from '@nrwl/workspace/src/utilities/project-graph-utils';
 import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph/project-graph';
 import { withDeps } from '@nrwl/workspace/src/core/project-graph/operators';
@@ -12,8 +10,7 @@ import { targetToTargetString } from '@nrwl/devkit/src/executors/parse-target-st
 function createTasks(
   affectedProjectsWithTargetAndConfig: ProjectGraphProjectNode[],
   projectGraph: ProjectGraph,
-  nxArgs: NxArgs,
-  overrides: Arguments
+  nxArgs: NxArgs
 ): Task[] {
   return affectedProjectsWithTargetAndConfig.map((affectedProject) => ({
     id: targetToTargetString({
@@ -22,7 +19,7 @@ function createTasks(
       configuration: nxArgs.configuration,
     }),
     target: { project: affectedProject.name, target: nxArgs.target, configuration: nxArgs.configuration },
-    overrides,
+    overrides: {},
   }));
 }
 
@@ -52,7 +49,7 @@ function mapToProjectName(project: ProjectGraphProjectNode): string {
 
 export async function getAffected(
   target: string,
-  args: string[]
+  args: NxArgs
 ): Promise<{
   tasks: Task[];
   projects: string[];
@@ -63,9 +60,8 @@ export async function getAffected(
 }> {
   const projectGraph = await createProjectGraphAsync();
 
-  const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: args.join(' ') }, 'print-affected');
-  const projectNodes = projectsToRun(nxArgs, projectGraph);
-  const tasks = createTasks(allProjectsWithTarget(projectNodes, target), projectGraph, nxArgs, overrides);
+  const projectNodes = allProjectsWithTarget(projectsToRun(args, projectGraph), target);
+  const tasks = createTasks(projectNodes, projectGraph, args);
   const apps: string[] = [],
     libs: string[] = [],
     e2e: string[] = [];

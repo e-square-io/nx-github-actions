@@ -22,7 +22,7 @@ describe('nxAffectedMatrix', () => {
         generateAffectedMatrix({
           targets: ['test1', 'test2'],
           maxDistribution: { test1: 1, test2: 2 },
-          args: [],
+          args: {},
         })
       ).resolves.toEqual({
         include: [
