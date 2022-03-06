@@ -1,3 +1,9 @@
+## [2.3.2](https://github.com/e-square-io/nx-github-actions/compare/v2.3.1...v2.3.2) (2022-03-06)
+
+### Bug Fixes
+
+- **utils:** save cache is not working (#35) ([3d222f7](https://github.com/e-square-io/nx-github-actions/commit/3d222f766040e79167ac77165a506ff92008c711)), closes [#35](https://github.com/e-square-io/nx-github-actions/issues/35)
+
 ## [2.3.1](https://github.com/e-square-io/nx-github-actions/compare/v2.3.0...v2.3.1) (2022-03-06)
 
 ### Bug Fixes
