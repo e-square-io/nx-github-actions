@@ -4,7 +4,7 @@ import * as glob from '@actions/glob';
 import * as io from '@actions/io';
 import { context } from '@actions/github';
 
-import { PRIMARY_KEY } from '@e-square/utils/cache';
+import * as cache from '@e-square/utils/cache';
 
 import { assertNxInstalled, runNxTask } from './app/nx';
 import { restoreCache, saveCache } from './app/cache';
@@ -31,7 +31,7 @@ describe('main', () => {
   });
 
   it('should run nx target for projects', async () => {
-    process.env = { ...process.env, [`STATE_${PRIMARY_KEY}`]: 'test' };
+    jest.spyOn(cache, 'getCacheKeys').mockResolvedValue(['test', ['test']]);
 
     await main(context, core, exec, glob, io);
 

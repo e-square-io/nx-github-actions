@@ -75,6 +75,5 @@ runs:
           const { default: setEnv } = require('${{ github.action_path }}/set-env.js');
           const { default: main } = require('${{ github.action_path }}/main.js');
 
-          console.log(JSON.stringify(process.env, null, 2));
           setEnv(${{ toJSON(inputs) }}, process);
           await main(context, core);

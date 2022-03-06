@@ -29,10 +29,10 @@ export default async function (
 
   try {
     await assertNxInstalled(new Exec(exec.exec));
-    await restoreCache(context, glob, core, parsedInputs);
+    await restoreCache(context, glob, parsedInputs);
     await runNxTask(context, exec, parsedInputs);
     await uploadProjectsOutputs(glob, parsedInputs);
-    await saveCache(core, parsedInputs);
+    await saveCache(parsedInputs);
   } catch (e) {
     core.setFailed(e);
   }

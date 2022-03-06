@@ -53,14 +53,3 @@ runs:
 
           setEnv(${{ toJSON(inputs) }}, process);
           await main(context, core, exec, glob, io, require);
-
-    - name: Post Execute target
-      if: ${{ !fromJSON(inputs.nxCloud) }}
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const { default: setEnv } = require('${{ github.action_path }}/set-env.js');
-          const { default: main } = require('${{ github.action_path }}/main.js');
-
-          setEnv(${{ toJSON(inputs) }}, process);
-          await main(context, core, exec, glob, io, require);
