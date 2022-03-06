@@ -26,7 +26,7 @@ describe('main', () => {
   it('should output the generated matrix and if there are changes', async () => {
     await main(context, core);
 
-    expect(core.setOutput).toHaveBeenCalledTimes(2);
+    expect(core.setOutput).toHaveBeenCalledTimes(4);
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'matrix', {
       include: [
         { distribution: 1, projects: 'project1,project2', target: 'test' },
@@ -35,13 +35,15 @@ describe('main', () => {
         { distribution: 2, projects: 'project3,project4', target: 'build' },
       ],
     });
-    expect(core.setOutput).toHaveBeenNthCalledWith(2, 'hasChanges', true);
+    expect(core.setOutput).toHaveBeenNthCalledWith(2, 'apps', 'project1,project2');
+    expect(core.setOutput).toHaveBeenNthCalledWith(3, 'libs', 'project3,project4');
+    expect(core.setOutput).toHaveBeenNthCalledWith(4, 'hasChanges', true);
 
     process.env.INPUT_MAXDISTRIBUTION = '{"test": 2, "build": 1}';
 
     await main(context, core);
 
-    expect(core.setOutput).toHaveBeenNthCalledWith(3, 'matrix', {
+    expect(core.setOutput).toHaveBeenNthCalledWith(5, 'matrix', {
       include: [
         { distribution: 1, projects: 'project1,project2', target: 'test' },
         { distribution: 2, projects: 'project3,project4', target: 'test' },

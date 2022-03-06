@@ -40,8 +40,14 @@ export function generateAffectedMatrix({
   targets,
   maxDistribution,
   args = {},
-}: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>): Promise<NxAffectedMatrix> {
+}: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>): Promise<{
+  matrix: NxAffectedMatrix;
+  apps: string;
+  libs: string;
+}> {
   return group(`⚙️ Generating affected matrix for ${targets}`, async () => {
+    const affectedApps = [];
+    const affectedLibs = [];
     const matrix: NxAffectedMatrix = {
       include: [],
     };
@@ -49,7 +55,11 @@ export function generateAffectedMatrix({
     for (const target of targets) {
       debug(`Calculating affected for "${target}" target`);
 
-      const { projects } = await getAffected(target, args);
+      const { projects, apps, libs } = await getAffected(target, args);
+
+      affectedApps.push(...apps);
+      affectedLibs.push(...libs);
+
       const affectedTargets: NxAffectedTarget[] = chunkify(projects, maxDistribution[target])
         .map((projects, idx) => ({
           target,
@@ -66,6 +76,10 @@ export function generateAffectedMatrix({
     debug(`matrix: ${JSON.stringify(matrix, null, 2)}`);
     success(`Generated affected matrix`);
 
-    return matrix;
+    return {
+      matrix,
+      apps: Array.from(new Set(affectedApps)).join(','),
+      libs: Array.from(new Set(affectedLibs)).join(','),
+    };
   });
 }

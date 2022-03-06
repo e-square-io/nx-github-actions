@@ -25,23 +25,27 @@ describe('nxAffectedMatrix', () => {
           args: {},
         })
       ).resolves.toEqual({
-        include: [
-          {
-            distribution: 1,
-            projects: 'project1,project2,project3,project4',
-            target: 'test1',
-          },
-          {
-            distribution: 1,
-            projects: 'project1,project2',
-            target: 'test2',
-          },
-          {
-            distribution: 2,
-            projects: 'project3,project4',
-            target: 'test2',
-          },
-        ],
+        apps: 'project1,project2',
+        libs: 'project3,project4',
+        matrix: {
+          include: [
+            {
+              distribution: 1,
+              projects: 'project1,project2,project3,project4',
+              target: 'test1',
+            },
+            {
+              distribution: 1,
+              projects: 'project1,project2',
+              target: 'test2',
+            },
+            {
+              distribution: 2,
+              projects: 'project3,project4',
+              target: 'test2',
+            },
+          ],
+        },
       });
     });
   });

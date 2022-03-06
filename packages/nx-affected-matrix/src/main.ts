@@ -9,10 +9,12 @@ import { getInputs } from './app/inputs';
 export default async function (context: typeof Context, core: typeof _core) {
   try {
     const parsedInputs = getInputs(core);
-    const matrix = await generateAffectedMatrix(parsedInputs);
+    const { matrix, apps, libs } = await generateAffectedMatrix(parsedInputs);
 
     core.setOutput('matrix', matrix);
-    core.setOutput('hasChanges', !!matrix.include.find((target) => target.projects.length));
+    core.setOutput('apps', apps);
+    core.setOutput('libs', libs);
+    core.setOutput('hasChanges', apps.length > 0 || libs.length > 0);
   } catch (e) {
     core.setFailed(e);
   }
