@@ -76,10 +76,10 @@ jobs:
         with:
           targets: build
           maxDistribution: 1
-          debug: true
+#          debug: true
 
   e2e-execute:
-    name: E2E nx-distributed-task [${{ matrix.target }} (${{ matrix.distribution }})]
+    name: E2E nx-distributed-task
     if: ${{ (github.event_name == 'pull_request' || github.event_name == 'pull_request_target') && contains(needs.setup.outputs.matrix, 'nx-distributed-task') }}
     needs: [setup, execute]
     runs-on: ubuntu-latest
@@ -101,7 +101,7 @@ jobs:
           target: build
           distribution: 1
           projects: 'nx-affected-matrix'
-          debug: true
+#          debug: true
 
   release:
     name: Release version

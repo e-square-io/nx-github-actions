@@ -78,7 +78,3 @@ runs:
           console.log(JSON.stringify(process.env, null, 2));
           setEnv(${{ toJSON(inputs) }}, process);
           await main(context, core);
-#      env:
-#        GITHUB_WORKSPACE: ${{ github.workspace }}
-#        NX_BASE: ${{ env.NX_BASE }}
-#        NX_HEAD: ${{ env.NX_HEAD }}

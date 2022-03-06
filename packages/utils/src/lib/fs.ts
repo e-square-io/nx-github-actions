@@ -50,7 +50,7 @@ export class GHTree implements Tree {
   }
 
   resolve(path: string): string {
-    return resolve(this.root, path);
+    return resolve(this.root, path.startsWith('/') ? path.slice(1) : path);
   }
 
   getLockFilePath(): string | void {

@@ -53,8 +53,6 @@ runs:
 
           setEnv(${{ toJSON(inputs) }}, process);
           await main(context, core, exec, glob, io, require);
-      env:
-        GITHUB_WORKSPACE: ${{ github.workspace }}
 
     - name: Post Execute target
       if: ${{ !fromJSON(inputs.nxCloud) }}
@@ -66,5 +64,3 @@ runs:
 
           setEnv(${{ toJSON(inputs) }}, process);
           await main(context, core, exec, glob, io, require);
-      env:
-        GITHUB_WORKSPACE: ${{ github.workspace }}
