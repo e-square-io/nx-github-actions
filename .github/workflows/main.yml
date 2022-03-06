@@ -15,12 +15,6 @@ jobs:
       hasChanges: ${{ steps.affected.outputs.hasChanges }}
       matrix: ${{ steps.affected.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - uses: e-square-io/.github/.github/actions/npm-ci@main
-
       - name: Calculate Affected Projects
         uses: e-square-io/nx-affected-matrix@v2
         id: affected
