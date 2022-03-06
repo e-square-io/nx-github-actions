@@ -80,8 +80,8 @@
     "tsconfig-paths": "^3.9.0",
     "typescript": "4.5.5"
   },
-  "override": {
-    "tmpl": "1.0.5"
+  "overrides": {
+    "tmpl": "^1.0.5"
   },
   "config": {
     "commitizen": {
