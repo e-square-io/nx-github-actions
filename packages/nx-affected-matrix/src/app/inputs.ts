@@ -12,7 +12,7 @@ export function getInputs(core: typeof Core): Inputs {
   const targets = getStringArrayInput(core, 'targets', ',');
 
   return {
-    ...getBaseInputs(core, 'affected'),
+    ...getBaseInputs(core, 'print-affected'),
     targets,
     maxDistribution: getMaxDistribution(core, targets),
   };

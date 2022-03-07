@@ -1,6 +1,7 @@
 import type * as Core from '@actions/core';
+import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
+
 import { debug, log, logger, warning } from './logger';
-import { NxArgs, RawNxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
 
 export interface BaseInputs {
   args: NxArgs;
@@ -17,7 +18,23 @@ export function getStringArrayInput(
   return core
     .getInput(name, options)
     .split(separator)
-    .filter((value) => value.length > 0);
+    .filter((value) => value.length > 0)
+    .map((value) => value.trim());
+}
+
+export function parseNxArgs(args: Record<string, unknown>): NxArgs {
+  const parsedArgs = { ...args };
+  if (parsedArgs.skipNxCache === 'false') delete parsedArgs.skipNxCache;
+
+  if (parsedArgs.exclude) {
+    parsedArgs.exclude =
+      typeof parsedArgs.exclude === 'string'
+        ? (parsedArgs.exclude as string).split(',')
+        : (parsedArgs.exclude as string[]).reduce((acc, curr) => [...acc, ...curr.split(',')], []);
+  }
+
+  debug(`parsed args: ${JSON.stringify(parsedArgs, null, 2)}`);
+  return parsedArgs;
 }
 
 export function getArgsInput(
@@ -31,17 +48,8 @@ export function getArgsInput(
   const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
     printWarnings: false,
   }) ?? { nxArgs: {}, overrides: {} };
-  debug(`nxArgs: ${JSON.stringify(nxArgs, null, 2)}`);
-  debug(`overrides: ${JSON.stringify(overrides, null, 2)}`);
 
-  const parsedArgs: NxArgs = { ...nxArgs, ...overrides };
-  parsedArgs.exclude =
-    parsedArgs.exclude && typeof parsedArgs.exclude === 'string'
-      ? (parsedArgs.exclude as string).split(',')
-      : parsedArgs.exclude?.reduce((acc, curr) => [...acc, ...curr.split(',')], []) || undefined;
-
-  debug(`parsedArgs: ${JSON.stringify(parsedArgs, null, 2)}`);
-  return parsedArgs;
+  return parseNxArgs({ ...nxArgs, ...overrides });
 }
 
 export function getMaxDistribution(
