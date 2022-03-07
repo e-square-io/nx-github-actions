@@ -25,6 +25,7 @@ function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraph
   if (!nxArgs.all && nxArgs.withDeps) {
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
   }
+  debug(JSON.stringify(nxArgs, null, 2));
 
   if (nxArgs.exclude) {
     const excludedProjects = new Set(nxArgs.exclude);
