@@ -22,7 +22,7 @@ export default async function (context: typeof Context, core: typeof _core, exec
   try {
     await assertNxInstalled(new Exec(exec.exec));
     await restoreCache(context, glob, parsedInputs);
-    await nxRunMany(context, parsedInputs, new Exec(exec.exec));
+    await nxRunMany(context, parsedInputs.args, new Exec(exec.exec));
     await uploadProjectsOutputs(glob, parsedInputs);
     await saveCache(parsedInputs);
   } catch (e) {
