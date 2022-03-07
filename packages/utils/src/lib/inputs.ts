@@ -24,7 +24,7 @@ export function getStringArrayInput(
 
 export function parseNxArgs(args: Record<string, unknown>): NxArgs {
   const parsedArgs = { ...args };
-  if (parsedArgs.skipNxCache === 'false') delete parsedArgs.skipNxCache;
+  if (parsedArgs.skipNxCache === false) delete parsedArgs.skipNxCache;
 
   if (parsedArgs.exclude) {
     parsedArgs.exclude =

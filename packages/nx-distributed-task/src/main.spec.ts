@@ -1,7 +1,6 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as glob from '@actions/glob';
-import * as io from '@actions/io';
 import { context } from '@actions/github';
 
 import * as cache from '@e-square/utils/cache';
@@ -33,7 +32,7 @@ describe('main', () => {
   it('should run nx target for projects', async () => {
     jest.spyOn(cache, 'getCacheKeys').mockResolvedValue(['test', ['test']]);
 
-    await main(context, core, exec, glob, io);
+    await main(context, core, exec, glob);
 
     expect(assertNxInstalled).toHaveBeenCalled();
     expect(restoreCache).toHaveBeenCalled();
@@ -49,14 +48,14 @@ describe('main', () => {
   it('should exit if no projects to run', async () => {
     process.env['INPUT_PROJECTS'] = undefined;
 
-    await main(context, core, exec, glob, io);
+    await main(context, core, exec, glob);
 
     expect(assertNxInstalled).not.toHaveBeenCalled();
   });
 
   it('should set job as failed if any unhandled error occurs', async () => {
     (assertNxInstalled as jest.Mock).mockRejectedValue('test');
-    await main(context, core, exec, glob, io);
+    await main(context, core, exec, glob);
 
     expect(core.setFailed).toHaveBeenCalledWith('test');
   });

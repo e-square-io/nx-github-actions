@@ -17,7 +17,6 @@ export default async function (
   core: typeof _core,
   exec: typeof _exec,
   glob: typeof _glob,
-  io: typeof _io,
   require?
 ) {
   const parsedInputs = getInputs(core);

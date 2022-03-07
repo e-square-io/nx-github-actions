@@ -1,7 +1,5 @@
 import type * as _core from '@actions/core';
-import type * as _exec from '@actions/exec';
 import type { context as Context } from '@actions/github';
-import type * as _io from '@actions/io';
 
 import { generateAffectedMatrix } from './app/nx-affected-matrix';
 import { getInputs } from './app/inputs';
