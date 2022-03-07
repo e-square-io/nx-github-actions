@@ -3,6 +3,10 @@ import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/com
 
 import { debug, log, logger, warning } from './logger';
 
+type KeyOfType<T, V> = keyof {
+  [P in keyof T as T[P] extends V ? P : never]: any;
+};
+
 export interface BaseInputs {
   args: NxArgs;
   debug: boolean;
@@ -23,14 +27,21 @@ export function getStringArrayInput(
 }
 
 export function parseNxArgs(args: Record<string, unknown>): NxArgs {
+  const aliasArgs: Record<string, keyof NxArgs> = { c: 'configuration' };
+  const arrArgs: KeyOfType<NxArgs, string[]>[] = ['exclude', 'projects', 'files'];
+
   let parsedArgs = { ...args };
   if (parsedArgs.skipNxCache === false) delete parsedArgs.skipNxCache;
 
   parsedArgs = Object.entries(args).reduce((acc, [key, value]) => {
-    if (typeof value === 'string' && value.includes(',')) acc[key] = value.split(',');
-    else if (Array.isArray(value) && value.some((v) => v.includes(',')))
+    key = aliasArgs[key] ?? key;
+
+    acc[key] = value;
+
+    if (Array.isArray(value) && value.some((v) => v.includes(',')))
       acc[key] = value.reduce((acc, curr) => [...acc, ...curr.split(',')], []);
-    else acc[key] = value;
+
+    if (typeof value === 'string' && (value.includes(',') || arrArgs.includes(key as any))) acc[key] = value.split(',');
 
     return acc;
   }, {});
@@ -44,9 +55,7 @@ export function getArgsInput(
   mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1] = 'print-affected',
   options?: Core.InputOptions
 ): NxArgs {
-  const args = getStringArrayInput(core, 'args', /[= ]/g, options).map((arg) =>
-    arg === '-c' ? '--configuration' : arg
-  );
+  const args = getStringArrayInput(core, 'args', /[= ]/g, options);
   const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
     printWarnings: false,
   }) ?? { nxArgs: {}, overrides: {} };
