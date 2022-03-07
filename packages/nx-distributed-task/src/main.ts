@@ -12,13 +12,7 @@ import { assertNxInstalled, runNxTask } from './app/nx';
 import { uploadProjectsOutputs } from './app/upload';
 import { restoreCache, saveCache } from './app/cache';
 
-export default async function (
-  context: typeof Context,
-  core: typeof _core,
-  exec: typeof _exec,
-  glob: typeof _glob,
-  require?
-) {
+export default async function (context: typeof Context, core: typeof _core, exec: typeof _exec, glob: typeof _glob) {
   const parsedInputs = getInputs(core);
 
   if (parsedInputs.projects.length === 0) {
