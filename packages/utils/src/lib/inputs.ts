@@ -28,11 +28,11 @@ export function getArgsInput(
   const args = getStringArrayInput(core, 'args', /[= ]/g, options).map((arg) =>
     arg === '-c' ? '--configuration' : arg
   );
-  return (
-    splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
-      printWarnings: false,
-    })?.nxArgs || {}
-  );
+  const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
+    printWarnings: false,
+  }) ?? { nxArgs: {}, overrides: {} };
+
+  return { ...nxArgs, ...overrides };
 }
 
 export function getMaxDistribution(
