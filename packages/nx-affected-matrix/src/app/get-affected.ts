@@ -25,12 +25,11 @@ function createTasks(
 }
 
 function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraphProjectNode[] {
-  debug(`nxArgs:`);
-  debug(JSON.stringify(nxArgs, null, 2));
   let affectedGraph = nxArgs.all ? projectGraph : getAffectedProjectGraph(projectGraph);
   if (!nxArgs.all && nxArgs.withDeps) {
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
   }
+  debug(JSON.stringify(affectedGraph.nodes, null, 2));
 
   if (nxArgs.exclude) {
     const excludedProjects = new Set(nxArgs.exclude);
