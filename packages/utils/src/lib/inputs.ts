@@ -38,7 +38,7 @@ export function getArgsInput(
   parsedArgs.exclude =
     parsedArgs.exclude && typeof parsedArgs.exclude === 'string'
       ? (parsedArgs.exclude as string).split(',')
-      : parsedArgs.exclude.reduce((acc, curr) => [...acc, ...curr.split(',')], []) || undefined;
+      : parsedArgs.exclude?.reduce((acc, curr) => [...acc, ...curr.split(',')], []) || undefined;
 
   debug(`parsedArgs: ${JSON.stringify(parsedArgs, null, 2)}`);
   return parsedArgs;
