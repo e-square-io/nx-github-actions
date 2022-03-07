@@ -1,8 +1,9 @@
 import { execSync } from 'child_process';
 
+import type { ProjectGraph } from '@nrwl/workspace/src/core/project-graph';
 import { filterAffected } from '@nrwl/workspace/src/core/affected-project-graph';
+import { pruneExternalNodes } from '@nrwl/workspace/src/core/project-graph/operators';
 import { calculateFileChanges, TEN_MEGABYTES } from '@nrwl/workspace/src/core/file-utils';
-import { ProjectGraph, pruneExternalNodes } from '@nrwl/workspace/src/core/project-graph';
 
 function getFilesUsingBaseAndHead(base: string, head: string): string[] {
   let mergeBase: string;

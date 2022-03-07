@@ -7,11 +7,7 @@ import { withDeps } from '@nrwl/workspace/src/core/project-graph/operators';
 import { getAffectedProjectGraph } from './project-graph';
 import { targetToTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
 
-function createTasks(
-  affectedProjectsWithTargetAndConfig: ProjectGraphProjectNode[],
-  projectGraph: ProjectGraph,
-  nxArgs: NxArgs
-): Task[] {
+function createTasks(affectedProjectsWithTargetAndConfig: ProjectGraphProjectNode[], nxArgs: NxArgs): Task[] {
   return affectedProjectsWithTargetAndConfig.map((affectedProject) => ({
     id: targetToTargetString({
       project: affectedProject.name,
@@ -29,14 +25,14 @@ function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraph
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
   }
 
+  const graphNodes = Object.values(affectedGraph.nodes);
+
   if (nxArgs.exclude) {
     const excludedProjects = new Set(nxArgs.exclude);
-    return Object.entries(affectedGraph.nodes as Record<string, ProjectGraphProjectNode>)
-      .filter(([projectName]) => !excludedProjects.has(projectName))
-      .map(([, project]) => project);
+    return graphNodes.filter((project) => !excludedProjects.has(project.name));
   }
 
-  return Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[];
+  return graphNodes;
 }
 
 function allProjectsWithTarget(projects: ProjectGraphProjectNode[], target: string): ProjectGraphProjectNode[] {
@@ -61,7 +57,7 @@ export async function getAffected(
   const projectGraph = await createProjectGraphAsync();
 
   const projectNodes = allProjectsWithTarget(projectsToRun(args, projectGraph), target);
-  const tasks = createTasks(projectNodes, projectGraph, args);
+  const tasks = createTasks(projectNodes, args);
   const apps: string[] = [],
     libs: string[] = [],
     e2e: string[] = [];

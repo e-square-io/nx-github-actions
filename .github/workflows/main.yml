@@ -76,6 +76,7 @@ jobs:
         with:
           targets: build
           maxDistribution: 1
+          args: '--exclude nx-distributed-task'
 #          debug: true
 
   e2e-execute:

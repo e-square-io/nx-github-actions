@@ -1,6 +1,11 @@
 import type * as Core from '@actions/core';
-import { log, logger, warning } from './logger';
 import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
+
+import { debug, log, logger, warning } from './logger';
+
+type KeyOfType<T, V> = keyof {
+  [P in keyof T as T[P] extends V ? P : never]: any;
+};
 
 export interface BaseInputs {
   args: NxArgs;
@@ -17,7 +22,32 @@ export function getStringArrayInput(
   return core
     .getInput(name, options)
     .split(separator)
-    .filter((value) => value.length > 0);
+    .filter((value) => value.length > 0)
+    .map((value) => value.trim());
+}
+
+export function parseNxArgs(args: Record<string, unknown>): NxArgs {
+  const aliasArgs: Record<string, keyof NxArgs> = { c: 'configuration' };
+  const arrArgs: KeyOfType<NxArgs, string[]>[] = ['exclude', 'projects', 'files'];
+
+  let parsedArgs = { ...args };
+  if (parsedArgs.skipNxCache === false) delete parsedArgs.skipNxCache;
+
+  parsedArgs = Object.entries(args).reduce((acc, [key, value]) => {
+    key = aliasArgs[key] ?? key;
+
+    acc[key] = value;
+
+    if (Array.isArray(value) && value.some((v) => v.includes(',')))
+      acc[key] = value.reduce((acc, curr) => [...acc, ...curr.split(',')], []);
+
+    if (typeof value === 'string' && (value.includes(',') || arrArgs.includes(key as any))) acc[key] = value.split(',');
+
+    return acc;
+  }, {});
+
+  debug(`parsed args: ${JSON.stringify(parsedArgs, null, 2)}`);
+  return parsedArgs;
 }
 
 export function getArgsInput(
@@ -25,14 +55,12 @@ export function getArgsInput(
   mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1] = 'print-affected',
   options?: Core.InputOptions
 ): NxArgs {
-  const args = getStringArrayInput(core, 'args', /[= ]/g, options).map((arg) =>
-    arg === '-c' ? '--configuration' : arg
-  );
-  return (
-    splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
-      printWarnings: false,
-    })?.nxArgs || {}
-  );
+  const args = getStringArrayInput(core, 'args', /[= ]/g, options);
+  const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
+    printWarnings: false,
+  }) ?? { nxArgs: {}, overrides: {} };
+
+  return parseNxArgs({ ...nxArgs, ...overrides });
 }
 
 export function getMaxDistribution(

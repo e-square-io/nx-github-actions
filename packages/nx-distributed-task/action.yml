@@ -52,4 +52,4 @@ runs:
           const { default: main } = require('${{ github.action_path }}/main.js');
 
           setEnv(${{ toJSON(inputs) }}, process);
-          await main(context, core, exec, glob, io, require);
+          await main(context, core, exec, glob);
