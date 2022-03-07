@@ -1,6 +1,6 @@
 import type * as Core from '@actions/core';
-import { log, logger, warning } from './logger';
-import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
+import { debug, log, logger, warning } from './logger';
+import { NxArgs, RawNxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
 
 export interface BaseInputs {
   args: NxArgs;
@@ -31,8 +31,17 @@ export function getArgsInput(
   const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
     printWarnings: false,
   }) ?? { nxArgs: {}, overrides: {} };
+  debug(`nxArgs: ${JSON.stringify(nxArgs, null, 2)}`);
+  debug(`overrides: ${JSON.stringify(overrides, null, 2)}`);
 
-  return { ...nxArgs, ...overrides };
+  const parsedArgs: NxArgs = { ...nxArgs, ...overrides };
+  parsedArgs.exclude =
+    parsedArgs.exclude && typeof parsedArgs.exclude === 'string'
+      ? (parsedArgs.exclude as string).split(',')
+      : parsedArgs.exclude.reduce((acc, curr) => [...acc, ...curr.split(',')], []) || undefined;
+
+  debug(`parsedArgs: ${JSON.stringify(parsedArgs, null, 2)}`);
+  return parsedArgs;
 }
 
 export function getMaxDistribution(
