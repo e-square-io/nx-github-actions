@@ -23,15 +23,17 @@ export function getStringArrayInput(
 }
 
 export function parseNxArgs(args: Record<string, unknown>): NxArgs {
-  const parsedArgs = { ...args };
+  let parsedArgs = { ...args };
   if (parsedArgs.skipNxCache === false) delete parsedArgs.skipNxCache;
 
-  if (parsedArgs.exclude) {
-    parsedArgs.exclude =
-      typeof parsedArgs.exclude === 'string'
-        ? (parsedArgs.exclude as string).split(',')
-        : (parsedArgs.exclude as string[]).reduce((acc, curr) => [...acc, ...curr.split(',')], []);
-  }
+  parsedArgs = Object.entries(args).reduce((acc, [key, value]) => {
+    if (typeof value === 'string' && value.includes(',')) acc[key] = value.split(',');
+    else if (Array.isArray(value) && value.some((v) => v.includes(',')))
+      acc[key] = value.reduce((acc, curr) => [...acc, ...curr.split(',')], []);
+    else acc[key] = value;
+
+    return acc;
+  }, {});
 
   debug(`parsed args: ${JSON.stringify(parsedArgs, null, 2)}`);
   return parsedArgs;
