@@ -1,3 +1,9 @@
+## [2.3.4](https://github.com/e-square-io/nx-github-actions/compare/v2.3.3...v2.3.4) (2022-03-07)
+
+### Bug Fixes
+
+- **utils:** args are not fully parsed (#37) ([c50d755](https://github.com/e-square-io/nx-github-actions/commit/c50d7559109f98a6e852f44f07025c53498651f1)), closes [#37](https://github.com/e-square-io/nx-github-actions/issues/37)
+
 ## [2.3.3](https://github.com/e-square-io/nx-github-actions/compare/v2.3.2...v2.3.3) (2022-03-06)
 
 ### Bug Fixes
