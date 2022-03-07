@@ -17,14 +17,24 @@ function getDistribution(core: typeof Core): number {
 
 export function getInputs(core: typeof Core): Inputs {
   const target = core.getInput('target', { required: true });
+  const { debug, workingDirectory, args } = getBaseInputs(core, 'run-many');
+
+  args.target = target;
+  args.projects = getStringArrayInput(core, 'projects', ',');
+  args.parallel = getMaxDistribution(core, target, 'maxParallel')[target];
+  args.scan = core.getBooleanInput('nxCloud');
+
+  if (args.scan === false) delete args.scan;
 
   return {
-    ...getBaseInputs(core, 'run-one'),
+    args,
+    debug,
+    workingDirectory,
     target,
     distribution: getDistribution(core),
-    projects: getStringArrayInput(core, 'projects', ','),
-    maxParallel: getMaxDistribution(core, target, 'maxParallel')[target],
-    nxCloud: core.getBooleanInput('nxCloud'),
+    projects: args.projects,
+    maxParallel: args.parallel,
+    nxCloud: Boolean(args.scan),
     uploadOutputs: core.getBooleanInput('uploadOutputs'),
   };
 }

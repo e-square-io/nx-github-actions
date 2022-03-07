@@ -7,7 +7,6 @@ import { logger } from '@e-square/utils/logger';
 import { assertNxInstalled, nxCommand, nxRunMany } from './nx';
 
 jest.mock('@e-square/utils/logger');
-jest.mock('@actions/github');
 
 describe('nx', () => {
   describe('assertNxInstalled', () => {
@@ -40,12 +39,12 @@ describe('nx', () => {
     });
 
     it('should call nxCommand', async () => {
-      await expect(nxCommand('test', 'build', exec, {})).resolves.toBe('');
+      await expect(nxCommand('test', { target: 'build' }, exec)).resolves.toBe('');
       expect(exec.withCommand).toHaveBeenCalledWith(`npx -p @nrwl/cli nx test`);
       expect(exec.withArgs).toHaveBeenCalledWith('--target=build');
 
       jest.spyOn(pm, 'getPackageManagerVersion').mockReturnValueOnce('7.0.0');
-      await expect(nxCommand('test', 'build', exec, {})).resolves.toBe('');
+      await expect(nxCommand('test', { target: 'build' }, exec)).resolves.toBe('');
       expect(exec.withCommand).toHaveBeenCalledWith(`npx --no -p @nrwl/cli nx test`);
     });
 
@@ -53,13 +52,17 @@ describe('nx', () => {
       await expect(
         nxRunMany(
           context,
-          'test',
-          { args: {}, debug: false, workingDirectory: '', nxCloud: true, maxParallel: 3 },
+          {
+            target: 'test',
+            projects: ['test'],
+            scan: true,
+            parallel: 3,
+          },
           exec
         )
       ).resolves.toBe('');
       expect(exec.withCommand).toHaveBeenCalledWith(`npx -p @nrwl/cli nx run-many`);
-      expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--scan', '--parallel=3');
+      expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--projects=test', '--scan', '--parallel=3');
       expect(exec.withOptions).toHaveBeenCalledWith(
         expect.objectContaining({
           env: expect.objectContaining({
@@ -76,8 +79,12 @@ describe('nx', () => {
       await expect(
         nxRunMany(
           context,
-          'test',
-          { args: {}, debug: false, workingDirectory: '', nxCloud: true, maxParallel: 3 },
+          {
+            target: 'test',
+            projects: ['test'],
+            scan: true,
+            parallel: 3,
+          },
           exec
         )
       ).resolves.toBe('[DEBUG MODE] skipping execution');

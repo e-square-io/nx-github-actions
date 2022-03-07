@@ -5,7 +5,7 @@ import { context } from '@actions/github';
 
 import * as cache from '@e-square/utils/cache';
 
-import { assertNxInstalled, runNxTask } from './app/nx';
+import { assertNxInstalled, nxRunMany } from './app/nx';
 import { restoreCache, saveCache } from './app/cache';
 import { uploadProjectsOutputs } from './app/upload';
 import main from './main';
@@ -19,7 +19,7 @@ describe('main', () => {
   beforeEach(() => {
     const env = {
       INPUT_TARGET: 'test',
-      INPUT_BUCKET: '1',
+      INPUT_DISTRIBUTION: '1',
       INPUT_NXCLOUD: 'false',
       INPUT_PROJECTS: 'project1,project2',
       INPUT_DEBUG: 'false',
@@ -36,10 +36,10 @@ describe('main', () => {
 
     expect(assertNxInstalled).toHaveBeenCalled();
     expect(restoreCache).toHaveBeenCalled();
-    expect(runNxTask).toHaveBeenCalledWith(
+    expect(nxRunMany).toHaveBeenCalledWith(
       context,
-      exec,
-      expect.objectContaining({ target: 'test', projects: ['project1', 'project2'] })
+      expect.objectContaining({ target: 'test', projects: ['project1', 'project2'] }),
+      expect.objectContaining({ exec: exec.exec })
     );
     expect(uploadProjectsOutputs).toHaveBeenCalled();
     expect(saveCache).toHaveBeenCalled();

@@ -6,7 +6,6 @@ import { withDeps } from '@nrwl/workspace/src/core/project-graph/operators';
 
 import { getAffectedProjectGraph } from './project-graph';
 import { targetToTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
-import { debug } from '@e-square/utils/logger';
 
 function createTasks(affectedProjectsWithTargetAndConfig: ProjectGraphProjectNode[], nxArgs: NxArgs): Task[] {
   return affectedProjectsWithTargetAndConfig.map((affectedProject) => ({
@@ -25,18 +24,15 @@ function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraph
   if (!nxArgs.all && nxArgs.withDeps) {
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
   }
-  debug(JSON.stringify(nxArgs, null, 2));
+
+  const graphNodes = Object.values(affectedGraph.nodes);
 
   if (nxArgs.exclude) {
     const excludedProjects = new Set(nxArgs.exclude);
-    const result = Object.entries(affectedGraph.nodes as Record<string, ProjectGraphProjectNode>)
-      .filter(([projectName]) => !excludedProjects.has(projectName))
-      .map(([, project]) => project);
-    debug(JSON.stringify(result, null, 2));
-    return result;
+    return graphNodes.filter((project) => !excludedProjects.has(project.name));
   }
 
-  return Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[];
+  return graphNodes;
 }
 
 function allProjectsWithTarget(projects: ProjectGraphProjectNode[], target: string): ProjectGraphProjectNode[] {
