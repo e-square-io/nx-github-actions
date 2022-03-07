@@ -6,6 +6,7 @@ import { withDeps } from '@nrwl/workspace/src/core/project-graph/operators';
 
 import { getAffectedProjectGraph } from './project-graph';
 import { targetToTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
+import { debug } from '@e-square/utils/logger';
 
 function createTasks(
   affectedProjectsWithTargetAndConfig: ProjectGraphProjectNode[],
@@ -24,6 +25,8 @@ function createTasks(
 }
 
 function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraphProjectNode[] {
+  debug(`nxArgs:`);
+  debug(JSON.stringify(nxArgs, null, 2));
   let affectedGraph = nxArgs.all ? projectGraph : getAffectedProjectGraph(projectGraph);
   if (!nxArgs.all && nxArgs.withDeps) {
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
