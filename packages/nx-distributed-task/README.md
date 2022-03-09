@@ -21,7 +21,6 @@ Check out the monorepo's [README](https://github.com/e-square-io/nx-github-actio
 | :--------------- | :---------------------------------------------------------- | :-----: | :------: |
 | target           | Target to run                                               |    -    | &check;  |
 | projects         | Comma-delimited list of projects to run against target      |    -    | &check;  |
-| distribution     | Current distribution run, required when running in a matrix |    -    | &cross;  |
 | maxParallel      | Maximum NX cli parallel runs                                |    3    | &cross;  |
 | nxCloud          | Enable support of Nx Cloud                                  |  false  | &cross;  |
 | uploadOutputs    | Upload target's outputs as workflow artifacts               |  true   | &cross;  |

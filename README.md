@@ -54,7 +54,7 @@ jobs:
           args: ''
 
   execute:
-    name: ${{ matrix.target }} (${{ matrix.distribution }})
+    name: ${{ matrix.target }}
     if: ${{ fromJSON(needs.setup.outputs.hasChanges) }}
     needs: [setup]
     runs-on: ubuntu-latest
@@ -71,7 +71,6 @@ jobs:
         with:
           target: ${{ matrix.target }}
           projects: ${{ matrix.projects }}
-          distribution: ${{ matrix.distribution }}
           uploadOutputs: true
           nxCloud: false
           args: ''

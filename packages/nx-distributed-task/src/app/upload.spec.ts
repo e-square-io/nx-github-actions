@@ -50,7 +50,6 @@ describe('upload', () => {
         uploadOutputs: true,
         args: {},
         debug: false,
-        distribution: 1,
         maxParallel: 1,
         workingDirectory: '',
       };

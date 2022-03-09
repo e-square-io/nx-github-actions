@@ -9,9 +9,10 @@ import { info } from '@e-square/utils/logger';
 import { getInputs } from './app/inputs';
 import { assertNxInstalled, nxRunMany } from './app/nx';
 import { uploadProjectsOutputs } from './app/upload';
-import { restoreCache, saveCache } from './app/cache';
+import { createProjectsHash, restoreCache, saveCache } from './app/cache';
 
 export default async function (context: typeof Context, core: typeof _core, exec: typeof _exec, glob: typeof _glob) {
+  let projectHashes;
   const parsedInputs = getInputs(core);
 
   if (parsedInputs.projects.length === 0) {
@@ -20,11 +21,15 @@ export default async function (context: typeof Context, core: typeof _core, exec
   }
 
   try {
+    if (parsedInputs.nxCloud) {
+      projectHashes = await createProjectsHash(parsedInputs);
+    }
+
     await assertNxInstalled(new Exec(exec.exec));
-    await restoreCache(context, glob, parsedInputs);
+    await restoreCache(context, projectHashes, parsedInputs.nxCloud);
     await nxRunMany(context, parsedInputs.args, new Exec(exec.exec));
     await uploadProjectsOutputs(glob, parsedInputs);
-    await saveCache(parsedInputs);
+    await saveCache(context, projectHashes, parsedInputs.nxCloud);
   } catch (e) {
     core.setFailed(e);
   }

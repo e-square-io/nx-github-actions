@@ -100,8 +100,7 @@ jobs:
         id: run
         with:
           target: build
-          distribution: 1
-          projects: 'nx-affected-matrix'
+          projects: 'nx-affected-matrix,nx-distributed-task'
 #          debug: true
 
   release:

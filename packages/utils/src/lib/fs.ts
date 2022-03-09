@@ -3,8 +3,6 @@ import { resolve } from 'path';
 
 import type { Tree } from '@nrwl/devkit';
 
-import { info } from './logger';
-
 export class GHTree implements Tree {
   readonly root: string;
 
@@ -51,16 +49,6 @@ export class GHTree implements Tree {
 
   resolve(path: string): string {
     return resolve(this.root, path.startsWith('/') ? path.slice(1) : path);
-  }
-
-  getLockFilePath(): string | void {
-    const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'pnpm-lock.yml'];
-    const lockFile = lockFiles.find((file) => this.exists(file));
-    if (!lockFile) {
-      info(`Couldn't find any lock file`);
-      return;
-    }
-    return this.resolve(lockFile);
   }
 
   changePermissions(filePath: string, mode: string | number): void {

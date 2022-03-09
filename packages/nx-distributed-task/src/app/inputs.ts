@@ -4,15 +4,10 @@ import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } fr
 
 export interface Inputs extends BaseInputs {
   target: string;
-  distribution: number;
   projects: string[];
   maxParallel: number;
   uploadOutputs: boolean;
   nxCloud: boolean;
-}
-
-function getDistribution(core: typeof Core): number {
-  return parseInt(core.getInput('distribution') || core.getInput('bucket') || '0');
 }
 
 export function getInputs(core: typeof Core): Inputs {
@@ -31,7 +26,6 @@ export function getInputs(core: typeof Core): Inputs {
     debug,
     workingDirectory,
     target,
-    distribution: getDistribution(core),
     projects: args.projects,
     maxParallel: args.parallel,
     nxCloud: Boolean(args.scan),

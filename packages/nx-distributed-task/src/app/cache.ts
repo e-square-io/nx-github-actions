@@ -1,21 +1,44 @@
 import { context as Context } from '@actions/github';
-import * as Glob from '@actions/glob';
-import { Inputs } from './inputs';
+import type { Hash } from '@nrwl/workspace/src/core/hasher/hasher';
+import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph';
+import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
+import { createTasksForProjectToRun } from '@nrwl/workspace/src/tasks-runner/run-command';
+
 import { group } from '@e-square/utils/logger';
+import { createHasher, hashTask } from '@e-square/utils/hasher';
 import { restoreNxCache, saveNxCache } from '@e-square/utils/cache';
+import { createTaskGraph } from '@e-square/utils/task-graph';
 
-export function restoreCache(
-  context: typeof Context,
-  glob: typeof Glob,
-  { target, distribution, nxCloud }: Inputs
-): Promise<void> {
-  if (nxCloud) return;
+import { Inputs } from './inputs';
+import { tree } from '@e-square/utils/fs';
 
-  return group('🚀 Retrieving NX cache', () => restoreNxCache(context, glob, target, distribution));
+export async function createProjectsHash(inputs: Inputs): Promise<Hash[]> {
+  const projectGraph = await createProjectGraphAsync();
+  const nxJson = readNxJson(tree);
+  const hasher = createHasher(projectGraph, nxJson);
+  const tasks = createTasksForProjectToRun(
+    inputs.projects.map((p) => projectGraph.nodes[p]),
+    { target: inputs.target, configuration: inputs.args.configuration, overrides: {} },
+    projectGraph,
+    null
+  );
+  const taskGraph = await createTaskGraph(projectGraph, nxJson, tasks);
+
+  return Promise.all(tasks.map(async (task) => await hashTask(task, taskGraph, hasher)));
 }
 
-export function saveCache({ nxCloud }: Inputs): Promise<void> {
+export function restoreCache(context: typeof Context, projectsHash?: Hash[], nxCloud?: boolean): Promise<void> {
   if (nxCloud) return;
 
-  return group('🚀 Saving NX cache', () => saveNxCache());
+  return group('🚀 Retrieving NX cache', () =>
+    Promise.all(projectsHash?.map(({ value }) => restoreNxCache(context, value))).then()
+  );
+}
+
+export function saveCache(context: typeof Context, projectsHash?: Hash[], nxCloud?: boolean): Promise<void> {
+  if (nxCloud) return;
+
+  return group('🚀 Saving NX cache', () =>
+    Promise.all(projectsHash?.map(({ value }) => saveNxCache(context, value))).then()
+  );
 }

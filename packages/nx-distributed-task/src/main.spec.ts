@@ -30,7 +30,7 @@ describe('main', () => {
   });
 
   it('should run nx target for projects', async () => {
-    jest.spyOn(cache, 'getCacheKeys').mockResolvedValue(['test', ['test']]);
+    jest.spyOn(cache, 'getCacheKeys').mockReturnValue(['test', ['test']]);
 
     await main(context, core, exec, glob);
 

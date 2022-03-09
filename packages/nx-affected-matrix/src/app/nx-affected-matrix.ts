@@ -5,6 +5,7 @@ import { getAffected } from './get-affected';
 
 interface NxAffectedTarget {
   target: string;
+  /** @deprecated not needed anymore */
   distribution: number;
   projects: string;
 }
