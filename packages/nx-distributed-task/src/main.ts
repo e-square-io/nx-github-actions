@@ -21,7 +21,7 @@ export default async function (context: typeof Context, core: typeof _core, exec
   }
 
   try {
-    if (parsedInputs.nxCloud) {
+    if (!parsedInputs.nxCloud) {
       projectHashes = await createProjectsHash(parsedInputs);
     }
 
