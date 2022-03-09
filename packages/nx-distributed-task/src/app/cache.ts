@@ -4,7 +4,7 @@ import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph'
 import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
 import { createTasksForProjectToRun } from '@nrwl/workspace/src/tasks-runner/run-command';
 
-import { group } from '@e-square/utils/logger';
+import { debug, group } from '@e-square/utils/logger';
 import { createHasher, hashTask } from '@e-square/utils/hasher';
 import { restoreNxCache, saveNxCache } from '@e-square/utils/cache';
 import { createTaskGraph } from '@e-square/utils/task-graph';
@@ -24,11 +24,23 @@ export async function createProjectsHash(inputs: Inputs): Promise<Hash[]> {
   );
   const taskGraph = await createTaskGraph(projectGraph, nxJson, tasks);
 
-  return Promise.all(tasks.map(async (task) => await hashTask(task, taskGraph, hasher)));
+  debug('Project Graph:');
+  debug(JSON.stringify(projectGraph, null, 2));
+  debug('NX json:');
+  debug(JSON.stringify(nxJson, null, 2));
+  debug('Tasks:');
+  debug(JSON.stringify(tasks, null, 2));
+  debug('Task Graph:');
+  debug(JSON.stringify(taskGraph, null, 2));
+
+  return Promise.all(tasks?.map(async (task) => await hashTask(task, taskGraph, hasher)));
 }
 
 export function restoreCache(context: typeof Context, projectsHash?: Hash[], nxCloud?: boolean): Promise<void> {
   if (nxCloud) return;
+
+  debug('Project Hashes:');
+  debug(JSON.stringify(projectsHash, null, 2));
 
   return group('🚀 Retrieving NX cache', () =>
     Promise.all(projectsHash?.map(({ value }) => restoreNxCache(context, value))).then()
