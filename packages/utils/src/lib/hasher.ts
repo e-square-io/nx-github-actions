@@ -1,6 +1,9 @@
 import { Hash, Hasher } from '@nrwl/workspace/src/core/hasher/hasher';
-import type { ProjectGraph, NxJsonConfiguration, Task, TaskGraph } from '@nrwl/devkit';
 import { getCustomHasher } from '@nrwl/workspace/src/tasks-runner/utils';
+import { Workspaces } from '@nrwl/tao/src/shared/workspace';
+import type { ProjectGraph, NxJsonConfiguration, Task, TaskGraph } from '@nrwl/devkit';
+
+import { tree } from './fs';
 
 export function createHasher(graph: ProjectGraph, nxJson: NxJsonConfiguration): Hasher {
   const { options } = nxJson.tasksRunnerOptions.default ?? { options: {} };
@@ -8,7 +11,7 @@ export function createHasher(graph: ProjectGraph, nxJson: NxJsonConfiguration): 
 }
 
 export async function hashTask(task: Task, taskGraph: TaskGraph, defaultHasher: Hasher): Promise<Hash> {
-  const customHasher = getCustomHasher(task, this.workspace);
+  const customHasher = getCustomHasher(task, new Workspaces(tree.root));
   return await (customHasher
     ? customHasher(task, taskGraph, defaultHasher)
     : defaultHasher.hashTaskWithDepsAndContext(task));
