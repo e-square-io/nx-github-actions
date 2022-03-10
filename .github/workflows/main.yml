@@ -101,6 +101,7 @@ jobs:
         with:
           target: build
           projects: 'nx-affected-matrix,nx-distributed-task'
+          nxCloud: false
 #          debug: true
     env:
       NX_CLOUD: false
