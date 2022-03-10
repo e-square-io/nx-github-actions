@@ -11,6 +11,8 @@ export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
 export const getNxCachePaths = (task: Task) => [
   `${NX_CACHE_PATH}/${task.hash}`,
+  `${NX_CACHE_PATH}/${task.hash}.commit`,
+  `${NX_CACHE_PATH}/${task.hash}.tar.gz`,
   ...(task.outputs ?? []).map(
     (path) => `${NX_CACHE_PATH}/latestOutputsHashes/${path.replace(new RegExp(sep, 'g'), '-')}.hash`
   ),
