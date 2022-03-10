@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@actions/artifact": "^0.6.1",
-    "@actions/cache": "^1.0.8",
+    "@actions/cache": "^1.0.9",
     "@nrwl/devkit": "13.8.4",
     "@nrwl/tao": "13.8.4",
     "@nrwl/workspace": "13.8.4",
