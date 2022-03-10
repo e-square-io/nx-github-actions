@@ -21,11 +21,11 @@ export class Workspaces extends NxWorkspaces {
 
     // accessing private methods and overriding them
     // @ts-ignore
-    super.readGeneratorsJson = this._readGeneratorJson.bind(this);
+    super.readGeneratorsJson = this._readGeneratorsJson.bind(this);
     // @ts-ignore
-    super.readExecutorsJson = this._readGeneratorJson.bind(this);
+    super.readExecutorsJson = this._readExecutorsJson.bind(this);
     // @ts-ignore
-    super.getImplementationFactory = this._readGeneratorJson.bind(this);
+    super.getImplementationFactory = this._getImplementationFactory.bind(this);
   }
 
   private resolveRoots(): string[] {
