@@ -11,7 +11,13 @@ import { assertNxInstalled, nxRunMany } from './app/nx';
 import { uploadProjectsOutputs } from './app/upload';
 import { createProjectsHash, restoreCache, saveCache } from './app/cache';
 
-export default async function (context: typeof Context, core: typeof _core, exec: typeof _exec, glob: typeof _glob) {
+export default async function (
+  context: typeof Context,
+  core: typeof _core,
+  exec: typeof _exec,
+  glob: typeof _glob,
+  _require: typeof require
+) {
   let projectHashes;
   const parsedInputs = getInputs(core);
 
@@ -22,7 +28,7 @@ export default async function (context: typeof Context, core: typeof _core, exec
 
   try {
     if (!parsedInputs.nxCloud) {
-      projectHashes = await createProjectsHash(parsedInputs);
+      projectHashes = await createProjectsHash(parsedInputs, _require);
     }
 
     await assertNxInstalled(new Exec(exec.exec));
