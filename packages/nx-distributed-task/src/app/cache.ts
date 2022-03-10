@@ -1,5 +1,6 @@
 import { context as Context } from '@actions/github';
 import type { Hash } from '@nrwl/workspace/src/core/hasher/hasher';
+import { Workspaces } from '@nrwl/tao/src/shared/workspace';
 import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph';
 import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
 import { createTasksForProjectToRun } from '@nrwl/workspace/src/tasks-runner/run-command';
@@ -13,11 +14,12 @@ import { Inputs } from './inputs';
 import { tree } from '@e-square/utils/fs';
 
 export async function createProjectsHash(inputs: Inputs): Promise<Hash[]> {
+  const workspace = new Workspaces(tree.root);
   const projectGraph = await createProjectGraphAsync();
   const nxJson = readNxJson(tree);
   const hasher = createHasher(projectGraph, nxJson);
   const tasks = createTasksForProjectToRun(
-    inputs.projects.map((p) => projectGraph.nodes[p]),
+    inputs.projects.map((p) => projectGraph.nodes[p] ?? null).filter((node) => node !== null),
     { target: inputs.target, configuration: inputs.args.configuration, overrides: {} },
     projectGraph,
     null
@@ -33,7 +35,7 @@ export async function createProjectsHash(inputs: Inputs): Promise<Hash[]> {
   debug('Task Graph:');
   debug(JSON.stringify(taskGraph, null, 2));
 
-  return Promise.all(tasks?.map(async (task) => await hashTask(task, taskGraph, hasher)));
+  return Promise.all(tasks?.map(async (task) => await hashTask(task, taskGraph, hasher, workspace)));
 }
 
 export function restoreCache(context: typeof Context, projectsHash?: Hash[], nxCloud?: boolean): Promise<void> {
