@@ -48,7 +48,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           projects: ${{ matrix.projects }}
-          nxCloud: true
+          args: '--runner local'
 
       - uses: e-square-io/.github/.github/actions/nx-codecov@main
         if: ${{ matrix.target == 'test' }}
