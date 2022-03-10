@@ -4,10 +4,10 @@ import type { context as Context } from '@actions/github';
 import { generateAffectedMatrix } from './app/nx-affected-matrix';
 import { getInputs } from './app/inputs';
 
-export default async function (context: typeof Context, core: typeof _core) {
+export default async function (context: typeof Context, core: typeof _core, _require: typeof require) {
   try {
     const parsedInputs = getInputs(core);
-    const { matrix, apps, libs } = await generateAffectedMatrix(parsedInputs);
+    const { matrix, apps, libs } = await generateAffectedMatrix(parsedInputs, _require);
 
     core.setOutput('matrix', matrix);
     core.setOutput('apps', apps);

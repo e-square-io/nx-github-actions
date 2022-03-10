@@ -1,4 +1,4 @@
-import type { Task } from '@nrwl/tao/src/shared/tasks';
+import type { Task } from '@e-square/utils/task';
 import type { ProjectGraph } from '@nrwl/workspace/src/core/project-graph';
 
 export const getAffected = jest.fn().mockResolvedValue({

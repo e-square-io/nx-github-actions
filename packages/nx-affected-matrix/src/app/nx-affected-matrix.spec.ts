@@ -19,11 +19,14 @@ describe('nxAffectedMatrix', () => {
   describe('generateAffectedMatrix', () => {
     it('should generate a matrix', async () => {
       await expect(
-        generateAffectedMatrix({
-          targets: ['test1', 'test2'],
-          maxDistribution: { test1: 1, test2: 2 },
-          args: {},
-        })
+        generateAffectedMatrix(
+          {
+            targets: ['test1', 'test2'],
+            maxDistribution: { test1: 1, test2: 2 },
+            args: {},
+          },
+          require
+        )
       ).resolves.toEqual({
         apps: 'project1,project2',
         libs: 'project3,project4',

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { join } from 'path';
+import { dirname, join } from 'path';
 
 import {
   buildWorkspaceConfigurationFromGlobs,
@@ -9,11 +9,11 @@ import {
   WorkspaceJsonConfiguration,
   Workspaces as NxWorkspaces,
 } from '@nrwl/tao/src/shared/workspace';
-import { tree } from '@e-square/utils/fs';
 import { readNxJson } from '@nrwl/workspace/src/core/file-utils';
-import { readJsonFile } from '@nrwl/devkit';
+import { readJsonFile } from '@nrwl/tao/src/utils/fileutils';
 import { NxJsonConfiguration } from '@nrwl/tao/src/shared/nx';
-import { dirname } from '@actions/glob/lib/internal-path-helper';
+
+import { tree } from './fs';
 
 export class Workspaces extends NxWorkspaces {
   constructor(private _require: typeof require) {

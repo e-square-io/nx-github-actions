@@ -1,8 +1,5 @@
-import * as glob from '@actions/glob';
-
 import { restoreNxCache, saveNxCache } from '@e-square/utils/cache';
 
-import { Inputs } from './inputs';
 import { restoreCache, saveCache } from './cache';
 import { context } from '@actions/github';
 
@@ -19,8 +16,32 @@ describe('cache', () => {
   });
 
   it('should call cache utils', async () => {
-    await restoreCache(context, [{ value: 'test', details: {} as any }], false);
-    await saveCache(context, [{ value: 'test', details: {} as any }], false);
+    await restoreCache(
+      context,
+      [
+        {
+          id: 'test:build',
+          overrides: {},
+          outputs: ['test'],
+          target: { target: 'build', project: 'test' },
+          hash: 'test',
+        },
+      ],
+      false
+    );
+    await saveCache(
+      context,
+      [
+        {
+          id: 'test:build',
+          overrides: {},
+          outputs: ['test'],
+          target: { target: 'build', project: 'test' },
+          hash: 'test',
+        },
+      ],
+      false
+    );
 
     expect(saveNxCache).toHaveBeenCalled();
     expect(restoreNxCache).toHaveBeenCalled();

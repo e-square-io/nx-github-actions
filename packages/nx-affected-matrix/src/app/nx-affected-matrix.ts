@@ -37,11 +37,10 @@ export function chunkify<T>(arr: T[], numberOfChunks: number): T[][] {
   return result;
 }
 
-export function generateAffectedMatrix({
-  targets,
-  maxDistribution,
-  args = {},
-}: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>): Promise<{
+export function generateAffectedMatrix(
+  { targets, maxDistribution, args = {} }: Pick<Inputs, 'targets' | 'maxDistribution' | 'args'>,
+  _require: typeof require
+): Promise<{
   matrix: NxAffectedMatrix;
   apps: string;
   libs: string;
@@ -56,7 +55,7 @@ export function generateAffectedMatrix({
     for (const target of targets) {
       debug(`Calculating affected for "${target}" target`);
 
-      const { projects, apps, libs } = await getAffected(target, args);
+      const { projects, apps, libs } = await getAffected(target, args, _require);
 
       affectedApps.push(...apps);
       affectedLibs.push(...libs);

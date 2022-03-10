@@ -1,18 +1,16 @@
-import { resolve } from 'path';
-
 import { saveCache, restoreCache, ReserveCacheError } from '@actions/cache';
 import * as core from '@actions/core';
 import { context } from '@actions/github';
 
-import { getNxCachePaths, NX_CACHE_PATH, restoreNxCache, saveNxCache } from './cache';
+import { getNxCachePaths, restoreNxCache, saveNxCache } from './cache';
 import { info, logger, warning } from './logger';
 
-import type { Hash } from '@nrwl/workspace/src/core/hasher/hasher';
+import { Task } from './task';
 
 jest.mock('./logger');
 
 describe('cache', () => {
-  let hash: Hash;
+  let task: Task;
 
   beforeAll(() => {
     process.env.RUNNER_OS = process.env.RUNNER_OS || process.platform;
@@ -20,29 +18,33 @@ describe('cache', () => {
   });
 
   beforeEach(() => {
-    hash = {
-      value: 'test',
-    } as Hash;
+    task = {
+      id: 'test:build',
+      overrides: {},
+      outputs: ['test'],
+      target: { target: 'build', project: 'test' },
+      hash: 'test',
+    };
   });
 
   describe('restoreNxCache', () => {
     it('should restore cache with primary key and restoreKeys', async () => {
-      await restoreNxCache(context, hash);
-      expect(restoreCache).toHaveBeenCalledWith(getNxCachePaths('test'), expect.stringContaining('test'), [
+      await restoreNxCache(context, task);
+      expect(restoreCache).toHaveBeenCalledWith(getNxCachePaths(task), expect.stringContaining('test'), [
         'nx-cache-test',
       ]);
     });
 
     it('should fail silently', async () => {
       (restoreCache as jest.Mock).mockRejectedValueOnce('');
-      await restoreNxCache(context, hash);
+      await restoreNxCache(context, task);
 
       expect(warning).toHaveBeenCalledWith('');
     });
 
     it('should report cache miss', async () => {
       (restoreCache as jest.Mock).mockResolvedValueOnce('');
-      await restoreNxCache(context, hash);
+      await restoreNxCache(context, task);
 
       expect(info).toHaveBeenCalledWith('Cache miss');
     });
@@ -50,7 +52,7 @@ describe('cache', () => {
     it('should not restore cache if in debug mode', async () => {
       logger(core).debugMode = true;
 
-      await restoreNxCache(context, hash);
+      await restoreNxCache(context, task);
 
       expect(restoreCache).not.toHaveBeenCalled();
 
@@ -60,24 +62,24 @@ describe('cache', () => {
 
   describe('saveNxCache', () => {
     it('should save cache with primary key', async () => {
-      await saveNxCache(context, hash);
-      expect(saveCache).toHaveBeenCalledWith(getNxCachePaths('test'), 'nx-cache-test-0');
+      await saveNxCache(context, task);
+      expect(saveCache).toHaveBeenCalledWith(getNxCachePaths(task), 'nx-cache-test-0');
     });
 
     it('should fail silently for ReserveCacheError', async () => {
       (saveCache as jest.Mock).mockRejectedValueOnce(new ReserveCacheError('test'));
-      await expect(saveNxCache(context, hash)).resolves.toBeUndefined();
+      await expect(saveNxCache(context, task)).resolves.toBeUndefined();
     });
 
     it('should fail for not ReserveCacheError', async () => {
       (saveCache as jest.Mock).mockRejectedValueOnce(new Error('test'));
-      await expect(saveNxCache(context, hash)).rejects.toThrowError('test');
+      await expect(saveNxCache(context, task)).rejects.toThrowError('test');
     });
 
     it('should not save cache if in debug mode', async () => {
       logger(core).debugMode = true;
 
-      await saveNxCache(context, hash);
+      await saveNxCache(context, task);
 
       expect(saveCache).not.toHaveBeenCalled();
 
@@ -85,7 +87,7 @@ describe('cache', () => {
     });
 
     it('should not save if cache hit occurred on primary key', async () => {
-      await saveNxCache(context, { ...hash, cacheKey: 'nx-cache-test-0' });
+      await saveNxCache(context, { ...task, cacheKey: 'nx-cache-test-0' });
     });
   });
 });

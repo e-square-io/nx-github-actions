@@ -24,7 +24,7 @@ describe('main', () => {
   });
 
   it('should output the generated matrix and if there are changes', async () => {
-    await main(context, core);
+    await main(context, core, require);
 
     expect(core.setOutput).toHaveBeenCalledTimes(4);
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'matrix', {
@@ -41,7 +41,7 @@ describe('main', () => {
 
     process.env.INPUT_MAXDISTRIBUTION = '{"test": 2, "build": 1}';
 
-    await main(context, core);
+    await main(context, core, require);
 
     expect(core.setOutput).toHaveBeenNthCalledWith(5, 'matrix', {
       include: [
@@ -54,7 +54,7 @@ describe('main', () => {
 
   it('should set job as failed if any unhandled error occurs', async () => {
     (getAffected as jest.Mock).mockRejectedValueOnce('test');
-    await main(context, core);
+    await main(context, core, require);
 
     expect(core.setFailed).toHaveBeenCalledWith('test');
   });

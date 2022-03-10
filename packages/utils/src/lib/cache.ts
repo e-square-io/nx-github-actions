@@ -1,13 +1,20 @@
+import { sep } from 'path';
+
 import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
 
 import { debug, info, logger, success, warning } from './logger';
 
 import type { context as Context } from '@actions/github';
-import type { Hash } from '@nrwl/workspace/src/core/hasher/hasher';
+import type { Task } from './task';
 
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
-export const getNxCachePaths = (hash: string) => [`${NX_CACHE_PATH}/${hash}` /*, `${NX_CACHE_PATH}/${hash}*`*/];
+export const getNxCachePaths = (task: Task) => [
+  `${NX_CACHE_PATH}/${task.hash}`,
+  ...(task.outputs ?? []).map(
+    (path) => `${NX_CACHE_PATH}/latestOutputsHashes/${path.replace(new RegExp(sep, 'g'), '-')}.hash`
+  ),
+];
 
 export function getCacheKeys(hash: string, context: typeof Context): [primary: string, restoreKeys: string[]] {
   const keyParts = [];
@@ -27,21 +34,21 @@ export function getCacheKeys(hash: string, context: typeof Context): [primary: s
   return [keyParts.join('-'), restoreKeys];
 }
 
-export async function restoreNxCache(context: typeof Context, hash: Hash & { cacheKey?: string }): Promise<void> {
+export async function restoreNxCache(context: typeof Context, task: Task): Promise<void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping restoring cache`);
     return;
   }
 
-  const [primaryKey, restoreKeys] = getCacheKeys(hash.value, context);
+  const [primaryKey, restoreKeys] = getCacheKeys(task.hash, context);
   debug(`Restoring NX cache for ${primaryKey}`);
 
   try {
-    const key = await restoreCache(getNxCachePaths(hash.value), primaryKey, restoreKeys);
+    const key = await restoreCache(getNxCachePaths(task), primaryKey, restoreKeys);
 
     if (key) {
       success(`Cache hit: ${key}`);
-      hash.cacheKey = key;
+      task.cacheKey = key;
     } else {
       info(`Cache miss`);
     }
@@ -50,28 +57,28 @@ export async function restoreNxCache(context: typeof Context, hash: Hash & { cac
   }
 }
 
-export async function saveNxCache(context: typeof Context, hash: Hash & { cacheKey?: string }): Promise<void> {
+export async function saveNxCache(context: typeof Context, task: Task): Promise<void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping saving cache`);
     return;
   }
 
-  const [primaryKey] = getCacheKeys(hash.value, context);
+  const [primaryKey] = getCacheKeys(task.hash, context);
 
   if (!primaryKey) {
     info(`Couldn't find the primary key, skipping saving cache`);
     return;
   }
 
-  if (isExactKeyMatch(primaryKey, hash.cacheKey)) {
-    info(`Cache hit occurred on the primary key ${hash.cacheKey}, not saving cache.`);
+  if (isExactKeyMatch(primaryKey, task.cacheKey)) {
+    info(`Cache hit occurred on the primary key ${task.cacheKey}, not saving cache.`);
     return;
   }
 
   debug(`Saving NX cache to ${primaryKey}`);
 
   try {
-    await saveCache(getNxCachePaths(hash.value), primaryKey);
+    await saveCache(getNxCachePaths(task), primaryKey);
 
     success(`Successfully saved cache to ${primaryKey}`);
   } catch (err) {

@@ -1,25 +1,15 @@
-import type { Task, ProjectGraphProjectNode, ProjectGraph } from '@nrwl/devkit';
-import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
 import { projectHasTarget } from '@nrwl/workspace/src/utilities/project-graph-utils';
 import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph/project-graph';
 import { withDeps } from '@nrwl/workspace/src/core/project-graph/operators';
 
 import { getAffectedProjectGraph } from './project-graph';
-import { targetToTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
+import { createTaskGraph } from '@e-square/utils/task-graph';
 
-function createTasks(affectedProjectsWithTargetAndConfig: ProjectGraphProjectNode[], nxArgs: NxArgs): Task[] {
-  return affectedProjectsWithTargetAndConfig.map((affectedProject) => ({
-    id: targetToTargetString({
-      project: affectedProject.name,
-      target: nxArgs.target,
-      configuration: nxArgs.configuration,
-    }),
-    target: { project: affectedProject.name, target: nxArgs.target, configuration: nxArgs.configuration },
-    overrides: {},
-  }));
-}
+import type { ProjectGraphProjectNode, ProjectGraph, TaskGraph } from '@nrwl/devkit';
+import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
+import type { Task } from '@e-square/utils/task';
 
-function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraphProjectNode[] {
+function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph, target: string): ProjectGraphProjectNode[] {
   let affectedGraph = nxArgs.all ? projectGraph : getAffectedProjectGraph(projectGraph);
   if (!nxArgs.all && nxArgs.withDeps) {
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
@@ -32,7 +22,7 @@ function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): ProjectGraph
     return graphNodes.filter((project) => !excludedProjects.has(project.name));
   }
 
-  return graphNodes;
+  return allProjectsWithTarget(graphNodes, target);
 }
 
 function allProjectsWithTarget(projects: ProjectGraphProjectNode[], target: string): ProjectGraphProjectNode[] {
@@ -45,9 +35,11 @@ function mapToProjectName(project: ProjectGraphProjectNode): string {
 
 export async function getAffected(
   target: string,
-  args: NxArgs
+  args: NxArgs,
+  _require: typeof require
 ): Promise<{
   tasks: Task[];
+  taskGraph: TaskGraph;
   projects: string[];
   apps: string[];
   libs: string[];
@@ -56,8 +48,13 @@ export async function getAffected(
 }> {
   const projectGraph = await createProjectGraphAsync();
 
-  const projectNodes = allProjectsWithTarget(projectsToRun(args, projectGraph), target);
-  const tasks = createTasks(projectNodes, args);
+  const projectNodes = projectsToRun(args, projectGraph, target);
+  const { tasks, graph } = await createTaskGraph(
+    projectNodes.map(mapToProjectName),
+    target,
+    args.configuration,
+    _require
+  );
   const apps: string[] = [],
     libs: string[] = [],
     e2e: string[] = [];
@@ -77,6 +74,7 @@ export async function getAffected(
 
   return {
     tasks,
+    taskGraph: graph,
     projects: projectNodes.map(mapToProjectName),
     apps,
     libs,

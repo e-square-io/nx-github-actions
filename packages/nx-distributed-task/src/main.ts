@@ -9,7 +9,8 @@ import { info } from '@e-square/utils/logger';
 import { getInputs } from './app/inputs';
 import { assertNxInstalled, nxRunMany } from './app/nx';
 import { uploadProjectsOutputs } from './app/upload';
-import { createProjectsHash, restoreCache, saveCache } from './app/cache';
+import { restoreCache, saveCache } from './app/cache';
+import { createTaskGraph } from '@e-square/utils/task-graph';
 
 export default async function (
   context: typeof Context,
@@ -18,7 +19,6 @@ export default async function (
   glob: typeof _glob,
   _require: typeof require
 ) {
-  let projectHashes;
   const parsedInputs = getInputs(core);
 
   if (parsedInputs.projects.length === 0) {
@@ -27,15 +27,18 @@ export default async function (
   }
 
   try {
-    if (!parsedInputs.nxCloud) {
-      projectHashes = await createProjectsHash(parsedInputs, _require);
-    }
+    const { tasks } = await createTaskGraph(
+      parsedInputs.projects,
+      parsedInputs.target,
+      parsedInputs.args.configuration,
+      _require
+    );
 
     await assertNxInstalled(new Exec(exec.exec));
-    await restoreCache(context, projectHashes, parsedInputs.nxCloud);
+    await restoreCache(context, tasks, parsedInputs.nxCloud);
     await nxRunMany(context, parsedInputs.args, new Exec(exec.exec));
-    await uploadProjectsOutputs(glob, parsedInputs);
-    await saveCache(context, projectHashes, parsedInputs.nxCloud);
+    await uploadProjectsOutputs(glob, tasks, parsedInputs.uploadOutputs);
+    await saveCache(context, tasks, parsedInputs.nxCloud);
   } catch (e) {
     core.setFailed(e);
   }
