@@ -101,10 +101,8 @@ jobs:
         with:
           target: build
           projects: 'nx-affected-matrix,nx-distributed-task'
-          nxCloud: false
+          args: '--runner local'
 #          debug: true
-    env:
-      NX_CLOUD: false
 
   release:
     name: Release version

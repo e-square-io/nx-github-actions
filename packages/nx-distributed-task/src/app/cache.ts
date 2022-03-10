@@ -33,14 +33,12 @@ export function restoreCache(context: typeof Context, projectsHash?: Hash[], nxC
   if (nxCloud) return;
 
   return group('🚀 Retrieving NX cache', () =>
-    Promise.all(projectsHash?.map(({ value }) => restoreNxCache(context, value))).then()
+    Promise.all(projectsHash?.map((hash) => restoreNxCache(context, hash))).then()
   );
 }
 
 export function saveCache(context: typeof Context, projectsHash?: Hash[], nxCloud?: boolean): Promise<void> {
   if (nxCloud) return;
 
-  return group('🚀 Saving NX cache', () =>
-    Promise.all(projectsHash?.map(({ value }) => saveNxCache(context, value))).then()
-  );
+  return group('🚀 Saving NX cache', () => Promise.all(projectsHash?.map((hash) => saveNxCache(context, hash))).then());
 }

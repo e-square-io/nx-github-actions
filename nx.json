@@ -19,6 +19,12 @@
         "canTrackAnalytics": false,
         "showUsageWarnings": true
       }
+    },
+    "local": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
+      }
     }
   },
   "workspaceLayout": {

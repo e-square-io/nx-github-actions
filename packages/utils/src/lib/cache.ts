@@ -1,10 +1,13 @@
 import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
-import type { context as Context } from '@actions/github';
 
-import { tree } from './fs';
 import { debug, info, logger, success, warning } from './logger';
 
+import type { context as Context } from '@actions/github';
+import type { Hash } from '@nrwl/workspace/src/core/hasher/hasher';
+
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
+
+export const getNxCachePaths = (hash: string) => [`${NX_CACHE_PATH}/${hash}` /*, `${NX_CACHE_PATH}/${hash}*`*/];
 
 export function getCacheKeys(hash: string, context: typeof Context): [primary: string, restoreKeys: string[]] {
   const keyParts = [];
@@ -24,20 +27,21 @@ export function getCacheKeys(hash: string, context: typeof Context): [primary: s
   return [keyParts.join('-'), restoreKeys];
 }
 
-export async function restoreNxCache(context: typeof Context, hash: string): Promise<void> {
+export async function restoreNxCache(context: typeof Context, hash: Hash & { cacheKey?: string }): Promise<void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping restoring cache`);
     return;
   }
 
-  const [primaryKey, restoreKeys] = getCacheKeys(hash, context);
+  const [primaryKey, restoreKeys] = getCacheKeys(hash.value, context);
   debug(`Restoring NX cache for ${primaryKey}`);
 
   try {
-    const key = await restoreCache([tree.resolve(`${NX_CACHE_PATH}/${hash}`)], primaryKey, restoreKeys);
+    const key = await restoreCache(getNxCachePaths(hash.value), primaryKey, restoreKeys);
 
     if (key) {
       success(`Cache hit: ${key}`);
+      hash.cacheKey = key;
     } else {
       info(`Cache miss`);
     }
@@ -46,32 +50,47 @@ export async function restoreNxCache(context: typeof Context, hash: string): Pro
   }
 }
 
-export async function saveNxCache(context: typeof Context, hash: string): Promise<void> {
+export async function saveNxCache(context: typeof Context, hash: Hash & { cacheKey?: string }): Promise<void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping saving cache`);
     return;
   }
 
-  const [primaryKey, cacheKey] = getCacheKeys(hash, context);
+  const [primaryKey] = getCacheKeys(hash.value, context);
 
   if (!primaryKey) {
     info(`Couldn't find the primary key, skipping saving cache`);
     return;
   }
 
+  if (isExactKeyMatch(primaryKey, hash.cacheKey)) {
+    info(`Cache hit occurred on the primary key ${hash.cacheKey}, not saving cache.`);
+    return;
+  }
+
   debug(`Saving NX cache to ${primaryKey}`);
 
   try {
-    await saveCache([tree.resolve(`${NX_CACHE_PATH}/${hash}`)], primaryKey);
+    await saveCache(getNxCachePaths(hash.value), primaryKey);
 
     success(`Successfully saved cache to ${primaryKey}`);
   } catch (err) {
     // don't throw an error if cache already exists, which may happen due to concurrency
     if (err instanceof ReserveCacheError) {
-      info(`Cache hit occurred on the primary key ${cacheKey}, not saving cache.`);
+      warning(err);
       return;
     }
     // otherwise re-throw
     throw err;
   }
+}
+
+function isExactKeyMatch(key: string, cacheKey?: string): boolean {
+  return !!(
+    cacheKey &&
+    key &&
+    cacheKey.localeCompare(key, undefined, {
+      sensitivity: 'accent',
+    }) === 0
+  );
 }
