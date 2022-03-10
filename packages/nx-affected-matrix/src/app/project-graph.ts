@@ -2,7 +2,6 @@ import { execSync } from 'child_process';
 
 import type { ProjectGraph } from '@nrwl/workspace/src/core/project-graph';
 import { filterAffected } from '@nrwl/workspace/src/core/affected-project-graph';
-import { pruneExternalNodes } from '@nrwl/workspace/src/core/project-graph/operators';
 import { calculateFileChanges, TEN_MEGABYTES } from '@nrwl/workspace/src/core/file-utils';
 
 function getFilesUsingBaseAndHead(base: string, head: string): string[] {
@@ -39,6 +38,5 @@ export function getAffectedFiles(): string[] {
 }
 
 export function getAffectedProjectGraph(graph: ProjectGraph): ProjectGraph {
-  const affectedGraph = filterAffected(graph, calculateFileChanges(getAffectedFiles(), graph.allWorkspaceFiles));
-  return pruneExternalNodes(affectedGraph);
+  return filterAffected(graph, calculateFileChanges(getAffectedFiles(), graph.allWorkspaceFiles));
 }

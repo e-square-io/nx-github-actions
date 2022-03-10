@@ -15,11 +15,11 @@ function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph, target: strin
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
   }
 
-  const graphNodes = Object.values(affectedGraph.nodes);
+  let graphNodes = Object.values(affectedGraph.nodes);
 
   if (nxArgs.exclude) {
     const excludedProjects = new Set(nxArgs.exclude);
-    return graphNodes.filter((project) => !excludedProjects.has(project.name));
+    graphNodes = graphNodes.filter((project) => !excludedProjects.has(project.name));
   }
 
   return allProjectsWithTarget(graphNodes, target);
