@@ -8,7 +8,7 @@ import type { Task } from './task';
 import type { Workspaces } from './workspace';
 
 export function createHasher(graph: ProjectGraph, nxJson: NxJsonConfiguration): Hasher {
-  const { options } = nxJson.tasksRunnerOptions.default ?? { options: {} };
+  const { options } = nxJson?.tasksRunnerOptions?.['default'] ?? { options: {} };
   return new Hasher(graph, nxJson, options);
 }
 
@@ -23,7 +23,7 @@ export async function hashTask(
     customHasher = getCustomHasher(task, workspace);
   } catch (e) {
     const unableToFindError = `Unable to load hasher for task ${task.id}`;
-    if ((typeof e === 'string' ? e : e.message) === unableToFindError) {
+    if ((typeof e === 'string' ? e : (e as Error).message) === unableToFindError) {
       warning(`${unableToFindError}, fallbacks to default hasher`);
     }
   }
@@ -34,13 +34,4 @@ export async function hashTask(
 
   task.hash = value;
   task.hashDetails = details;
-}
-
-export async function hashTasks(
-  tasks: Task[],
-  taskGraph: TaskGraph,
-  defaultHasher: Hasher,
-  workspace: Workspaces
-): Promise<void> {
-  await Promise.all(tasks.map((task) => hashTask(task, taskGraph, defaultHasher, workspace)));
 }

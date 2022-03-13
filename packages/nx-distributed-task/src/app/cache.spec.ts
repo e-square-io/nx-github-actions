@@ -7,14 +7,6 @@ jest.mock('@e-square/utils/cache');
 jest.mock('@e-square/utils/logger');
 
 describe('cache', () => {
-  it('should not use cache if nx cloud is used', async () => {
-    await restoreCache(context, undefined, true);
-    await saveCache(context, undefined, true);
-
-    expect(saveNxCache).not.toHaveBeenCalled();
-    expect(restoreNxCache).not.toHaveBeenCalled();
-  });
-
   it('should call cache utils', async () => {
     await restoreCache(
       context,
@@ -27,7 +19,11 @@ describe('cache', () => {
           hash: 'test',
         },
       ],
-      false
+      {
+        tasks: {},
+        roots: [],
+        dependencies: {},
+      }
     );
     await saveCache(
       context,
@@ -40,7 +36,18 @@ describe('cache', () => {
           hash: 'test',
         },
       ],
-      false
+      {
+        tasks: {
+          'test:build': {
+            id: 'test:build',
+            overrides: {},
+            target: { target: 'build', project: 'test' },
+            hash: 'test',
+          },
+        },
+        roots: [],
+        dependencies: {},
+      }
     );
 
     expect(saveNxCache).toHaveBeenCalled();

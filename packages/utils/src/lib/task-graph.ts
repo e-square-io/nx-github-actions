@@ -1,48 +1,53 @@
 import { TaskGraphCreator } from '@nrwl/workspace/src/tasks-runner/task-graph-creator';
-import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph';
-import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
+import { ProjectGraphProjectNode } from '@nrwl/workspace/src/core/project-graph';
 import { createTasksForProjectToRun } from '@nrwl/workspace/src/tasks-runner/run-command';
-
-import { tree } from './fs';
-import { createHasher, hashTasks } from './hasher';
-import { Workspaces } from './workspace';
-
-import type { TaskGraph } from '@nrwl/devkit';
-import type { Task } from './task';
 import { getOutputs } from '@nrwl/workspace/src/tasks-runner/utils';
 
+import { createHasher, hashTask } from './hasher';
+import { Workspaces } from './workspace';
+
+import type { ProjectGraph, TaskGraph } from '@nrwl/devkit';
+import type { Task } from './task';
+import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
+import { NxJsonConfiguration } from '@nrwl/tao/src/shared/nx';
+
 export async function createTaskGraph(
-  projects: string[],
-  target: string,
-  configuration: string = undefined,
-  _require: typeof require
-): Promise<{ tasks: Task[]; graph: TaskGraph }> {
-  const projectGraph = await createProjectGraphAsync();
-  const nxJson = readNxJson(tree);
+  { target, configuration, projects }: NxArgs,
+  projectNodes: ProjectGraphProjectNode[],
+  projectGraph: ProjectGraph,
+  nxJson: NxJsonConfiguration,
+  workspace: Workspaces
+): Promise<{ tasks: Task[]; taskGraph: TaskGraph }> {
   const defaultTargetDependencies = nxJson.targetDependencies ?? {};
+
+  const hasher = createHasher(projectGraph, nxJson);
+
   const taskGraphCreator = new TaskGraphCreator(projectGraph, defaultTargetDependencies);
 
-  const workspace = new Workspaces(_require);
-
-  const tasks: Task[] = createTasksForProjectToRun(
-    projects.map((p) => projectGraph.nodes[p] ?? null).filter((node) => node !== null),
-    { target, configuration, overrides: {} },
+  let tasks: Task[] = createTasksForProjectToRun(
+    projectNodes,
+    { target: target ?? '', configuration: configuration ?? '', overrides: {} },
     projectGraph,
     null
   );
 
-  // add interpolated outputs to tasks
+  let taskGraph = taskGraphCreator.createTaskGraph(tasks);
+
+  // enrich tasks
   for (const task of tasks) {
+    // add interpolated outputs to tasks
     task.outputs = getOutputs(projectGraph.nodes, task);
+    // add hash details to tasks
+    await hashTask(task, taskGraph, hasher, workspace);
   }
 
-  const hasher = createHasher(projectGraph, nxJson);
+  // create a fresh TaskGraph with the enriched tasks
+  taskGraph = taskGraphCreator.createTaskGraph(tasks);
 
-  const taskGraph = taskGraphCreator.createTaskGraph(tasks);
+  if (projects) {
+    // keep only specified project's tasks
+    tasks = tasks.filter((task) => projects.includes(task.target.project));
+  }
 
-  // add hash details to tasks
-  await hashTasks(tasks, taskGraph, hasher, workspace);
-
-  // return a fresh TaskGraph with the enriched tasks
-  return { tasks, graph: taskGraphCreator.createTaskGraph(tasks) };
+  return { tasks, taskGraph };
 }

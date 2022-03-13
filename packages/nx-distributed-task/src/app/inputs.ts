@@ -1,6 +1,12 @@
 import type * as Core from '@actions/core';
 
-import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } from '@e-square/utils/inputs';
+import {
+  BaseInputs,
+  getBaseInputs,
+  getMaxDistribution,
+  getStringArrayInput,
+  shouldRunWithDeps,
+} from '@e-square/utils/inputs';
 
 export interface Inputs extends BaseInputs {
   target: string;
@@ -18,6 +24,7 @@ export function getInputs(core: typeof Core): Inputs {
   args.projects = getStringArrayInput(core, 'projects', ',');
   args.parallel = getMaxDistribution(core, target, 'maxParallel')[target];
   args.scan = core.getBooleanInput('nxCloud');
+  args.withDeps = shouldRunWithDeps(target);
 
   if (args.scan === false) delete args.scan;
 

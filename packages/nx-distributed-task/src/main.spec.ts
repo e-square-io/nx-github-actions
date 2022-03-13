@@ -12,7 +12,7 @@ import main from './main';
 
 jest.mock('./app/nx');
 jest.mock('./app/upload');
-jest.mock('./app/cache');
+// jest.mock('./app/cache');
 jest.mock('@e-square/utils/logger');
 
 describe('main', () => {
@@ -23,7 +23,7 @@ describe('main', () => {
       INPUT_TARGET: 'test',
       INPUT_DISTRIBUTION: '1',
       INPUT_NXCLOUD: 'false',
-      INPUT_PROJECTS: 'project1,project2',
+      INPUT_PROJECTS: 'nx-affected-matrix,nx-distributed-task,utils',
       INPUT_DEBUG: 'false',
       INPUT_UPLOADOUTPUTS: 'true',
     };
@@ -40,7 +40,7 @@ describe('main', () => {
     expect(restoreCache).toHaveBeenCalled();
     expect(nxRunMany).toHaveBeenCalledWith(
       context,
-      expect.objectContaining({ target: 'test', projects: ['project1', 'project2'] }),
+      expect.objectContaining({ target: 'build', projects: ['nx-affected-matrix', 'nx-distributed-task'] }),
       expect.objectContaining({ exec: exec.exec })
     );
     expect(uploadProjectsOutputs).toHaveBeenCalled();
@@ -53,6 +53,15 @@ describe('main', () => {
     await main(context, core, exec, glob, _require);
 
     expect(assertNxInstalled).not.toHaveBeenCalled();
+  });
+
+  it('should skip upload if uploadOutputs is false', async () => {
+    process.env['INPUT_UPLOADOUTPUTS'] = 'false';
+
+    await main(context, core, exec, glob, _require);
+
+    expect(assertNxInstalled).toHaveBeenCalled();
+    expect(uploadProjectsOutputs).not.toHaveBeenCalled();
   });
 
   it('should set job as failed if any unhandled error occurs', async () => {

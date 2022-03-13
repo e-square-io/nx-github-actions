@@ -12,20 +12,19 @@ export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 export const getNxCachePaths = (task: Task) => [
   `${NX_CACHE_PATH}/${task.hash}`,
   `${NX_CACHE_PATH}/${task.hash}.commit`,
-  `${NX_CACHE_PATH}/${task.hash}.tar.gz`,
   ...(task.outputs ?? []).map(
     (path) => `${NX_CACHE_PATH}/latestOutputsHashes/${path.replace(new RegExp(sep, 'g'), '-')}.hash`
   ),
 ];
 
 export function getCacheKeys(hash: string, context: typeof Context): [primary: string, restoreKeys: string[]] {
-  const keyParts = [];
-  const restoreKeys = [];
+  const keyParts: string[] = [];
+  const restoreKeys: string[] = [];
   const addRestoreKey = () => restoreKeys.unshift(keyParts.join('-'));
 
   keyParts.push(`nx-cache-${hash}`);
 
-  if (context.eventName === 'pull_request') {
+  if (context.eventName === 'pull_request' && context?.payload?.pull_request?.number) {
     addRestoreKey();
     keyParts.push(context.payload.pull_request.number.toString());
   }
@@ -36,9 +35,14 @@ export function getCacheKeys(hash: string, context: typeof Context): [primary: s
   return [keyParts.join('-'), restoreKeys];
 }
 
-export async function restoreNxCache(context: typeof Context, task: Task): Promise<void> {
+export async function restoreNxCache(context: typeof Context, task: Task): Promise<string | void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping restoring cache`);
+    return;
+  }
+
+  if (!task.hash) {
+    debug(`Hash is missing for task '${task.id}'`);
     return;
   }
 
@@ -55,13 +59,20 @@ export async function restoreNxCache(context: typeof Context, task: Task): Promi
       info(`Cache miss`);
     }
   } catch (e) {
-    warning(e);
+    warning(e as string);
   }
+
+  return task.cacheKey;
 }
 
 export async function saveNxCache(context: typeof Context, task: Task): Promise<void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping saving cache`);
+    return;
+  }
+
+  if (!task.hash) {
+    debug(`Hash is missing for task '${task.id}'`);
     return;
   }
 

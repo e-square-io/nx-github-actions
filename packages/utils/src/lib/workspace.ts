@@ -32,8 +32,11 @@ export class Workspaces extends NxWorkspaces {
     return tree.root ? [tree.root, __dirname] : [__dirname];
   }
 
-  private _readGeneratorsJson(collectionName: string, generator: string) {
-    let generatorsFilePath;
+  private _readGeneratorsJson(
+    collectionName: string,
+    generator: string
+  ): { generatorsFilePath: string; generatorsJson: any; normalizedGeneratorName: string } | void {
+    let generatorsFilePath: string;
     if (collectionName.endsWith('.json')) {
       generatorsFilePath = this._require.resolve(collectionName, {
         paths: this.resolveRoots(),
@@ -67,10 +70,22 @@ export class Workspaces extends NxWorkspaces {
 
       throw new Error(`Cannot find generator '${generator}' in ${generatorsFilePath}.`);
     }
+
     return { generatorsFilePath, generatorsJson, normalizedGeneratorName };
   }
 
-  private _readExecutorsJson(moduleName: string, executor: string) {
+  private _readExecutorsJson(
+    moduleName: string,
+    executor: string
+  ): {
+    executorsFilePath: string;
+    executorConfig: {
+      implementation: string;
+      batchImplementation?: string;
+      schema: string;
+      hasher?: string;
+    };
+  } {
     const packageJsonPath = this._require.resolve(`${moduleName}/package.json`, {
       paths: this.resolveRoots(),
     });
@@ -103,7 +118,7 @@ export class Workspaces extends NxWorkspaces {
     };
   }
 
-  readWorkspaceConfiguration(): WorkspaceJsonConfiguration & NxJsonConfiguration {
+  override readWorkspaceConfiguration(): WorkspaceJsonConfiguration & NxJsonConfiguration {
     const nxJsonPath = join(tree.root, 'nx.json');
     const nxJson = readNxJson(nxJsonPath);
     const workspaceFile = workspaceConfigName(tree.root);
@@ -124,7 +139,7 @@ function findFullGeneratorName(
   generators: {
     [name: string]: { aliases?: string[] };
   }
-) {
+): string | void {
   if (generators) {
     for (const [key, data] of Object.entries<{ aliases?: string[] }>(generators)) {
       if (key === name || (data.aliases && (data.aliases as string[]).includes(name))) {
