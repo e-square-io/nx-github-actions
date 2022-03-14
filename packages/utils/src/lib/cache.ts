@@ -24,7 +24,7 @@ export function getCacheKeys(hash: string, context: typeof Context): [primary: s
 
   keyParts.push(`nx-cache-${hash}`);
 
-  if (context.eventName === 'pull_request' && context?.payload?.pull_request?.number) {
+  if (context.eventName === 'pull_request' && context?.payload?.pull_request?.number !== undefined) {
     addRestoreKey();
     keyParts.push(context.payload.pull_request.number.toString());
   }

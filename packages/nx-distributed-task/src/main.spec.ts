@@ -40,7 +40,7 @@ describe('main', () => {
     expect(restoreCache).toHaveBeenCalled();
     expect(nxRunMany).toHaveBeenCalledWith(
       context,
-      expect.objectContaining({ target: 'build', projects: ['nx-affected-matrix', 'nx-distributed-task'] }),
+      expect.objectContaining({ target: 'test', projects: ['nx-affected-matrix', 'nx-distributed-task', 'utils'] }),
       expect.objectContaining({ exec: exec.exec })
     );
     expect(uploadProjectsOutputs).toHaveBeenCalled();
