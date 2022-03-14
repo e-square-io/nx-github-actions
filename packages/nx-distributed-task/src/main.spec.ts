@@ -12,7 +12,7 @@ import main from './main';
 
 jest.mock('./app/nx');
 jest.mock('./app/upload');
-// jest.mock('./app/cache');
+jest.mock('./app/cache');
 jest.mock('@e-square/utils/logger');
 
 describe('main', () => {
