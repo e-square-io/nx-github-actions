@@ -16,12 +16,14 @@ jest.mock('./app/cache');
 jest.mock('@e-square/utils/logger');
 
 describe('main', () => {
+  let _require;
   beforeEach(() => {
+    _require = jest.fn();
     const env = {
       INPUT_TARGET: 'test',
       INPUT_DISTRIBUTION: '1',
       INPUT_NXCLOUD: 'false',
-      INPUT_PROJECTS: 'project1,project2',
+      INPUT_PROJECTS: 'nx-affected-matrix,nx-distributed-task,utils',
       INPUT_DEBUG: 'false',
       INPUT_UPLOADOUTPUTS: 'true',
     };
@@ -30,15 +32,15 @@ describe('main', () => {
   });
 
   it('should run nx target for projects', async () => {
-    jest.spyOn(cache, 'getCacheKeys').mockResolvedValue(['test', ['test']]);
+    jest.spyOn(cache, 'getCacheKeys').mockReturnValue(['test', ['test']]);
 
-    await main(context, core, exec, glob);
+    await main(context, core, exec, glob, _require);
 
     expect(assertNxInstalled).toHaveBeenCalled();
     expect(restoreCache).toHaveBeenCalled();
     expect(nxRunMany).toHaveBeenCalledWith(
       context,
-      expect.objectContaining({ target: 'test', projects: ['project1', 'project2'] }),
+      expect.objectContaining({ target: 'test', projects: ['nx-affected-matrix', 'nx-distributed-task', 'utils'] }),
       expect.objectContaining({ exec: exec.exec })
     );
     expect(uploadProjectsOutputs).toHaveBeenCalled();
@@ -48,14 +50,23 @@ describe('main', () => {
   it('should exit if no projects to run', async () => {
     process.env['INPUT_PROJECTS'] = undefined;
 
-    await main(context, core, exec, glob);
+    await main(context, core, exec, glob, _require);
 
     expect(assertNxInstalled).not.toHaveBeenCalled();
   });
 
+  it('should skip upload if uploadOutputs is false', async () => {
+    process.env['INPUT_UPLOADOUTPUTS'] = 'false';
+
+    await main(context, core, exec, glob, _require);
+
+    expect(assertNxInstalled).toHaveBeenCalled();
+    expect(uploadProjectsOutputs).not.toHaveBeenCalled();
+  });
+
   it('should set job as failed if any unhandled error occurs', async () => {
     (assertNxInstalled as jest.Mock).mockRejectedValue('test');
-    await main(context, core, exec, glob);
+    await main(context, core, exec, glob, _require);
 
     expect(core.setFailed).toHaveBeenCalledWith('test');
   });

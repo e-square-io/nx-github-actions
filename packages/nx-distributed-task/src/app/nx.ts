@@ -7,9 +7,11 @@ import { Exec } from '@e-square/utils/exec';
 import { debug, group, logger } from '@e-square/utils/logger';
 
 export async function assertNxInstalled(exec: Exec) {
+  const command = getPackageManagerCommand().list;
+
   debug(`Checking existence of nx`);
 
-  const path = await exec.withCommand('npm ls @nrwl/cli -p --depth 1').build()();
+  const path = await exec.withCommand(`${command} @nrwl/cli -p --depth 1`).build()();
   debug(`NX bin path: ${path}`);
 
   if (!path) throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");

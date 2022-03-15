@@ -1,57 +1,30 @@
-import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
-import type * as Core from '@actions/core';
-import type * as Glob from '@actions/glob';
-import type { context as Context } from '@actions/github';
+import { sep } from 'path';
 
-import { tree } from './fs';
+import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
+
 import { debug, info, logger, success, warning } from './logger';
+
+import type { context as Context } from '@actions/github';
+import type { Task } from './task';
 
 export const NX_CACHE_PATH = 'node_modules/.cache/nx';
 
-export let keys: string[] = [];
+export const getNxCachePaths = (task: Task) => [
+  `${NX_CACHE_PATH}/${task.hash}`,
+  `${NX_CACHE_PATH}/${task.hash}.commit`,
+  ...(task.outputs ?? []).map(
+    (path) => `${NX_CACHE_PATH}/latestOutputsHashes/${path.replace(new RegExp(sep, 'g'), '-')}.hash`
+  ),
+];
 
-function isExactKeyMatch(key: string, cacheKey?: string): boolean {
-  return !!(
-    cacheKey &&
-    key &&
-    cacheKey.localeCompare(key, undefined, {
-      sensitivity: 'accent',
-    }) === 0
-  );
-}
-
-export async function getCacheKeys(
-  context: typeof Context,
-  glob: typeof Glob,
-  target: string,
-  distribution: number
-): Promise<[primary: string, restoreKeys: string[]]> {
-  const keyParts = [];
-  const restoreKeys = [];
-
+export function getCacheKeys(hash: string, context: typeof Context): [primary: string, restoreKeys: string[]] {
+  const keyParts: string[] = [];
+  const restoreKeys: string[] = [];
   const addRestoreKey = () => restoreKeys.unshift(keyParts.join('-'));
-  keyParts.push(`${process.env.RUNNER_OS}-${process.env.RUNNER_ARCH}`);
 
-  const lockFile = tree.getLockFilePath();
-  if (lockFile) {
-    keyParts.push(await glob.hashFiles(lockFile));
-    addRestoreKey();
-  }
+  keyParts.push(`nx-cache-${hash}`);
 
-  // setting cache limit to 1 month
-  const now = new Date();
-  keyParts.push(now.getFullYear().toString(), (now.getMonth() + 1).toString());
-  addRestoreKey();
-
-  // setting target and distribution
-  keyParts.push(`${target}`);
-
-  if (distribution) {
-    addRestoreKey();
-    keyParts.push(distribution);
-  }
-
-  if (context.eventName === 'pull_request') {
+  if (context.eventName === 'pull_request' && context?.payload?.pull_request?.number !== undefined) {
     addRestoreKey();
     keyParts.push(context.payload.pull_request.number.toString());
   }
@@ -62,58 +35,58 @@ export async function getCacheKeys(
   return [keyParts.join('-'), restoreKeys];
 }
 
-export async function restoreNxCache(
-  context: typeof Context,
-  glob: typeof Glob,
-  target: string,
-  distribution: number
-): Promise<void> {
+export async function restoreNxCache(context: typeof Context, task: Task): Promise<string | void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping restoring cache`);
     return;
   }
 
-  const [primaryKey, restoreKeys] = await getCacheKeys(context, glob, target, distribution);
+  if (!task.hash) {
+    debug(`Hash is missing for task '${task.id}'`);
+    return;
+  }
+
+  const [primaryKey, restoreKeys] = getCacheKeys(task.hash, context);
   debug(`Restoring NX cache for ${primaryKey}`);
 
   try {
-    const key = await restoreCache([tree.resolve(NX_CACHE_PATH)], primaryKey, restoreKeys);
+    const key = await restoreCache(getNxCachePaths(task), primaryKey, restoreKeys);
 
     if (key) {
       success(`Cache hit: ${key}`);
-
-      keys = [primaryKey, key];
+      task.cacheKey = key;
     } else {
       info(`Cache miss`);
-      keys = [primaryKey];
     }
   } catch (e) {
-    warning(e);
+    warning(e as string);
   }
+
+  return task.cacheKey;
 }
 
-export async function saveNxCache(): Promise<void> {
+export async function saveNxCache(context: typeof Context, task: Task): Promise<void> {
   if (logger().debugMode) {
     debug(`Debug mode is on, skipping saving cache`);
     return;
   }
 
-  const [primaryKey, cacheKey] = keys;
-
-  if (!primaryKey) {
-    info(`Couldn't find the primary key, skipping saving cache`);
+  if (!task.hash) {
+    debug(`Hash is missing for task '${task.id}'`);
     return;
   }
 
-  if (isExactKeyMatch(primaryKey, cacheKey)) {
-    info(`Cache hit occurred on the primary key ${cacheKey}, not saving cache.`);
+  const [primaryKey] = getCacheKeys(task.hash, context);
+
+  if (isExactKeyMatch(primaryKey, task.cacheKey)) {
+    info(`Cache hit occurred on the primary key ${task.cacheKey}, not saving cache.`);
     return;
   }
 
   debug(`Saving NX cache to ${primaryKey}`);
 
   try {
-    await saveCache([tree.resolve(NX_CACHE_PATH)], primaryKey);
+    await saveCache(getNxCachePaths(task), primaryKey);
 
     success(`Successfully saved cache to ${primaryKey}`);
   } catch (err) {
@@ -125,4 +98,14 @@ export async function saveNxCache(): Promise<void> {
     // otherwise re-throw
     throw err;
   }
+}
+
+function isExactKeyMatch(key: string, cacheKey?: string): boolean {
+  return !!(
+    cacheKey &&
+    key &&
+    cacheKey.localeCompare(key, undefined, {
+      sensitivity: 'accent',
+    }) === 0
+  );
 }

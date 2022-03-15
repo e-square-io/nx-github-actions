@@ -3,7 +3,7 @@ import type * as Glob from '@actions/glob';
 
 import { debug, info, logger, success, warning } from './logger';
 
-export async function uploadArtifact(glob: typeof Glob, name: string, paths: string[]): Promise<string | undefined> {
+export async function uploadArtifact(glob: typeof Glob, name: string, paths: string[]): Promise<string | void> {
   if (paths.length === 0) return;
 
   const globPaths = paths.map((path) => `${path}/*`).join('\n');
@@ -30,6 +30,6 @@ export async function uploadArtifact(glob: typeof Glob, name: string, paths: str
     success(`Successfully uploaded ${artifactName}`);
     return artifactName;
   } catch (e) {
-    warning(e);
+    warning(e as string);
   }
 }

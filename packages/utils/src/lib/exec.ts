@@ -43,8 +43,8 @@ export class Exec {
         ...coercedOptions,
         ...options,
         listeners: {
-          stdout: (data) => (stdout += data.toString()),
-          stderr: (data) => (stderr += data.toString()),
+          stdout: (data: Buffer) => (stdout += data.toString()),
+          stderr: (data: Buffer) => (stderr += data.toString()),
         },
       };
 

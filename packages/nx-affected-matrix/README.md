@@ -62,12 +62,10 @@ So the output matrix from the example above will be:
   "include": [
     {
       "target": "test",
-      "distribution": "1",
       "projects": "project1,project2"
     },
     {
       "target": "test",
-      "distribution": "2",
       "projects": "project3,project4"
     },
     ...

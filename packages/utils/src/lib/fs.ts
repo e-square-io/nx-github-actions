@@ -1,15 +1,15 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync, renameSync, rmSync } from 'fs';
 import { resolve } from 'path';
 
-import type { Tree } from '@nrwl/devkit';
+import { appRootPath } from '@nrwl/tao/src/utils/app-root';
 
-import { info } from './logger';
+import type { Tree } from '@nrwl/devkit';
 
 export class GHTree implements Tree {
   readonly root: string;
 
   constructor(root?: string) {
-    this.root = root ?? process.env.GITHUB_WORKSPACE ?? process.cwd();
+    this.root = root ?? appRootPath;
   }
 
   children(dirPath: string): string[] {
@@ -51,16 +51,6 @@ export class GHTree implements Tree {
 
   resolve(path: string): string {
     return resolve(this.root, path.startsWith('/') ? path.slice(1) : path);
-  }
-
-  getLockFilePath(): string | void {
-    const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'pnpm-lock.yml'];
-    const lockFile = lockFiles.find((file) => this.exists(file));
-    if (!lockFile) {
-      info(`Couldn't find any lock file`);
-      return;
-    }
-    return this.resolve(lockFile);
   }
 
   changePermissions(filePath: string, mode: string | number): void {

@@ -15,10 +15,11 @@ inputs:
   distribution:
     description: 'Current distribution run, required when running in a matrix'
     required: false
+    deprecationMessage: 'deprecated, not used anymore'
   bucket:
     description: 'Current distribution run, required when running in a matrix'
     required: false
-    deprecationMessage: 'deprecated, use distribution input instead'
+    deprecationMessage: 'deprecated, not used anymore'
   maxParallel:
     description: 'Maximum NX cli parallel runs'
     required: false
@@ -52,4 +53,4 @@ runs:
           const { default: main } = require('${{ github.action_path }}/main.js');
 
           setEnv(${{ toJSON(inputs) }}, process);
-          await main(context, core, exec, glob);
+          await main(context, core, exec, glob, __original_require__);

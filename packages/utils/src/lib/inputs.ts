@@ -1,11 +1,10 @@
 import type * as Core from '@actions/core';
+
 import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
+import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
 
 import { debug, log, logger, warning } from './logger';
-
-type KeyOfType<T, V> = keyof {
-  [P in keyof T as T[P] extends V ? P : never]: any;
-};
+import { tree } from './fs';
 
 export interface BaseInputs {
   args: NxArgs;
@@ -28,12 +27,12 @@ export function getStringArrayInput(
 
 export function parseNxArgs(args: Record<string, unknown>): NxArgs {
   const aliasArgs: Record<string, keyof NxArgs> = { c: 'configuration' };
-  const arrArgs: KeyOfType<NxArgs, string[]>[] = ['exclude', 'projects', 'files'];
+  const arrArgs: (keyof NxArgs)[] = ['exclude', 'projects', 'files'];
 
   let parsedArgs = { ...args };
-  if (parsedArgs.skipNxCache === false) delete parsedArgs.skipNxCache;
+  if (parsedArgs['skipNxCache'] === false) delete parsedArgs['skipNxCache'];
 
-  parsedArgs = Object.entries(args).reduce((acc, [key, value]) => {
+  parsedArgs = Object.entries(args).reduce((acc: Record<string, string | number | boolean | unknown>, [key, value]) => {
     key = aliasArgs[key] ?? key;
 
     acc[key] = value;
@@ -41,13 +40,20 @@ export function parseNxArgs(args: Record<string, unknown>): NxArgs {
     if (Array.isArray(value) && value.some((v) => v.includes(',')))
       acc[key] = value.reduce((acc, curr) => [...acc, ...curr.split(',')], []);
 
-    if (typeof value === 'string' && (value.includes(',') || arrArgs.includes(key as any))) acc[key] = value.split(',');
+    if (typeof value === 'string' && (value.includes(',') || arrArgs.includes(key as keyof NxArgs)))
+      acc[key] = value.split(',');
 
     return acc;
   }, {});
 
   debug(`parsed args: ${JSON.stringify(parsedArgs, null, 2)}`);
   return parsedArgs;
+}
+
+export function shouldRunWithDeps(target: string): boolean {
+  const nxJson = readNxJson(tree);
+
+  return Boolean(nxJson?.targetDependencies?.[target]?.some?.(({ projects }) => projects === 'dependencies'));
 }
 
 export function getArgsInput(
@@ -69,7 +75,7 @@ export function getMaxDistribution(
   name?: string
 ): Record<string, number> {
   const value = name ? core.getInput(name) : core.getInput('maxDistribution') || core.getInput('maxParallel');
-  const coercedTargets = [].concat(targets);
+  const coercedTargets: string[] = ([] as string[]).concat(targets as string);
   const maybeNumberValue = parseInt(value);
 
   const reduceTargetsDistribution = (source: number | number[] | Record<string, number>) =>
