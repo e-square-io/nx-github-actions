@@ -19,7 +19,7 @@ jobs:
         uses: e-square-io/nx-affected-matrix@v2
         id: affected
         with:
-          targets: 'lint,test,build'
+          targets: 'test,build'
           maxDistribution: 1
 
   execute:
@@ -74,7 +74,7 @@ jobs:
         uses: ./dist/packages/nx-affected-matrix
         id: affected
         with:
-          targets: build
+          targets: 'test,build'
           maxDistribution: 1
           args: '--exclude nx-distributed-task'
 #          debug: true
