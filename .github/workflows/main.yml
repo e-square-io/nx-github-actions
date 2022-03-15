@@ -97,7 +97,7 @@ jobs:
 
       - name: Run local distributed task action (test)
         uses: ./dist/packages/nx-distributed-task
-        id: run
+        id: run-test
         with:
           target: test
           projects: 'nx-affected-matrix,nx-distributed-task'
@@ -105,7 +105,7 @@ jobs:
 
       - name: Run local distributed task action (build)
         uses: ./dist/packages/nx-distributed-task
-        id: run
+        id: run-build
         with:
           target: build
           projects: 'nx-affected-matrix,nx-distributed-task'
