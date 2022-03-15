@@ -1,3 +1,9 @@
+## [2.4.2](https://github.com/e-square-io/nx-github-actions/compare/v2.4.1...v2.4.2) (2022-03-15)
+
+### Bug Fixes
+
+- **utils:** support both new and old custom hashers signatures (#42) ([4df7758](https://github.com/e-square-io/nx-github-actions/commit/4df77589960e1aca943cb7ba543c82a4ed097e4d)), closes [#42](https://github.com/e-square-io/nx-github-actions/issues/42)
+
 ## [2.4.1](https://github.com/e-square-io/nx-github-actions/compare/v2.4.0...v2.4.1) (2022-03-15)
 
 ### Bug Fixes
