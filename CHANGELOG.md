@@ -1,3 +1,9 @@
+## [2.4.1](https://github.com/e-square-io/nx-github-actions/compare/v2.4.0...v2.4.1) (2022-03-15)
+
+### Bug Fixes
+
+- cant get task configuration when resolving customHasher (#41) ([9596455](https://github.com/e-square-io/nx-github-actions/commit/959645599c775262a69f4ec0746c56ca55b34475)), closes [#41](https://github.com/e-square-io/nx-github-actions/issues/41)
+
 # [2.4.0](https://github.com/e-square-io/nx-github-actions/compare/v2.3.4...v2.4.0) (2022-03-15)
 
 ### Features
