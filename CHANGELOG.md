@@ -1,3 +1,9 @@
+# [2.4.0](https://github.com/e-square-io/nx-github-actions/compare/v2.3.4...v2.4.0) (2022-03-15)
+
+### Features
+
+- reimplement caching mechanism (#38) ([53cd2c4](https://github.com/e-square-io/nx-github-actions/commit/53cd2c4c4256813d90bce71e25c0a19762773aaf)), closes [#38](https://github.com/e-square-io/nx-github-actions/issues/38)
+
 ## [2.3.4](https://github.com/e-square-io/nx-github-actions/compare/v2.3.3...v2.3.4) (2022-03-07)
 
 ### Bug Fixes
