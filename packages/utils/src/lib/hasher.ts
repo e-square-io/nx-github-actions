@@ -1,11 +1,45 @@
-import { Hasher } from '@nrwl/workspace/src/core/hasher/hasher';
+import { Hasher, Hash } from '@nrwl/workspace/src/core/hasher/hasher';
 
 import { warning } from './logger';
 import { getExecutorForTask } from './workspace';
 
-import type { ProjectGraph, NxJsonConfiguration, TaskGraph } from '@nrwl/devkit';
+import type { ProjectGraph, NxJsonConfiguration, TaskGraph, WorkspaceConfiguration } from '@nrwl/devkit';
 import type { Task } from './task';
 import type { Workspaces } from './workspace';
+
+/** Run the hasher or the custom one
+ * supports both the new (experimental) and the old (current) ways of invoking a custom hasher
+ */
+async function runHasher(
+  task: Task,
+  hasher: Hasher,
+  projectGraph: ProjectGraph,
+  taskGraph: TaskGraph,
+  workspaceConfig: WorkspaceConfiguration,
+  customHasher?: (...args: any[]) => Promise<Hash>
+): Promise<Hash> {
+  let hash: Hash | null = null;
+
+  if (customHasher) {
+    try {
+      if (customHasher.length === 3) {
+        // old way (or current)
+        hash = await customHasher(task, taskGraph, hasher);
+      } else {
+        // new way (experimental)
+        hash = await customHasher(task, {
+          hasher,
+          projectGraph,
+          taskGraph,
+          workspaceConfig,
+        });
+      }
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+  }
+
+  return hash ?? (await hasher.hashTaskWithDepsAndContext(task));
+}
 
 export function getCustomHasher(task: Task, workspace: Workspaces) {
   try {
@@ -38,14 +72,14 @@ export async function hashTask(
     }
   }
 
-  const { value, details } = await (customHasher
-    ? customHasher(task, {
-        hasher: defaultHasher,
-        projectGraph,
-        taskGraph,
-        workspaceConfig: workspace.readWorkspaceConfiguration(),
-      })
-    : defaultHasher.hashTaskWithDepsAndContext(task));
+  const { value, details } = await runHasher(
+    task,
+    defaultHasher,
+    projectGraph,
+    taskGraph,
+    workspace.readWorkspaceConfiguration(),
+    customHasher
+  );
 
   task.hash = value;
   task.hashDetails = details;

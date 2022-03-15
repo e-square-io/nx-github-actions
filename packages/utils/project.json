@@ -3,17 +3,6 @@
   "sourceRoot": "packages/utils/src",
   "projectType": "library",
   "targets": {
-    "build": {
-      "executor": "@nrwl/js:swc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/packages/utils",
-        "tsConfig": "packages/utils/tsconfig.lib.json",
-        "packageJson": "packages/utils/package.json",
-        "main": "packages/utils/src/index.ts",
-        "assets": ["packages/utils/*.md"]
-      }
-    },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
