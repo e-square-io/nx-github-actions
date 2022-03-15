@@ -77,7 +77,7 @@ jobs:
           targets: build
           maxDistribution: 1
           args: '--exclude nx-distributed-task'
-          debug: true
+#          debug: true
 
   e2e-execute:
     name: E2E nx-distributed-task
@@ -101,7 +101,7 @@ jobs:
         with:
           target: build
           projects: 'nx-affected-matrix,nx-distributed-task'
-          debug: true
+#          debug: true
 
   release:
     name: Release version
