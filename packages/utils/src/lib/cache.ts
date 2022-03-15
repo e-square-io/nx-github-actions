@@ -78,11 +78,6 @@ export async function saveNxCache(context: typeof Context, task: Task): Promise<
 
   const [primaryKey] = getCacheKeys(task.hash, context);
 
-  if (!primaryKey) {
-    info(`Couldn't find the primary key, skipping saving cache`);
-    return;
-  }
-
   if (isExactKeyMatch(primaryKey, task.cacheKey)) {
     info(`Cache hit occurred on the primary key ${task.cacheKey}, not saving cache.`);
     return;

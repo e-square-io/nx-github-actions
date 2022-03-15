@@ -58,6 +58,12 @@ describe('cache', () => {
 
       logger().debugMode = false;
     });
+
+    it('should not restore cache if hash is missing', async () => {
+      await restoreNxCache(context, { ...task, hash: undefined });
+
+      expect(restoreCache).not.toHaveBeenCalled();
+    });
   });
 
   describe('saveNxCache', () => {
@@ -84,6 +90,12 @@ describe('cache', () => {
       expect(saveCache).not.toHaveBeenCalled();
 
       logger().debugMode = false;
+    });
+
+    it('should not save cache if hash is missing', async () => {
+      await saveNxCache(context, { ...task, hash: undefined });
+
+      expect(saveCache).not.toHaveBeenCalled();
     });
 
     it('should not save if cache hit occurred on primary key', async () => {
