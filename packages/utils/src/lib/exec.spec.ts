@@ -49,7 +49,7 @@ describe('exec', () => {
     try {
       exec.build();
     } catch (e) {
-      expect(e.message).toBe('No command given to Exec');
+      expect((e as Error).message).toBe('No command given to Exec');
     }
   });
 });
