@@ -16,7 +16,7 @@ jobs:
       matrix: ${{ steps.affected.outputs.matrix }}
     steps:
       - name: Calculate Affected Projects
-        uses: e-square-io/nx-affected-matrix@v2
+        uses: e-square-io/nx-affected-matrix@v2.3
         id: affected
         with:
           targets: 'test,build'
@@ -43,7 +43,7 @@ jobs:
           dry-run: true
 
       - name: Execute target
-        uses: e-square-io/nx-distributed-task@v2
+        uses: e-square-io/nx-distributed-task@v2.3
         id: execute
         with:
           target: ${{ matrix.target }}
@@ -77,7 +77,7 @@ jobs:
           targets: build
           maxDistribution: 1
           args: '--exclude nx-distributed-task'
-          debug: true
+#          debug: true
 
   e2e-execute:
     name: E2E nx-distributed-task
@@ -95,13 +95,21 @@ jobs:
         with:
           name: build
 
-      - name: Run local distributed task action
+      - name: Run local distributed task action (test)
         uses: ./dist/packages/nx-distributed-task
-        id: run
+        id: run-test
+        with:
+          target: test
+          projects: 'nx-affected-matrix,nx-distributed-task'
+#          debug: true
+
+      - name: Run local distributed task action (build)
+        uses: ./dist/packages/nx-distributed-task
+        id: run-build
         with:
           target: build
           projects: 'nx-affected-matrix,nx-distributed-task'
-          debug: true
+#          debug: true
 
   release:
     name: Release version

@@ -5,18 +5,48 @@ import {
   buildWorkspaceConfigurationFromGlobs,
   globForProjectFiles,
   resolveNewFormatWithInlineProjects,
+  resolveOldFormatWithInlineProjects,
   workspaceConfigName,
   WorkspaceJsonConfiguration,
   Workspaces as NxWorkspaces,
 } from '@nrwl/tao/src/shared/workspace';
 import { readNxJson } from '@nrwl/workspace/src/core/file-utils';
-import { readJsonFile } from '@nrwl/tao/src/utils/fileutils';
 import { NxJsonConfiguration } from '@nrwl/tao/src/shared/nx';
+import { mergeNpmScriptsWithTargets } from '@nrwl/workspace/src/utilities/project-graph-utils';
+import { mergePluginTargetsWithNxTargets } from '@nrwl/tao/src/shared/nx-plugin';
+import {
+  getProjects,
+  readJson,
+  readJsonFile,
+  readProjectConfiguration,
+  readWorkspaceConfiguration,
+} from '@nrwl/devkit';
 
 import { tree } from './fs';
+import type { Task } from './task';
+import type { NxPlugin } from '@nrwl/devkit';
+
+function findFullGeneratorName(
+  name: string,
+  generators: {
+    [name: string]: { aliases?: string[] };
+  }
+): string | void {
+  if (generators) {
+    for (const [key, data] of Object.entries<{ aliases?: string[] }>(generators)) {
+      if (key === name || (data.aliases && (data.aliases as string[]).includes(name))) {
+        return key;
+      }
+    }
+  }
+}
+
+function resolveRoots(): string[] {
+  return tree.root ? [tree.root, __dirname] : [__dirname];
+}
 
 export class Workspaces extends NxWorkspaces {
-  constructor(private _require: typeof require) {
+  constructor(public readonly _require: typeof require) {
     super(tree.root);
 
     // accessing private methods and overriding them
@@ -28,10 +58,6 @@ export class Workspaces extends NxWorkspaces {
     super.getImplementationFactory = this._getImplementationFactory.bind(this);
   }
 
-  private resolveRoots(): string[] {
-    return tree.root ? [tree.root, __dirname] : [__dirname];
-  }
-
   private _readGeneratorsJson(
     collectionName: string,
     generator: string
@@ -39,11 +65,11 @@ export class Workspaces extends NxWorkspaces {
     let generatorsFilePath: string;
     if (collectionName.endsWith('.json')) {
       generatorsFilePath = this._require.resolve(collectionName, {
-        paths: this.resolveRoots(),
+        paths: resolveRoots(),
       });
     } else {
       const packageJsonPath = this._require.resolve(`${collectionName}/package.json`, {
-        paths: this.resolveRoots(),
+        paths: resolveRoots(),
       });
       const packageJson = readJsonFile(packageJsonPath);
       const generatorsFile = packageJson.generators ?? packageJson.schematics;
@@ -87,7 +113,7 @@ export class Workspaces extends NxWorkspaces {
     };
   } {
     const packageJsonPath = this._require.resolve(`${moduleName}/package.json`, {
-      paths: this.resolveRoots(),
+      paths: resolveRoots(),
     });
     const packageJson = readJsonFile(packageJsonPath);
     const executorsFile = packageJson.executors ?? packageJson.builders;
@@ -129,22 +155,72 @@ export class Workspaces extends NxWorkspaces {
         : buildWorkspaceConfigurationFromGlobs(nxJson, globForProjectFiles(tree.root, nxJson), (path) =>
             readJsonFile(join(tree.root, path))
           );
+    // const workspace = readWorkspaceConfiguration(tree);
+    // const projects = getProjects(tree);
 
-    return { ...workspace, ...nxJson };
+    return {
+      ...workspace,
+      ...nxJson,
+      // npmScope: workspace.npmScope ?? '',
+      // projects: Object.fromEntries(projects.entries()),
+    };
   }
 }
 
-function findFullGeneratorName(
-  name: string,
-  generators: {
-    [name: string]: { aliases?: string[] };
-  }
-): string | void {
-  if (generators) {
-    for (const [key, data] of Object.entries<{ aliases?: string[] }>(generators)) {
-      if (key === name || (data.aliases && (data.aliases as string[]).includes(name))) {
-        return key;
-      }
+function findPluginPackageJson(path: string, plugin: string) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    if (!path.startsWith(tree.root)) {
+      throw new Error("Couldn't find a package.json for Nx plugin:" + plugin);
     }
+    if (tree.exists(join(path, 'package.json'))) {
+      return join(path, 'package.json');
+    }
+    path = dirname(path);
   }
+}
+
+let nxPluginCache: NxPlugin[];
+export function loadNxPlugins(plugins: string[] = [], _require: typeof require): NxPlugin[] {
+  return plugins.length
+    ? nxPluginCache ||
+        (nxPluginCache = plugins.map((path) => {
+          const pluginPath = _require.resolve(path, {
+            paths: resolveRoots(),
+          });
+
+          const { name } = readJsonFile(findPluginPackageJson(pluginPath, path));
+          const plugin = _require(pluginPath) as NxPlugin;
+          plugin.name = name;
+
+          return plugin;
+        }))
+    : [];
+}
+
+export function getExecutorNameForTask(task: Task, _require: typeof require) {
+  const workspaceConfiguration = readWorkspaceConfiguration(tree);
+  const project = readProjectConfiguration(tree, task.target.project);
+
+  if (tree.exists(join(project.root, 'package.json'))) {
+    project.targets = mergeNpmScriptsWithTargets(join(tree.root, project.root), project.targets);
+  }
+  project.targets = mergePluginTargetsWithNxTargets(
+    join(tree.root, project.root),
+    project.targets ?? {},
+    loadNxPlugins(workspaceConfiguration.plugins, _require)
+  );
+
+  if (!project.targets[task.target.target]) {
+    throw new Error(`Cannot find configuration for task ${task.target.project}:${task.target.target}`);
+  }
+
+  return project.targets[task.target.target].executor;
+}
+
+export function getExecutorForTask(task: Task, workspace: Workspaces) {
+  const executor = getExecutorNameForTask(task, workspace._require);
+  const [nodeModule, executorName] = executor.split(':');
+
+  return workspace.readExecutor(nodeModule, executorName);
 }

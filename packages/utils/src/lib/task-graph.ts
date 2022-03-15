@@ -38,7 +38,7 @@ export async function createTaskGraph(
     // add interpolated outputs to tasks
     task.outputs = getOutputs(projectGraph.nodes, task);
     // add hash details to tasks
-    await hashTask(task, taskGraph, hasher, workspace);
+    await hashTask(task, projectGraph, taskGraph, hasher, workspace);
   }
 
   // create a fresh TaskGraph with the enriched tasks

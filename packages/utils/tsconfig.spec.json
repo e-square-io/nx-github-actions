@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
+    "lib": ["ES2021"],
     "types": ["jest", "node"]
   },
   "include": [

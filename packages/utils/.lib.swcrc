@@ -22,7 +22,7 @@
   "sourceMaps": true,
   "env": {
     "targets": {
-      "node": "14"
+      "node": "16"
     }
   },
   "exclude": ["./src/**/.*.spec.ts$","./**/.*.spec.ts$","./**/__mocks__/.*.ts$","./__mocks__/.*.ts$","./src/**/jest-setup.ts$","./**/jest-setup.ts$","./**/.*.js$"]

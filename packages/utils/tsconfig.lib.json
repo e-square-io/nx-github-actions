@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "declaration": true,
+    "lib": ["ES2021"],
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "__mocks__/**/*", "**/*/__mocks__/**/*"],
