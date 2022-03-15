@@ -16,9 +16,7 @@ jest.mock('./app/cache');
 jest.mock('@e-square/utils/logger');
 
 describe('main', () => {
-  let _require;
   beforeEach(() => {
-    _require = jest.fn();
     const env = {
       INPUT_TARGET: 'test',
       INPUT_DISTRIBUTION: '1',
@@ -34,7 +32,7 @@ describe('main', () => {
   it('should run nx target for projects', async () => {
     jest.spyOn(cache, 'getCacheKeys').mockReturnValue(['test', ['test']]);
 
-    await main(context, core, exec, glob, _require);
+    await main(context, core, exec, glob, require);
 
     expect(assertNxInstalled).toHaveBeenCalled();
     expect(restoreCache).toHaveBeenCalled();
@@ -50,7 +48,7 @@ describe('main', () => {
   it('should exit if no projects to run', async () => {
     process.env['INPUT_PROJECTS'] = undefined;
 
-    await main(context, core, exec, glob, _require);
+    await main(context, core, exec, glob, require);
 
     expect(assertNxInstalled).not.toHaveBeenCalled();
   });
@@ -58,7 +56,7 @@ describe('main', () => {
   it('should skip upload if uploadOutputs is false', async () => {
     process.env['INPUT_UPLOADOUTPUTS'] = 'false';
 
-    await main(context, core, exec, glob, _require);
+    await main(context, core, exec, glob, require);
 
     expect(assertNxInstalled).toHaveBeenCalled();
     expect(uploadProjectsOutputs).not.toHaveBeenCalled();
@@ -66,7 +64,7 @@ describe('main', () => {
 
   it('should set job as failed if any unhandled error occurs', async () => {
     (assertNxInstalled as jest.Mock).mockRejectedValue('test');
-    await main(context, core, exec, glob, _require);
+    await main(context, core, exec, glob, require);
 
     expect(core.setFailed).toHaveBeenCalledWith('test');
   });

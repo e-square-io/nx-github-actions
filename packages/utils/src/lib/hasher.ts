@@ -1,11 +1,20 @@
 import { Hasher } from '@nrwl/workspace/src/core/hasher/hasher';
-import { getCustomHasher } from '@nrwl/workspace/src/tasks-runner/utils';
 
 import { warning } from './logger';
+import { getExecutorForTask } from './workspace';
 
 import type { ProjectGraph, NxJsonConfiguration, TaskGraph } from '@nrwl/devkit';
 import type { Task } from './task';
 import type { Workspaces } from './workspace';
+
+export function getCustomHasher(task: Task, workspace: Workspaces) {
+  try {
+    const factory = getExecutorForTask(task, workspace).hasherFactory;
+    return factory ? factory() : null;
+  } catch (e) {
+    throw new Error(`Unable to load hasher for task "${task.id}"`);
+  }
+}
 
 export function createHasher(graph: ProjectGraph, nxJson: NxJsonConfiguration): Hasher {
   const { options } = nxJson?.tasksRunnerOptions?.['default'] ?? { options: {} };
@@ -14,6 +23,7 @@ export function createHasher(graph: ProjectGraph, nxJson: NxJsonConfiguration): 
 
 export async function hashTask(
   task: Task,
+  projectGraph: ProjectGraph,
   taskGraph: TaskGraph,
   defaultHasher: Hasher,
   workspace: Workspaces
@@ -29,7 +39,12 @@ export async function hashTask(
   }
 
   const { value, details } = await (customHasher
-    ? customHasher(task, taskGraph, defaultHasher)
+    ? customHasher(task, {
+        hasher: defaultHasher,
+        projectGraph,
+        taskGraph,
+        workspaceConfig: workspace.readWorkspaceConfiguration(),
+      })
     : defaultHasher.hashTaskWithDepsAndContext(task));
 
   task.hash = value;
