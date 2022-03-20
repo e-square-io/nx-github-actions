@@ -1,3 +1,9 @@
+## [2.4.3](https://github.com/e-square-io/nx-github-actions/compare/v2.4.2...v2.4.3) (2022-03-20)
+
+### Bug Fixes
+
+- **nx-distributed-task:** running NX command is not working with pnpm (#44) ([d569434](https://github.com/e-square-io/nx-github-actions/commit/d569434c0b16af17fcef17b09fe80e66facf8053)), closes [#44](https://github.com/e-square-io/nx-github-actions/issues/44)
+
 ## [2.4.2](https://github.com/e-square-io/nx-github-actions/compare/v2.4.1...v2.4.2) (2022-03-15)
 
 ### Bug Fixes
