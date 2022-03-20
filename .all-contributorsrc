@@ -23,6 +23,16 @@
         "ideas",
         "maintenance"
       ]
+    },
+    {
+      "login": "robinpellegrims",
+      "name": "Robin Pellegrims",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6053571?v=4",
+      "profile": "https://github.com/robinpellegrims",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
