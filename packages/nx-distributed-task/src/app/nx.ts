@@ -18,12 +18,19 @@ export async function assertNxInstalled(exec: Exec) {
 }
 
 export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Promise<string> {
-  const pmVersion = getPackageManagerVersion().split('.');
+  const [pmMajorVersion] = getPackageManagerVersion().split('.');
   let command = getPackageManagerCommand().exec;
-  if (command === 'npx' && Number(pmVersion[0]) > 6) command += ' --no';
+  const isNpx = command === 'npx';
+  const isYarn = command === 'yarn';
+  if (isNpx && Number(pmMajorVersion) > 6) {
+    command += ' --no';
+  }
+  if (isNpx || isYarn) {
+    command += ` -p @nrwl/cli`;
+  }
 
   const wrapper = exec
-    .withCommand(`${command} -p @nrwl/cli nx ${nxCommand}`)
+    .withCommand(`${command} nx ${nxCommand}`)
     .withArgs(
       ...Object.entries(args).map(([k, v]) =>
         typeof v === 'boolean' && v ? `--${names(k).fileName}` : `--${names(k).fileName}=${v}`
