@@ -9,7 +9,7 @@
 ## Summary
 
 Github Action that runs nx `run-many` for the specified target and projects.  
-This action was designed to consume the outputs of [@e-square/nx-affected-matrix](https://github.com/marketplace/actions/nx-affected-task) in order to distribute jobs with ease.
+This action was designed to consume the outputs of [@e-square/nx-affected-matrix](https://github.com/marketplace/actions/nx-affected-matrix) in order to distribute jobs with ease.
 
 Check out the monorepo's [README](https://github.com/e-square-io/nx-github-actions#usage) for a full usage example of both actions with GitHub Actions' matrix
 
