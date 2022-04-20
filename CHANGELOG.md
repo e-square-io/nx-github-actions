@@ -1,3 +1,10 @@
+## [2.4.4](https://github.com/e-square-io/nx-github-actions/compare/v2.4.3...v2.4.4) (2022-04-20)
+
+### Documentation
+
+- add @robinpellegrims as a contributor [skip ci] ([8953f8a](https://github.com/e-square-io/nx-github-actions/commit/8953f8aa94873f6f8e161288052e722e0fbe2e7f))
+- fix marketplace link in README (#49) ([0a397f7](https://github.com/e-square-io/nx-github-actions/commit/0a397f799d78b0a45c557a3a35c6254920da52ee)), closes [#49](https://github.com/e-square-io/nx-github-actions/issues/49)
+
 ## [2.4.3](https://github.com/e-square-io/nx-github-actions/compare/v2.4.2...v2.4.3) (2022-03-20)
 
 ### Bug Fixes
