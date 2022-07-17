@@ -18,7 +18,8 @@ export async function assertNxInstalled(exec: Exec) {
 }
 
 export async function getNxVersion(exec: Exec): Promise<string> {
-  return await exec.withCommand(`nx --version`).build()();
+  const command = getPackageManagerCommand().exec;
+  return await exec.withCommand(`${command} nx --version`).build()();
 }
 
 export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Promise<string> {
