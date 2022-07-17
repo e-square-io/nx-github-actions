@@ -1,3 +1,9 @@
+## [2.4.5](https://github.com/e-square-io/nx-github-actions/compare/v2.4.4...v2.4.5) (2022-07-17)
+
+### Bug Fixes
+
+- with-deps removed in nx 14 (#51) ([57441b6](https://github.com/e-square-io/nx-github-actions/commit/57441b62639ec90db3b1aef573980f80e72c22d2)), closes [#51](https://github.com/e-square-io/nx-github-actions/issues/51)
+
 ## [2.4.4](https://github.com/e-square-io/nx-github-actions/compare/v2.4.3...v2.4.4) (2022-04-20)
 
 ### Documentation
