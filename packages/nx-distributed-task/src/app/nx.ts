@@ -23,9 +23,12 @@ export async function getNxVersion(exec: Exec): Promise<string> {
 
 export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Promise<string> {
   const [nxMajorVersion] = (await getNxVersion(exec)).split('.');
-  // override with-deps because it was removed in NX 14
-  if (nxMajorVersion < '14' && args.withDeps) {
+  if (args.withDeps) {
     warning(`with-deps was removed in NX 14. Please replace its usage with 'targetDefaults'`);
+  }
+
+  // override with-deps because it was removed in NX 14
+  if (nxMajorVersion >= '14') {
     args.withDeps = undefined;
     args['with-deps'] = undefined;
   }
