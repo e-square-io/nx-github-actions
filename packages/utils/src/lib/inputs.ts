@@ -52,8 +52,14 @@ export function parseNxArgs(args: Record<string, unknown>): NxArgs {
 
 export function shouldRunWithDeps(target: string): boolean {
   const nxJson = readNxJson(tree);
-
-  return Boolean(nxJson?.targetDependencies?.[target]?.some?.(({ projects }) => projects === 'dependencies'));
+  const isNx14 = (nxJson as any).targetDefaults !== undefined;
+  if (isNx14) {
+    return Boolean(
+      ((nxJson as any)?.targetDefaults?.[target]?.dependsOn as string[]).some?.((dep) => dep.includes(target))
+    );
+  } else {
+    return Boolean(nxJson?.targetDependencies?.[target]?.some?.(({ projects }) => projects === 'dependencies'));
+  }
 }
 
 export function getArgsInput(

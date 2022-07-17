@@ -4,7 +4,7 @@ import { NxArgs } from '@nrwl/workspace/src/command-line/utils';
 import { names } from '@nrwl/devkit/src/utils/names';
 
 import { Exec } from '@e-square/utils/exec';
-import { debug, group, logger } from '@e-square/utils/logger';
+import { debug, group, logger, warning } from '@e-square/utils/logger';
 
 export async function assertNxInstalled(exec: Exec) {
   const command = getPackageManagerCommand().list;
@@ -17,7 +17,23 @@ export async function assertNxInstalled(exec: Exec) {
   if (!path) throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
 }
 
+export async function getNxVersion(exec: Exec): Promise<string> {
+  const command = getPackageManagerCommand().exec;
+  return await exec.withCommand(`${command} nx --version`).build()();
+}
+
 export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Promise<string> {
+  const [nxMajorVersion] = (await getNxVersion(exec)).split('.');
+  if (args.withDeps) {
+    warning(`with-deps was removed in NX 14. Please replace its usage with 'targetDefaults'`);
+  }
+
+  // override with-deps because it was removed in NX 14
+  if (nxMajorVersion >= '14') {
+    args.withDeps = undefined;
+    args['with-deps'] = undefined;
+  }
+
   const [pmMajorVersion] = getPackageManagerVersion().split('.');
   let command = getPackageManagerCommand().exec;
   const isNpx = command === 'npx';
