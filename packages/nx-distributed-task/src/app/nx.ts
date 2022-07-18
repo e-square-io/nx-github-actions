@@ -30,8 +30,8 @@ export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Pr
 
   // override with-deps because it was removed in NX 14
   if (nxMajorVersion >= '14') {
-    args.withDeps = undefined;
-    args['with-deps'] = undefined;
+    delete args.withDeps;
+    delete args['with-deps'];
   }
 
   const [pmMajorVersion] = getPackageManagerVersion().split('.');

@@ -6,39 +6,34 @@ import { Exec } from '@e-square/utils/exec';
 import { logger } from '@e-square/utils/logger';
 import { assertNxInstalled, nxCommand, nxRunMany } from './nx';
 
-jest.mock('@e-square/utils/logger');
 jest.mock('child_process');
 jest.mock('fs');
+jest.mock('@e-square/utils/logger');
 
 describe('nx', () => {
+  let exec: Exec;
+
+  beforeEach(() => {
+    exec = new Exec(jest.fn());
+    jest.spyOn(exec, 'build').mockReturnValue(() => Promise.resolve(''));
+    jest.spyOn(exec, 'withCommand');
+    jest.spyOn(exec, 'withArgs');
+    jest.spyOn(exec, 'withOptions');
+  });
+
   describe('assertNxInstalled', () => {
     it('should fail to assert and throw error', async () => {
-      const exec = new Exec(jest.fn().mockResolvedValueOnce(0));
       await expect(assertNxInstalled(exec)).rejects.toThrow("Couldn't find Nx binary, Have you run npm/yarn install?");
     });
 
     it('should success assertion', async () => {
-      const exec = new Exec(
-        jest.fn().mockImplementation(async (_, __, opts) => {
-          opts.listeners.stdout('test');
-          return Promise.resolve(0);
-        })
-      );
+      jest.spyOn(exec, 'build').mockReturnValue(() => Promise.resolve('test'));
+
       await expect(assertNxInstalled(exec)).resolves.toBeUndefined();
     });
   });
 
   describe('exec nx', () => {
-    let exec: Exec;
-
-    beforeEach(() => {
-      exec = new Exec(jest.fn());
-      jest.spyOn(exec, 'build').mockReturnValue(() => Promise.resolve(''));
-      jest.spyOn(exec, 'withCommand');
-      jest.spyOn(exec, 'withArgs');
-      jest.spyOn(exec, 'withOptions');
-    });
-
     const cases: [pm.PackageManager, string, string][] = [
       ['npm', '6.8.0', 'npx -p @nrwl/cli'],
       ['npm', '7.0.0', 'npx --no -p @nrwl/cli'],
@@ -64,6 +59,23 @@ describe('nx', () => {
       it('should call nxCommand', async () => {
         await expect(nxCommand('test', { target: 'build' }, exec)).resolves.toBe('');
         expect(exec.withCommand).toHaveBeenCalledWith(`${expectedCommand} nx test`);
+        expect(exec.withArgs).toHaveBeenCalledWith('--target=build');
+      });
+
+      it('should not parse withDeps when nx version is >= 14', async () => {
+        jest.spyOn(exec, 'build').mockReturnValueOnce(() => Promise.resolve('14.0.0'));
+
+        await expect(
+          nxCommand(
+            'test',
+            {
+              target: 'build',
+              withDeps: true,
+              'with-deps': true,
+            },
+            exec
+          )
+        ).resolves.toBe('');
         expect(exec.withArgs).toHaveBeenCalledWith('--target=build');
       });
 
