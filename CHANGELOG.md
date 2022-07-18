@@ -1,3 +1,9 @@
+## [2.4.6](https://github.com/e-square-io/nx-github-actions/compare/v2.4.5...v2.4.6) (2022-07-18)
+
+### Bug Fixes
+
+- **nx-distributed-task:** undefined args are not filtered out (#52) ([353e717](https://github.com/e-square-io/nx-github-actions/commit/353e717debc8656565736af9933d8d4c1a5ace73)), closes [#52](https://github.com/e-square-io/nx-github-actions/issues/52)
+
 ## [2.4.5](https://github.com/e-square-io/nx-github-actions/compare/v2.4.4...v2.4.5) (2022-07-17)
 
 ### Bug Fixes
