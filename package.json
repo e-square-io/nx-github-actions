@@ -39,7 +39,7 @@
   "dependencies": {
     "@actions/artifact": "^1.0.0",
     "@actions/cache": "^1.0.9",
-    "@nrwl/devkit": "13.8.8",
+    "@nrwl/devkit": "13.9.2",
     "@nrwl/tao": "13.8.8",
     "@nrwl/workspace": "13.8.8",
     "tslib": "^2.0.0"
