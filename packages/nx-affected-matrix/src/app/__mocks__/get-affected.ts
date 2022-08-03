@@ -11,7 +11,6 @@ export const getAffected = jest.fn().mockResolvedValue({
   projects: ['project1', 'project2', 'project3', 'project4'],
   apps: ['project1', 'project2'],
   libs: ['project3', 'project4'],
-  e2e: ['project1-e2e'],
   projectGraph: {
     nodes: {},
   } as ProjectGraph,
