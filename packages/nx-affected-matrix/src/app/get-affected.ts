@@ -20,13 +20,11 @@ export async function getAffected(
   projects: string[];
   apps: string[];
   libs: string[];
-  e2e: string[];
   projectGraph: ProjectGraph;
 }> {
   args = { ...args, target };
   const apps: string[] = [],
-    libs: string[] = [],
-    e2e: string[] = [];
+    libs: string[] = [];
 
   const projectGraph = await createProjectGraphAsync();
   const projectNodes = projectsToRun(args, projectGraph);
@@ -40,14 +38,13 @@ export async function getAffected(
 
   for (const project of projectNodes) {
     switch (project.type) {
+      case 'e2e':
       case 'app':
         apps.push(mapToProjectName(project));
         break;
       case 'lib':
         libs.push(mapToProjectName(project));
         break;
-      case 'e2e':
-        e2e.push(mapToProjectName(project));
     }
   }
 
@@ -57,7 +54,6 @@ export async function getAffected(
     projects: projectNodes.map(mapToProjectName),
     apps,
     libs,
-    e2e,
     projectGraph,
   };
 }
