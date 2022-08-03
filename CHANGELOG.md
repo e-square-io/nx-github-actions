@@ -1,3 +1,9 @@
+## [2.4.7](https://github.com/e-square-io/nx-github-actions/compare/v2.4.6...v2.4.7) (2022-08-03)
+
+### Bug Fixes
+
+- **nx-affected-matrix:** e2e apps are ignored (#55) ([5819478](https://github.com/e-square-io/nx-github-actions/commit/581947860dcdf60735da99137acb896878875fda)), closes [#55](https://github.com/e-square-io/nx-github-actions/issues/55) [#54](https://github.com/e-square-io/nx-github-actions/issues/54)
+
 ## [2.4.6](https://github.com/e-square-io/nx-github-actions/compare/v2.4.5...v2.4.6) (2022-07-18)
 
 ### Bug Fixes
