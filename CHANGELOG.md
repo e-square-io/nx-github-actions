@@ -1,3 +1,9 @@
+## [2.4.8](https://github.com/e-square-io/nx-github-actions/compare/v2.4.7...v2.4.8) (2022-09-03)
+
+### Bug Fixes
+
+- **nx-affected-matrix:** get affected fails (#57) ([cbbf3e8](https://github.com/e-square-io/nx-github-actions/commit/cbbf3e8ee171c2f02bff042d3993a1466fcf2911)), closes [#57](https://github.com/e-square-io/nx-github-actions/issues/57)
+
 ## [2.4.7](https://github.com/e-square-io/nx-github-actions/compare/v2.4.6...v2.4.7) (2022-08-03)
 
 ### Bug Fixes
