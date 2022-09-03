@@ -63,6 +63,7 @@ export class Workspaces extends NxWorkspaces {
     generator: string
   ): { generatorsFilePath: string; generatorsJson: any; normalizedGeneratorName: string } | void {
     let generatorsFilePath: string;
+    if (!collectionName) return;
     if (collectionName.endsWith('.json')) {
       generatorsFilePath = this._require.resolve(collectionName, {
         paths: resolveRoots(),
