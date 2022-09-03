@@ -95,3 +95,8 @@ _Note: The action allows to set a partial distribution config, any target that i
 **Q: Can I use this action without any prior actions? (checkout, npm ci, etc)**  
 A: Yes! The action is already bundled with everything needed to run NX's affected command.  
 Also, the action will do the checkout for you with `clean: false` & `fetch-depth: 0` (which is required in order to calculate the changes).
+
+## Known Issues
+
+1. **Cannot read properties of undefined (reading 'endsWith')**  
+Workaround: make sure all of your projects has `root` defined in their `project.json` config file
