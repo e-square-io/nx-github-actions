@@ -122,6 +122,7 @@ export function getBaseInputs(
 
   if (workingDirectory?.length > 0) {
     log(`🏃 Working in custom directory: ${workingDirectory}`);
+    process.env.NX_WORKSPACE_ROOT_PATH = workingDirectory;
     process.chdir(workingDirectory);
   }
 
