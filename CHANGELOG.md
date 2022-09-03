@@ -1,3 +1,9 @@
+## [2.4.9](https://github.com/e-square-io/nx-github-actions/compare/v2.4.8...v2.4.9) (2022-09-03)
+
+### Documentation
+
+- **nx-affected-matrix:** add known issues (#58) ([c9dfba8](https://github.com/e-square-io/nx-github-actions/commit/c9dfba8d066d3a6343d3234d0fbfb7ef5b19591a)), closes [#58](https://github.com/e-square-io/nx-github-actions/issues/58) [#53](https://github.com/e-square-io/nx-github-actions/issues/53)
+
 ## [2.4.8](https://github.com/e-square-io/nx-github-actions/compare/v2.4.7...v2.4.8) (2022-09-03)
 
 ### Bug Fixes
