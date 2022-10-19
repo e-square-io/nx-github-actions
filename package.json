@@ -41,7 +41,7 @@
     "@actions/cache": "^1.0.9",
     "@nrwl/devkit": "13.8.8",
     "@nrwl/tao": "13.8.8",
-    "@nrwl/workspace": "13.8.8",
+    "@nrwl/workspace": "14.2.0",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
