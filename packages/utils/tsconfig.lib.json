@@ -6,6 +6,6 @@
     "lib": ["ES2021"],
     "types": ["node"]
   },
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "__mocks__/**/*", "**/*/__mocks__/**/*"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "__mocks__/**/*", "**/*/__mocks__/**/*", "jest.config.ts"],
   "include": ["**/*.ts"]
 }

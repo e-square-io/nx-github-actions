@@ -1,4 +1,5 @@
-module.exports = {
+/* eslint-disable */
+export default {
   displayName: 'nx-distributed-task',
   preset: '../../jest.preset.js',
   globals: {

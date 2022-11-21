@@ -1,4 +1,5 @@
-module.exports = {
+/* eslint-disable */
+export default {
   displayName: 'nx-affected-matrix',
   preset: '../../jest.preset.js',
   globals: {

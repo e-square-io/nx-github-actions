@@ -7,6 +7,6 @@
     "target": "ES2021",
     "types": ["ES2021", "node"]
   },
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "__mocks__/**/*", "**/*/__mocks__/**/*"],
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "__mocks__/**/*", "**/*/__mocks__/**/*", "jest.config.ts"],
   "include": ["**/*.ts"]
 }

@@ -1,10 +1,11 @@
 {
-  "root": "packages/nx-affected-matrix",
+  "name": "nx-affected-matrix",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/nx-affected-matrix/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/nx-affected-matrix",
@@ -29,7 +30,9 @@
             "glob": "*.@(yml|md)",
             "output": "."
           }
-        ]
+        ],
+        "target": "node",
+        "compiler": "tsc"
       }
     },
     "serve": {
@@ -47,9 +50,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/packages/nx-affected-matrix"],
+      "outputs": ["{workspaceRoot}/coverage/packages/nx-affected-matrix"],
       "options": {
-        "jestConfig": "packages/nx-affected-matrix/jest.config.js",
+        "jestConfig": "packages/nx-affected-matrix/jest.config.ts",
         "passWithNoTests": true,
         "codeCoverage": true
       }
