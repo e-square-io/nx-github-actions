@@ -4,7 +4,7 @@ import { debug, group } from '@e-square/utils/logger';
 import { restoreNxCache, saveNxCache } from '@e-square/utils/cache';
 
 import type { Task } from '@e-square/utils/task';
-import type { TaskGraph } from '@nrwl/nx-cloud/lib/core/models/run-context.model';
+import type { TaskGraph } from 'nx/src/config/task-graph';
 
 export function restoreCache(context: typeof Context, tasks: Task[], taskGraph: TaskGraph): Promise<void> {
   const seenDeps = new Set<string>();
@@ -16,7 +16,7 @@ export function restoreCache(context: typeof Context, tasks: Task[], taskGraph: 
     if (key || !deps?.length) return;
 
     while (deps.length > 0) {
-      const nextDepTask = taskGraph.tasks[deps.shift()];
+      const nextDepTask = taskGraph.tasks[deps.shift()] as Task;
       if (seenDeps.has(nextDepTask.id)) continue;
       seenDeps.add(nextDepTask.id);
 

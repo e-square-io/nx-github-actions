@@ -16,6 +16,7 @@ import { restoreCache, saveCache } from './app/cache';
 import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
 import { readNxJsonInTree } from '@nrwl/workspace';
 import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
+import { Task } from '@e-square/utils/task';
 
 // TODO: daniel - from nx
 function mapTargetDefaultsToDependencies(defaults: TargetDefaults): TargetDependencies {
@@ -43,24 +44,24 @@ export default async function (
 
   try {
     const projectGraph = await createProjectGraphAsync();
-    const projectNodes = projectsToRun(parsedInputs.args, projectGraph);
+    const projectNames = projectsToRun(parsedInputs.args, projectGraph).map((project) => project.name);
     const nxJson = readNxJsonInTree(tree);
     const defaultDependencyConfigs = mapTargetDefaultsToDependencies(nxJson.targetDefaults);
     const taskGraph = await createTaskGraph(
       projectGraph,
       defaultDependencyConfigs,
-      projectNodes,
+      projectNames,
       [parsedInputs.target],
       undefined,
       {}
     );
 
-    const tasks = Object.values(taskGraph.tasks);
+    const tasks = Object.values(taskGraph.tasks) as Task[];
 
     await assertNxInstalled(new Exec(exec.exec));
     !parsedInputs.nxCloud && (await restoreCache(context, tasks, taskGraph));
     await nxRunMany(context, parsedInputs.args, new Exec(exec.exec));
-    parsedInputs.uploadOutputs && (await uploadProjectsOutputs(glob, tasks, taskGraph));
+    parsedInputs.uploadOutputs && (await uploadProjectsOutputs(glob, tasks));
     !parsedInputs.nxCloud && (await saveCache(context, tasks, taskGraph));
   } catch (e) {
     core.setFailed(e);

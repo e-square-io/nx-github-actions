@@ -18,7 +18,7 @@ describe('nx', () => {
     jest.spyOn(exec, 'build').mockReturnValue(() => Promise.resolve(''));
     jest.spyOn(exec, 'withCommand');
     jest.spyOn(exec, 'withArgs');
-    jest.spyOn(exec, 'withOptions');
+    // jest.spyOn(exec, 'withOptions');
   });
 
   describe('assertNxInstalled', () => {
@@ -94,14 +94,14 @@ describe('nx', () => {
         ).resolves.toBe('');
         expect(exec.withCommand).toHaveBeenCalledWith(`${expectedCommand} nx run-many`);
         expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--projects=test', '--parallel=3');
-        expect(exec.withOptions).toHaveBeenCalledWith(
-          expect.objectContaining({
-            env: expect.objectContaining({
-              NX_BRANCH: '0',
-              NX_RUN_GROUP: '0',
-            }),
-          })
-        );
+        // expect(exec.withOptions).toHaveBeenCalledWith(
+        //   expect.objectContaining({
+        //     env: expect.objectContaining({
+        //       NX_BRANCH: '0',
+        //       NX_RUN_GROUP: '0',
+        //     }),
+        //   })
+        // );
       });
     });
 
