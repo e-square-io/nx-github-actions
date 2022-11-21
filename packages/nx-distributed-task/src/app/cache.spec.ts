@@ -3,7 +3,7 @@ import { restoreNxCache, saveNxCache } from '@e-square/utils/cache';
 import { restoreCache, saveCache } from './cache';
 import { context } from '@actions/github';
 import { Task } from '@e-square/utils/task';
-import { TaskGraph } from '@nrwl/nx-cloud/lib/core/models/run-context.model';
+import { TaskGraph } from 'nx/src/config/task-graph';
 
 jest.mock('@e-square/utils/cache');
 jest.mock('@e-square/utils/logger');
