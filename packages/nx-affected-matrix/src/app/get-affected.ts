@@ -4,10 +4,10 @@ import { tree } from '@e-square/utils/fs';
 import type { ProjectGraph, TaskGraph } from '@nrwl/devkit';
 import type { Task } from '@e-square/utils/task';
 import { NxArgs } from 'nx/src/utils/command-line-utils';
-import { createProjectGraphAsync } from '@nrwl/devkit';
 import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
 import { readNxJson } from 'nx/src/generators/utils/project-configuration';
 import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
+import { createProjectGraphAsync } from 'nx/src/project-graph/project-graph';
 
 // TODO: daniel - from nx
 function mapTargetDefaultsToDependencies(defaults: TargetDefaults): TargetDependencies {

@@ -1,17 +1,13 @@
 import { warning } from './logger';
 import { getExecutorForTask } from './workspace';
-
-import type {
-  ProjectGraph,
-  NxJsonConfiguration,
-  TaskGraph,
-  WorkspaceConfiguration,
-  Hash,
-  CustomHasher,
-} from '@nrwl/devkit';
 import type { Task } from './task';
 import type { Workspaces } from './workspace';
-import { Hasher } from '@nrwl/devkit';
+import { Hasher, Hash } from 'nx/src/hasher/hasher';
+import { ProjectGraph } from 'nx/src/config/project-graph';
+import { TaskGraph } from 'nx/src/config/task-graph';
+import { WorkspaceConfiguration } from 'nx/src/generators/utils/project-configuration';
+import { CustomHasher } from 'nx/src/config/misc-interfaces';
+import { NxJsonConfiguration } from 'nx/src/config/nx-json';
 
 /** Run the hasher or the custom one
  * supports both the new (experimental) and the old (current) ways of invoking a custom hasher

@@ -1,8 +1,8 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync, renameSync, rmSync } from 'fs';
 import { resolve } from 'path';
 
-import type { Tree } from '@nrwl/devkit';
-import { appRootPath } from '@nrwl/devkit';
+import type { Tree } from 'nx/src/generators/tree';
+import { appRootPath } from 'nx/src/utils/app-root';
 
 export class GHTree implements Tree {
   readonly root: string;

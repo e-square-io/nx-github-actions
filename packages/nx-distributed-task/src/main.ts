@@ -2,7 +2,7 @@ import type * as _core from '@actions/core';
 import type * as _exec from '@actions/exec';
 import type * as _glob from '@actions/glob';
 import type { context as Context } from '@actions/github';
-import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph';
+import { createProjectGraphAsync } from 'nx/src/project-graph/project-graph';
 
 import { Exec } from '@e-square/utils/exec';
 import { info } from '@e-square/utils/logger';
@@ -16,7 +16,6 @@ import { restoreCache, saveCache } from './app/cache';
 import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
 import { readNxJson } from 'nx/src/generators/utils/project-configuration';
 import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
-import { Task } from '@e-square/utils/task';
 
 // TODO: daniel - from nx
 function mapTargetDefaultsToDependencies(defaults: TargetDefaults): TargetDependencies {
