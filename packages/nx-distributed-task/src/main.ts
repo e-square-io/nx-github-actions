@@ -14,7 +14,7 @@ import { assertNxInstalled, nxRunMany } from './app/nx';
 import { uploadProjectsOutputs } from './app/upload';
 import { restoreCache, saveCache } from './app/cache';
 import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
-import { readNxJsonInTree } from '@nrwl/workspace';
+import { readNxJson } from 'nx/src/generators/utils/project-configuration';
 import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
 import { Task } from '@e-square/utils/task';
 
@@ -45,7 +45,7 @@ export default async function (
   try {
     const projectGraph = await createProjectGraphAsync();
     const projectNames = projectsToRun(parsedInputs.args, projectGraph).map((project) => project.name);
-    const nxJson = readNxJsonInTree(tree);
+    const nxJson = readNxJson(tree);
     const defaultDependencyConfigs = mapTargetDefaultsToDependencies(nxJson.targetDefaults);
     const taskGraph = await createTaskGraph(
       projectGraph,
@@ -56,7 +56,7 @@ export default async function (
       {}
     );
 
-    const tasks = Object.values(taskGraph.tasks) as Task[];
+    const tasks = Object.values(taskGraph.tasks);
 
     await assertNxInstalled(new Exec(exec.exec));
     !parsedInputs.nxCloud && (await restoreCache(context, tasks, taskGraph));

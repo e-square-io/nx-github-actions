@@ -6,7 +6,7 @@ import type { Task } from '@e-square/utils/task';
 import { NxArgs } from 'nx/src/utils/command-line-utils';
 import { createProjectGraphAsync } from '@nrwl/devkit';
 import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
-import { readNxJsonInTree } from '@nrwl/workspace';
+import { readNxJson } from 'nx/src/generators/utils/project-configuration';
 import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
 
 // TODO: daniel - from nx
@@ -36,12 +36,12 @@ export async function getAffected(
     libs: string[] = [];
   const projectGraph = await createProjectGraphAsync();
   const projectNodes = projectsToRun(args, projectGraph);
-  const nxJson = readNxJsonInTree(tree);
+  const nxJson = readNxJson(tree);
   const defaultDependencyConfigs = mapTargetDefaultsToDependencies(nxJson.targetDefaults);
   const taskGraph = await createTaskGraph(
     projectGraph,
     defaultDependencyConfigs,
-    projectNodes,
+    projectNodes.map(({ name }) => name),
     [target],
     undefined,
     {}

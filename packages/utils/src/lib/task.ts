@@ -1,4 +1,4 @@
-import type { Task as NxTask } from '@nrwl/nx-cloud/lib/core/models/run-context.model';
+import type { Task as NxTask } from '@nrwl/devkit';
 
 export interface Task extends NxTask {
   cacheKey?: string;

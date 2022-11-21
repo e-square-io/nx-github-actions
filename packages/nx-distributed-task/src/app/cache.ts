@@ -16,7 +16,7 @@ export function restoreCache(context: typeof Context, tasks: Task[], taskGraph: 
     if (key || !deps?.length) return;
 
     while (deps.length > 0) {
-      const nextDepTask = taskGraph.tasks[deps.shift()] as Task;
+      const nextDepTask = taskGraph.tasks[deps.shift()];
       if (seenDeps.has(nextDepTask.id)) continue;
       seenDeps.add(nextDepTask.id);
 

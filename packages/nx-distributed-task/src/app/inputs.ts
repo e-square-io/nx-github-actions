@@ -1,12 +1,6 @@
 import type * as Core from '@actions/core';
 
-import {
-  BaseInputs,
-  getBaseInputs,
-  getMaxDistribution,
-  getStringArrayInput,
-  shouldRunWithDeps,
-} from '@e-square/utils/inputs';
+import { BaseInputs, getBaseInputs, getMaxDistribution, getStringArrayInput } from '@e-square/utils/inputs';
 
 export interface Inputs extends BaseInputs {
   target: string;

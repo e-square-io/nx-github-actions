@@ -3,7 +3,7 @@ import type * as Core from '@actions/core';
 import { debug, log, logger, warning } from './logger';
 import { tree } from './fs';
 import { NxArgs, splitArgsIntoNxArgsAndOverrides } from 'nx/src/utils/command-line-utils';
-import { readNxJsonInTree } from '@nrwl/workspace';
+import { readNxJson } from 'nx/src/generators/utils/project-configuration';
 import { TargetDependencyConfig } from 'nx/src/config/workspace-json-project-json';
 
 export interface BaseInputs {
@@ -51,7 +51,7 @@ export function parseNxArgs(args: Record<string, unknown>): NxArgs {
 }
 
 export function shouldRunWithDeps(target: string): boolean {
-  const nxJson = readNxJsonInTree(tree);
+  const nxJson = readNxJson(tree);
   const isNxAbove14 = (nxJson as any).targetDefaults !== undefined;
   log(`nxJson: ${nxJson}`);
   log(`isNx14: ${isNxAbove14}`);
@@ -73,7 +73,7 @@ export function getArgsInput(
   options?: Core.InputOptions
 ): NxArgs {
   const args = getStringArrayInput(core, 'args', /[= ]/g, options);
-  const nxJson = readNxJsonInTree(tree);
+  const nxJson = readNxJson(tree) ?? {};
   const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides(
     { _: args, $0: '' },
     mode,

@@ -19,7 +19,7 @@ import {
 import { tree } from './fs';
 import type { Task } from './task';
 import type { NxPlugin } from '@nrwl/devkit';
-import { readNxJsonInTree } from '@nrwl/workspace';
+import { readNxJson } from 'nx/src/generators/utils/project-configuration';
 import { mergeNpmScriptsWithTargets } from 'nx/src/utils/project-graph-utils';
 import { mergePluginTargetsWithNxTargets } from 'nx/src/utils/nx-plugin';
 
@@ -143,8 +143,8 @@ export class Workspaces extends NxWorkspaces {
   }
 
   override readWorkspaceConfiguration(): WorkspaceJsonConfiguration & NxJsonConfiguration {
-    const nxJsonPath = join(tree.root, 'nx.json');
-    const nxJson = readNxJsonInTree(nxJsonPath);
+    // const nxJsonPath = join(tree.root, 'nx.json');
+    const nxJson = readNxJson(tree) ?? {};
     const workspaceFile = workspaceConfigName(tree.root);
     const workspacePath = workspaceFile ? join(tree.root, workspaceFile) : null;
     const workspace =
