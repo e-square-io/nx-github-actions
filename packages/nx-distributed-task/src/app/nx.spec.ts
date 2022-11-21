@@ -70,8 +70,8 @@ describe('nx', () => {
             'test',
             {
               target: 'build',
-              withDeps: true,
-              'with-deps': true,
+              // withDeps: true,
+              // 'with-deps': true,
             },
             exec
           )
@@ -86,7 +86,7 @@ describe('nx', () => {
             {
               target: 'test',
               projects: ['test'],
-              scan: true,
+              // scan: true,
               parallel: 3,
             },
             exec
@@ -114,7 +114,7 @@ describe('nx', () => {
           {
             target: 'test',
             projects: ['test'],
-            scan: true,
+            // scan: true,
             parallel: 3,
           },
           exec

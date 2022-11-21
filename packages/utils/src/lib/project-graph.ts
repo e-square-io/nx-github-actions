@@ -1,12 +1,11 @@
 import { execSync } from 'child_process';
 
-import { filterAffected } from '@nrwl/workspace/src/core/affected-project-graph/affected-project-graph';
 import { calculateFileChanges, TEN_MEGABYTES } from '@nrwl/workspace/src/core/file-utils';
-import { filterNodes, withDeps } from '@nrwl/workspace/src/core/project-graph/operators';
-import { projectHasTarget } from '@nrwl/workspace/src/utilities/project-graph-utils';
-
-import type { ProjectGraph, ProjectGraphProjectNode } from '@nrwl/workspace/src/core/project-graph';
-import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
+import { ProjectGraph, ProjectGraphProjectNode } from '@nrwl/devkit';
+import { filterNodes, withDeps } from 'nx/src/project-graph/operators';
+import { NxArgs } from 'nx/src/utils/command-line-utils';
+import { projectHasTarget } from 'nx/src/utils/project-graph-utils';
+import { filterAffected } from 'nx/src/project-graph/affected/affected-project-graph';
 
 function filterByPredicate(
   list: Set<string>,
@@ -30,7 +29,9 @@ export function projectsToRun(nxArgs: NxArgs, projectGraph: ProjectGraph): Proje
     affectedGraph = filterByPredicate(new Set(nxArgs.projects), affectedGraph, (exists) => !exists);
   }
 
-  if (!nxArgs.all && nxArgs.withDeps) {
+  // TODO: daniel - validate you dont need this
+  // && nxArgs.withDeps
+  if (!nxArgs.all) {
     affectedGraph = withDeps(projectGraph, Object.values(affectedGraph.nodes) as ProjectGraphProjectNode[]);
   }
 
