@@ -93,7 +93,7 @@ describe('nx', () => {
           )
         ).resolves.toBe('');
         expect(exec.withCommand).toHaveBeenCalledWith(`${expectedCommand} nx run-many`);
-        expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--projects=test', '--scan', '--parallel=3');
+        expect(exec.withArgs).toHaveBeenCalledWith('--target=test', '--projects=test', '--parallel=3');
         expect(exec.withOptions).toHaveBeenCalledWith(
           expect.objectContaining({
             env: expect.objectContaining({
