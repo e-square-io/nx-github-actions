@@ -3,7 +3,7 @@ import * as core from '@actions/core';
 import { getArgsInput, getMaxDistribution, getStringArrayInput } from './inputs';
 import { splitArgsIntoNxArgsAndOverrides } from 'nx/src/utils/command-line-utils';
 
-jest.mock('@nrwl/workspace/src/command-line/utils');
+jest.mock('nx/src/utils/command-line-utils');
 jest.mock('./fs');
 jest.mock('./logger');
 
@@ -34,6 +34,7 @@ describe('inputs', () => {
       expect(splitArgsIntoNxArgsAndOverrides).toHaveBeenCalledWith(
         expect.objectContaining({ _: ['-f', 'b', '--foo', 'bar', '--baz', 'false'] }),
         'print-affected',
+        expect.anything(),
         expect.anything()
       );
     });
