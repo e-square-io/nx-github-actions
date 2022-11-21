@@ -9,21 +9,10 @@ jest.mock('@e-square/utils/logger');
 describe('upload', () => {
   describe('uploadProjectsOutputs', () => {
     it('should call the uploader per each task', async () => {
-      await uploadProjectsOutputs(
-        glob,
-        [
-          { id: 'test:build', overrides: {}, outputs: ['test'], target: { target: 'build', project: 'test' } },
-          { id: 'test2:build', overrides: {}, outputs: ['test'], target: { target: 'build', project: 'test' } },
-        ],
-        {
-          dependencies: {},
-          roots: [],
-          tasks: {
-            'test:build': { id: 'test:build', overrides: {}, target: { target: 'build', project: 'test' } },
-            'test2:build': { id: 'test2:build', overrides: {}, target: { target: 'build', project: 'test' } },
-          },
-        }
-      );
+      await uploadProjectsOutputs(glob, [
+        { id: 'test:build', overrides: {}, outputs: ['test'], target: { target: 'build', project: 'test' } },
+        { id: 'test2:build', overrides: {}, outputs: ['test'], target: { target: 'build', project: 'test' } },
+      ]);
 
       expect(uploadArtifact).toHaveBeenNthCalledWith(1, glob, 'build', ['test']);
       expect(uploadArtifact).toHaveBeenNthCalledWith(2, glob, 'build', ['test']);
