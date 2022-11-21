@@ -2,12 +2,10 @@ import type * as _core from '@actions/core';
 import type * as _exec from '@actions/exec';
 import type * as _glob from '@actions/glob';
 import type { context as Context } from '@actions/github';
-import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
 import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph';
 
 import { Exec } from '@e-square/utils/exec';
 import { info } from '@e-square/utils/logger';
-import { createTaskGraph } from '@e-square/utils/task-graph';
 import { projectsToRun } from '@e-square/utils/project-graph';
 import { tree } from '@e-square/utils/fs';
 
@@ -15,7 +13,19 @@ import { getInputs } from './app/inputs';
 import { assertNxInstalled, nxRunMany } from './app/nx';
 import { uploadProjectsOutputs } from './app/upload';
 import { restoreCache, saveCache } from './app/cache';
-import { Workspaces } from '@e-square/utils/workspace';
+import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
+import { readNxJsonInTree } from '@nrwl/workspace';
+import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
+
+// TODO: daniel - from nx
+function mapTargetDefaultsToDependencies(defaults: TargetDefaults): TargetDependencies {
+  const res = {};
+  Object.keys(defaults).forEach((k) => {
+    res[k] = defaults[k].dependsOn;
+  });
+
+  return res;
+}
 
 export default async function (
   context: typeof Context,
@@ -34,14 +44,18 @@ export default async function (
   try {
     const projectGraph = await createProjectGraphAsync();
     const projectNodes = projectsToRun(parsedInputs.args, projectGraph);
-
-    const { tasks, taskGraph } = await createTaskGraph(
-      parsedInputs.args,
-      projectNodes,
+    const nxJson = readNxJsonInTree(tree);
+    const defaultDependencyConfigs = mapTargetDefaultsToDependencies(nxJson.targetDefaults);
+    const taskGraph = await createTaskGraph(
       projectGraph,
-      readNxJson(tree),
-      new Workspaces(_require)
+      defaultDependencyConfigs,
+      projectNodes,
+      [parsedInputs.target],
+      undefined,
+      {}
     );
+
+    const tasks = Object.values(taskGraph.tasks);
 
     await assertNxInstalled(new Exec(exec.exec));
     !parsedInputs.nxCloud && (await restoreCache(context, tasks, taskGraph));

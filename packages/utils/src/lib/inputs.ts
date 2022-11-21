@@ -1,10 +1,10 @@
 import type * as Core from '@actions/core';
 
-import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
-import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
-
 import { debug, log, logger, warning } from './logger';
 import { tree } from './fs';
+import { NxArgs, splitArgsIntoNxArgsAndOverrides } from 'nx/src/utils/command-line-utils';
+import { readNxJsonInTree } from '@nrwl/workspace';
+import { TargetDependencyConfig } from 'nx/src/config/workspace-json-project-json';
 
 export interface BaseInputs {
   args: NxArgs;
@@ -51,7 +51,7 @@ export function parseNxArgs(args: Record<string, unknown>): NxArgs {
 }
 
 export function shouldRunWithDeps(target: string): boolean {
-  const nxJson = readNxJson(tree);
+  const nxJson = readNxJsonInTree(tree);
   console.log(nxJson);
   const isNx14 = (nxJson as any).targetDefaults !== undefined;
   if (isNx14) {
@@ -59,7 +59,11 @@ export function shouldRunWithDeps(target: string): boolean {
       ((nxJson as any)?.targetDefaults?.[target]?.dependsOn as string[]).some?.((dep) => dep.includes(target))
     );
   } else {
-    return Boolean(nxJson?.targetDependencies?.[target]?.some?.(({ projects }) => projects === 'dependencies'));
+    return Boolean(
+      (nxJson?.targetDependencies?.[target] as TargetDependencyConfig[])?.some?.(
+        ({ projects }) => projects === 'dependencies'
+      )
+    );
   }
 }
 
@@ -69,9 +73,15 @@ export function getArgsInput(
   options?: Core.InputOptions
 ): NxArgs {
   const args = getStringArrayInput(core, 'args', /[= ]/g, options);
-  const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
-    printWarnings: false,
-  }) ?? { nxArgs: {}, overrides: {} };
+  const nxJson = readNxJsonInTree(tree);
+  const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides(
+    { _: args, $0: '' },
+    mode,
+    {
+      printWarnings: false,
+    },
+    nxJson
+  ) ?? { nxArgs: {}, overrides: {} };
 
   return parseNxArgs({ ...nxArgs, ...overrides });
 }

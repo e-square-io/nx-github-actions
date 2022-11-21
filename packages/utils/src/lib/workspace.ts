@@ -5,26 +5,23 @@ import {
   buildWorkspaceConfigurationFromGlobs,
   globForProjectFiles,
   resolveNewFormatWithInlineProjects,
-  resolveOldFormatWithInlineProjects,
   workspaceConfigName,
-  WorkspaceJsonConfiguration,
   Workspaces as NxWorkspaces,
 } from '@nrwl/tao/src/shared/workspace';
-import { readNxJson } from '@nrwl/workspace/src/core/file-utils';
 import { NxJsonConfiguration } from '@nrwl/tao/src/shared/nx';
-import { mergeNpmScriptsWithTargets } from '@nrwl/workspace/src/utilities/project-graph-utils';
-import { mergePluginTargetsWithNxTargets } from '@nrwl/tao/src/shared/nx-plugin';
 import {
-  getProjects,
-  readJson,
   readJsonFile,
   readProjectConfiguration,
   readWorkspaceConfiguration,
+  WorkspaceJsonConfiguration,
 } from '@nrwl/devkit';
 
 import { tree } from './fs';
 import type { Task } from './task';
 import type { NxPlugin } from '@nrwl/devkit';
+import { readNxJsonInTree } from '@nrwl/workspace';
+import { mergeNpmScriptsWithTargets } from 'nx/src/utils/project-graph-utils';
+import { mergePluginTargetsWithNxTargets } from 'nx/src/utils/nx-plugin';
 
 function findFullGeneratorName(
   name: string,
@@ -147,12 +144,15 @@ export class Workspaces extends NxWorkspaces {
 
   override readWorkspaceConfiguration(): WorkspaceJsonConfiguration & NxJsonConfiguration {
     const nxJsonPath = join(tree.root, 'nx.json');
-    const nxJson = readNxJson(nxJsonPath);
+    const nxJson = readNxJsonInTree(nxJsonPath);
     const workspaceFile = workspaceConfigName(tree.root);
     const workspacePath = workspaceFile ? join(tree.root, workspaceFile) : null;
     const workspace =
       workspacePath && tree.exists(workspacePath)
-        ? resolveNewFormatWithInlineProjects(readJsonFile(join(tree.root, workspaceConfigName(tree.root))), tree.root)
+        ? resolveNewFormatWithInlineProjects(
+            readJsonFile(join(tree.root, workspaceConfigName(tree.root) ?? '')),
+            tree.root
+          )
         : buildWorkspaceConfigurationFromGlobs(nxJson, globForProjectFiles(tree.root, nxJson), (path) =>
             readJsonFile(join(tree.root, path))
           );
@@ -182,6 +182,7 @@ function findPluginPackageJson(path: string, plugin: string) {
 }
 
 let nxPluginCache: NxPlugin[];
+
 export function loadNxPlugins(plugins: string[] = [], _require: typeof require): NxPlugin[] {
   return plugins.length
     ? nxPluginCache ||

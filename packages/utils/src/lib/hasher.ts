@@ -1,11 +1,17 @@
-import { Hasher, Hash } from '@nrwl/workspace/src/core/hasher/hasher';
-
 import { warning } from './logger';
 import { getExecutorForTask } from './workspace';
 
-import type { ProjectGraph, NxJsonConfiguration, TaskGraph, WorkspaceConfiguration } from '@nrwl/devkit';
+import type {
+  ProjectGraph,
+  NxJsonConfiguration,
+  TaskGraph,
+  WorkspaceConfiguration,
+  Hash,
+  CustomHasher,
+} from '@nrwl/devkit';
 import type { Task } from './task';
 import type { Workspaces } from './workspace';
+import { Hasher } from '@nrwl/devkit';
 
 /** Run the hasher or the custom one
  * supports both the new (experimental) and the old (current) ways of invoking a custom hasher
@@ -41,10 +47,10 @@ async function runHasher(
   return hash ?? (await hasher.hashTaskWithDepsAndContext(task));
 }
 
-export function getCustomHasher(task: Task, workspace: Workspaces) {
+export function getCustomHasher(task: Task, workspace: Workspaces): CustomHasher | undefined {
   try {
     const factory = getExecutorForTask(task, workspace).hasherFactory;
-    return factory ? factory() : null;
+    return factory ? factory() : undefined;
   } catch (e) {
     throw new Error(`Unable to load hasher for task "${task.id}"`);
   }
@@ -62,7 +68,7 @@ export async function hashTask(
   defaultHasher: Hasher,
   workspace: Workspaces
 ): Promise<void> {
-  let customHasher = null;
+  let customHasher = undefined;
   try {
     customHasher = getCustomHasher(task, workspace);
   } catch (e) {

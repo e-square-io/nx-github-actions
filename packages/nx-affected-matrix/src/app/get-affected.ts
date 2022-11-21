@@ -1,14 +1,23 @@
-import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph/project-graph';
-import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
-
 import { mapToProjectName, projectsToRun } from '@e-square/utils/project-graph';
-import { createTaskGraph } from '@e-square/utils/task-graph';
-import { Workspaces } from '@e-square/utils/workspace';
 import { tree } from '@e-square/utils/fs';
 
 import type { ProjectGraph, TaskGraph } from '@nrwl/devkit';
-import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
 import type { Task } from '@e-square/utils/task';
+import { NxArgs } from 'nx/src/utils/command-line-utils';
+import { createProjectGraphAsync } from '@nrwl/devkit';
+import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
+import { readNxJsonInTree } from '@nrwl/workspace';
+import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
+
+// TODO: daniel - from nx
+function mapTargetDefaultsToDependencies(defaults: TargetDefaults): TargetDependencies {
+  const res = {};
+  Object.keys(defaults).forEach((k) => {
+    res[k] = defaults[k].dependsOn;
+  });
+
+  return res;
+}
 
 export async function getAffected(
   target: string,
@@ -25,15 +34,17 @@ export async function getAffected(
   args = { ...args, target };
   const apps: string[] = [],
     libs: string[] = [];
-
   const projectGraph = await createProjectGraphAsync();
   const projectNodes = projectsToRun(args, projectGraph);
-  const { tasks, taskGraph } = await createTaskGraph(
-    args,
-    projectNodes,
+  const nxJson = readNxJsonInTree(tree);
+  const defaultDependencyConfigs = mapTargetDefaultsToDependencies(nxJson.targetDefaults);
+  const taskGraph = await createTaskGraph(
     projectGraph,
-    readNxJson(tree),
-    new Workspaces(_require)
+    defaultDependencyConfigs,
+    projectNodes,
+    [target],
+    undefined,
+    {}
   );
 
   for (const project of projectNodes) {
@@ -49,7 +60,7 @@ export async function getAffected(
   }
 
   return {
-    tasks,
+    tasks: Object.values(taskGraph.tasks),
     taskGraph,
     projects: projectNodes.map(mapToProjectName),
     apps,

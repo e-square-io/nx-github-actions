@@ -1,9 +1,8 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync, renameSync, rmSync } from 'fs';
 import { resolve } from 'path';
 
-import { appRootPath } from '@nrwl/tao/src/utils/app-root';
-
 import type { Tree } from '@nrwl/devkit';
+import { appRootPath } from '@nrwl/devkit';
 
 export class GHTree implements Tree {
   readonly root: string;
