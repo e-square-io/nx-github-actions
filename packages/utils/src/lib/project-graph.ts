@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 
-import { calculateFileChanges, TEN_MEGABYTES } from '@nrwl/workspace/src/core/file-utils';
-import { ProjectGraph, ProjectGraphProjectNode } from '@nrwl/devkit';
+import { calculateFileChanges, TEN_MEGABYTES } from 'nx/src/project-graph/file-utils';
+import { ProjectGraph, ProjectGraphProjectNode } from 'nx/src/config/project-graph';
 import { filterNodes, withDeps } from 'nx/src/project-graph/operators';
 import { NxArgs } from 'nx/src/utils/command-line-utils';
 import { projectHasTarget } from 'nx/src/utils/project-graph-utils';

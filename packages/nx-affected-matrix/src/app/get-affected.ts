@@ -1,13 +1,14 @@
 import { mapToProjectName, projectsToRun } from '@e-square/utils/project-graph';
 import { tree } from '@e-square/utils/fs';
 
-import type { ProjectGraph, TaskGraph } from '@nrwl/devkit';
 import type { Task } from '@e-square/utils/task';
+import type { ProjectGraph } from 'nx/src/config/project-graph';
 import { NxArgs } from 'nx/src/utils/command-line-utils';
 import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
 import { readNxJson } from 'nx/src/generators/utils/project-configuration';
 import { TargetDefaults, TargetDependencies } from 'nx/src/config/nx-json';
 import { createProjectGraphAsync } from 'nx/src/project-graph/project-graph';
+import { TaskGraph } from 'nx/src/config/task-graph';
 
 // TODO: daniel - from nx
 function mapTargetDefaultsToDependencies(defaults: TargetDefaults): TargetDependencies {

@@ -2,13 +2,13 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSy
 import { resolve } from 'path';
 
 import type { Tree } from 'nx/src/generators/tree';
-import { appRootPath } from 'nx/src/utils/app-root';
+import { workspaceRoot } from 'nx/src/utils/app-root';
 
 export class GHTree implements Tree {
   readonly root: string;
 
   constructor(root?: string) {
-    this.root = root ?? appRootPath;
+    this.root = root ?? workspaceRoot;
   }
 
   children(dirPath: string): string[] {

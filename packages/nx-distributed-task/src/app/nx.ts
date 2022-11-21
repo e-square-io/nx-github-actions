@@ -1,5 +1,5 @@
 import type { context as Context } from '@actions/github';
-import { getPackageManagerCommand, getPackageManagerVersion } from '@nrwl/tao/src/shared/package-manager';
+import { getPackageManagerCommand, getPackageManagerVersion } from 'nx/src/utils/package-manager';
 import { names } from '@nrwl/devkit/src/utils/names';
 
 import { Exec } from '@e-square/utils/exec';

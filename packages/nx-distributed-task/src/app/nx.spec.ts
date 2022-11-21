@@ -1,4 +1,4 @@
-import * as pm from '@nrwl/tao/src/shared/package-manager';
+import * as pm from 'nx/src/utils/package-manager';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import { context } from '@actions/github';

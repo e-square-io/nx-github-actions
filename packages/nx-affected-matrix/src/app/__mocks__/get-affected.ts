@@ -1,5 +1,5 @@
 import type { Task } from '@e-square/utils/task';
-import type { ProjectGraph } from '@nrwl/devkit';
+import type { ProjectGraph } from 'nx/src/config/project-graph';
 
 export const getAffected = jest.fn().mockResolvedValue({
   tasks: [
