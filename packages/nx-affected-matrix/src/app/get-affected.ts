@@ -1,8 +1,8 @@
 import { mapToProjectName, projectsToRun } from '@e-square/utils/project-graph';
 import { tree } from '@e-square/utils/fs';
 
-import type { Task } from '@e-square/utils/task';
 import type { ProjectGraph } from 'nx/src/config/project-graph';
+import type { Task } from '@e-square/utils/task';
 import { NxArgs } from 'nx/src/utils/command-line-utils';
 import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
 import { readNxJson } from 'nx/src/generators/utils/project-configuration';

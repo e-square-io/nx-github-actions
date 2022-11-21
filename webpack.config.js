@@ -10,6 +10,8 @@ module.exports = (config) => {
     '@angular-devkit/build-angular/src/utils/version',
     '@angular-devkit/architect',
     '@angular-devkit/architect/node',
+    '@swc-node/register/register',
+    '@swc-node/register/read-default-tsconfig',
     ...(config.externals ?? []),
   ];
 
