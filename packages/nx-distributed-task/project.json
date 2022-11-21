@@ -1,4 +1,5 @@
 {
+  "root": "packages/nx-distributed-task",
   "name": "nx-distributed-task",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/nx-distributed-task/src",

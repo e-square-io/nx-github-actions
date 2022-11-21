@@ -1,4 +1,5 @@
 {
+  "root": "packages/nx-affected-matrix",
   "name": "nx-affected-matrix",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/nx-affected-matrix/src",
