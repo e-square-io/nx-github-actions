@@ -52,6 +52,7 @@ export function parseNxArgs(args: Record<string, unknown>): NxArgs {
 
 export function shouldRunWithDeps(target: string): boolean {
   const nxJson = readNxJson(tree);
+  console.log(nxJson);
   const isNx14 = (nxJson as any).targetDefaults !== undefined;
   if (isNx14) {
     return Boolean(
