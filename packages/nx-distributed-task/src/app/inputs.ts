@@ -23,10 +23,10 @@ export function getInputs(core: typeof Core): Inputs {
   args.target = target;
   args.projects = getStringArrayInput(core, 'projects', ',');
   args.parallel = getMaxDistribution(core, target, 'maxParallel')[target];
-  args.scan = core.getBooleanInput('nxCloud');
-  args.withDeps = shouldRunWithDeps(target);
+  // args.scan = core.getBooleanInput('nxCloud');
+  // args.withDeps = shouldRunWithDeps(target);
 
-  if (args.scan === false) delete args.scan;
+  // if (args.scan === false) delete args.scan;
 
   return {
     args,
@@ -35,7 +35,7 @@ export function getInputs(core: typeof Core): Inputs {
     target,
     projects: args.projects,
     maxParallel: args.parallel,
-    nxCloud: Boolean(args.scan),
+    nxCloud: core.getBooleanInput('nxCloud'),
     uploadOutputs: core.getBooleanInput('uploadOutputs'),
   };
 }
