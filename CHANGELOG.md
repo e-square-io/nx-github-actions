@@ -1,3 +1,9 @@
+## [2.4.10](https://github.com/e-square-io/nx-github-actions/compare/v2.4.9...v2.4.10) (2022-11-22)
+
+### Bug Fixes
+
+- **utils:** protect against no dependsOn (#64) ([18a7bbe](https://github.com/e-square-io/nx-github-actions/commit/18a7bbefc76632b241219237587e93ad5878de58)), closes [#64](https://github.com/e-square-io/nx-github-actions/issues/64)
+
 ## [2.4.9](https://github.com/e-square-io/nx-github-actions/compare/v2.4.8...v2.4.9) (2022-09-03)
 
 ### Documentation
