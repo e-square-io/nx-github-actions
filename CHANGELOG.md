@@ -1,3 +1,9 @@
+## [2.4.11](https://github.com/e-square-io/nx-github-actions/compare/v2.4.10...v2.4.11) (2022-11-22)
+
+### Bug Fixes
+
+- **utils:** workingDirectory is not being set correctly (#59) ([78f356d](https://github.com/e-square-io/nx-github-actions/commit/78f356df8b4d0621b85d9b0aabec5217af996051)), closes [#59](https://github.com/e-square-io/nx-github-actions/issues/59)
+
 ## [2.4.10](https://github.com/e-square-io/nx-github-actions/compare/v2.4.9...v2.4.10) (2022-11-22)
 
 ### Bug Fixes
