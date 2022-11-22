@@ -34,6 +34,7 @@ export default async function (
   glob: typeof _glob,
   _require: typeof require
 ) {
+  log('core: ' + JSON.stringify(core));
   const parsedInputs = getInputs(core);
   log('inputs: ' + JSON.stringify(parsedInputs));
   if (parsedInputs.projects.length === 0) {

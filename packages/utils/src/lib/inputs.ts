@@ -73,6 +73,7 @@ export function getArgsInput(
   options?: Core.InputOptions
 ): NxArgs {
   const args = getStringArrayInput(core, 'args', /[= ]/g, options);
+  log('args: ' + JSON.stringify(args));
   const nxJson = readNxJson(tree) ?? {};
   const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides(
     { _: args, $0: '' },
@@ -82,6 +83,8 @@ export function getArgsInput(
     },
     nxJson
   ) ?? { nxArgs: {}, overrides: {} };
+  log('nxArgs: ' + JSON.stringify(nxArgs));
+  log('overrides: ' + JSON.stringify(overrides));
 
   return parseNxArgs({ ...nxArgs, ...overrides });
 }
