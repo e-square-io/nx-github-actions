@@ -5,7 +5,7 @@ import type { context as Context } from '@actions/github';
 import { createProjectGraphAsync } from 'nx/src/project-graph/project-graph';
 
 import { Exec } from '@e-square/utils/exec';
-import { info } from '@e-square/utils/logger';
+import { info, log } from '@e-square/utils/logger';
 import { projectsToRun } from '@e-square/utils/project-graph';
 import { tree } from '@e-square/utils/fs';
 
@@ -35,7 +35,7 @@ export default async function (
   _require: typeof require
 ) {
   const parsedInputs = getInputs(core);
-
+  log('inputs: ' + parsedInputs);
   if (parsedInputs.projects.length === 0) {
     info('There are no projects to run, completing');
     return;
@@ -56,6 +56,7 @@ export default async function (
     );
 
     const tasks = Object.values(taskGraph.tasks);
+    log('tasks: ' + tasks);
 
     await assertNxInstalled(new Exec(exec.exec));
     !parsedInputs.nxCloud && (await restoreCache(context, tasks, taskGraph));
