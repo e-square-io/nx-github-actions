@@ -55,6 +55,7 @@ export default async function (
       undefined,
       {}
     );
+    log('taskGraph: ' + JSON.stringify(taskGraph));
 
     const tasks = Object.values(taskGraph.tasks);
     log('tasks: ' + JSON.stringify(tasks));
