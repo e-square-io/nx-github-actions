@@ -55,7 +55,7 @@ export function shouldRunWithDeps(target: string): boolean {
   const isNx14 = (nxJson as any).targetDefaults !== undefined;
   if (isNx14) {
     return Boolean(
-      ((nxJson as any)?.targetDefaults?.[target]?.dependsOn as string[]).some?.((dep) => dep.includes(target))
+      ((nxJson as any)?.targetDefaults?.[target]?.dependsOn as string[])?.some?.((dep) => dep.includes(target))
     );
   } else {
     return Boolean(nxJson?.targetDependencies?.[target]?.some?.(({ projects }) => projects === 'dependencies'));
