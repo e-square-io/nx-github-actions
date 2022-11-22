@@ -34,9 +34,9 @@ export default async function (
   glob: typeof _glob,
   _require: typeof require
 ) {
-  log('core: ' + JSON.stringify(core));
   const parsedInputs = getInputs(core);
   log('inputs: ' + JSON.stringify(parsedInputs));
+  log('core: ' + JSON.stringify(core));
   if (parsedInputs.projects.length === 0) {
     info('There are no projects to run, completing');
     return;
