@@ -5,6 +5,7 @@ import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
 
 import { debug, log, logger, warning } from './logger';
 import { tree } from './fs';
+import { TargetDependencyConfig } from 'nx/src/config/workspace-json-project-json';
 
 export interface BaseInputs {
   args: NxArgs;
@@ -55,10 +56,14 @@ export function shouldRunWithDeps(target: string): boolean {
   const isNx14 = (nxJson as any).targetDefaults !== undefined;
   if (isNx14) {
     return Boolean(
-      ((nxJson as any)?.targetDefaults?.[target]?.dependsOn as string[]).some?.((dep) => dep.includes(target))
+      ((nxJson as any)?.targetDefaults?.[target]?.dependsOn as string[])?.some?.((dep) => dep.includes(target))
     );
   } else {
-    return Boolean(nxJson?.targetDependencies?.[target]?.some?.(({ projects }) => projects === 'dependencies'));
+    return Boolean(
+      (nxJson?.targetDependencies?.[target] as TargetDependencyConfig[])?.some?.(
+        ({ projects }) => projects === 'dependencies'
+      )
+    );
   }
 }
 
