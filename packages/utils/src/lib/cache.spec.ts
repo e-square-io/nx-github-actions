@@ -72,14 +72,9 @@ describe('cache', () => {
       expect(saveCache).toHaveBeenCalledWith(getNxCachePaths(task), 'nx-cache-test-0');
     });
 
-    it('should fail silently for ReserveCacheError', async () => {
-      (saveCache as jest.Mock).mockRejectedValueOnce(new ReserveCacheError('test'));
-      await expect(saveNxCache(context, task)).resolves.toBeUndefined();
-    });
-
-    it('should fail for not ReserveCacheError', async () => {
+    it('should fail silently', async () => {
       (saveCache as jest.Mock).mockRejectedValueOnce(new Error('test'));
-      await expect(saveNxCache(context, task)).rejects.toThrowError('test');
+      await expect(saveNxCache(context, task)).resolves.toBeUndefined();
     });
 
     it('should not save cache if in debug mode', async () => {
