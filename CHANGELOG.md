@@ -1,3 +1,9 @@
+## [2.4.12](https://github.com/e-square-io/nx-github-actions/compare/v2.4.11...v2.4.12) (2022-12-19)
+
+### Bug Fixes
+
+- **utils:** cache error is being rethrown (#65) ([107c7d5](https://github.com/e-square-io/nx-github-actions/commit/107c7d5eaeaf87f8d8a88c7f0d3259b0a3653b02)), closes [#65](https://github.com/e-square-io/nx-github-actions/issues/65)
+
 ## [2.4.11](https://github.com/e-square-io/nx-github-actions/compare/v2.4.10...v2.4.11) (2022-11-22)
 
 ### Bug Fixes
