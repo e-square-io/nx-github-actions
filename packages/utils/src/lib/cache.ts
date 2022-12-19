@@ -90,13 +90,7 @@ export async function saveNxCache(context: typeof Context, task: Task): Promise<
 
     success(`Successfully saved cache to ${primaryKey}`);
   } catch (err) {
-    // don't throw an error if cache already exists, which may happen due to concurrency
-    if (err instanceof ReserveCacheError) {
       warning(err);
-      return;
-    }
-    // otherwise re-throw
-    throw err;
   }
 }
 
