@@ -1,6 +1,6 @@
 import { sep } from 'path';
 
-import { ReserveCacheError, restoreCache, saveCache } from '@actions/cache';
+import { restoreCache, saveCache } from '@actions/cache';
 
 import { debug, info, logger, success, warning } from './logger';
 
@@ -90,7 +90,7 @@ export async function saveNxCache(context: typeof Context, task: Task): Promise<
 
     success(`Successfully saved cache to ${primaryKey}`);
   } catch (err) {
-      warning(err);
+      warning(err as string);
   }
 }
 
