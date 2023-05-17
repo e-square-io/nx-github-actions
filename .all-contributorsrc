@@ -33,6 +33,17 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "rathpc",
+      "name": "Steven Rathbauer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5623579?v=4",
+      "profile": "https://github.com/rathpc",
+      "contributions": [
+        "code",
+        "maintenance",
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7
