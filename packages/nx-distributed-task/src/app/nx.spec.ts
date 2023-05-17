@@ -1,10 +1,10 @@
-import * as pm from '@nrwl/tao/src/shared/package-manager';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import { context } from '@actions/github';
 import { Exec } from '@e-square/utils/exec';
 import { logger } from '@e-square/utils/logger';
 import { assertNxInstalled, nxCommand, nxRunMany } from './nx';
+import { PackageManager } from '@nrwl/devkit';
 
 jest.mock('child_process');
 jest.mock('fs');
@@ -34,7 +34,7 @@ describe('nx', () => {
   });
 
   describe('exec nx', () => {
-    const cases: [pm.PackageManager, string, string][] = [
+    const cases: [PackageManager, string, string][] = [
       ['npm', '6.8.0', 'npx -p @nrwl/cli'],
       ['npm', '7.0.0', 'npx --no -p @nrwl/cli'],
       ['pnpm', '6.12.0', 'pnpx'],

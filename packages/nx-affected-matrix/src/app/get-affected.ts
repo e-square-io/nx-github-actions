@@ -1,14 +1,14 @@
-import { createProjectGraphAsync } from '@nrwl/workspace/src/core/project-graph/project-graph';
-import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
+import { createProjectGraphAsync, readNxJson } from '@nrwl/devkit';
 
 import { mapToProjectName, projectsToRun } from '@e-square/utils/project-graph';
 import { createTaskGraph } from '@e-square/utils/task-graph';
 import { Workspaces } from '@e-square/utils/workspace';
-import { tree } from '@e-square/utils/fs';
 
 import type { ProjectGraph, TaskGraph } from '@nrwl/devkit';
-import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
+import type { NxArgs } from 'nx/src/utils/command-line-utils';
 import type { Task } from '@e-square/utils/task';
+import { tree } from '@e-square/utils/fs';
+import { join } from 'path';
 
 export async function getAffected(
   target: string,
@@ -28,11 +28,12 @@ export async function getAffected(
 
   const projectGraph = await createProjectGraphAsync();
   const projectNodes = projectsToRun(args, projectGraph);
+  const nxJsonPath = join(tree.root, 'nx.json');
   const { tasks, taskGraph } = await createTaskGraph(
     args,
     projectNodes,
     projectGraph,
-    readNxJson(tree),
+    readNxJson(nxJsonPath),
     new Workspaces(_require)
   );
 

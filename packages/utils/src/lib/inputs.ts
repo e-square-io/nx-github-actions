@@ -1,9 +1,10 @@
 import type * as Core from '@actions/core';
 
-import { NxArgs, splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
-import { readNxJson } from '@nrwl/devkit/src/generators/project-configuration';
+import { NxArgs, splitArgsIntoNxArgsAndOverrides } from 'nx/src/utils/command-line-utils';
+import { readNxJson } from '@nrwl/devkit';
 
 import { debug, log, logger, warning } from './logger';
+import { join } from 'path';
 import { tree } from './fs';
 
 export interface BaseInputs {
@@ -51,7 +52,8 @@ export function parseNxArgs(args: Record<string, unknown>): NxArgs {
 }
 
 export function shouldRunWithDeps(target: string): boolean {
-  const nxJson = readNxJson(tree);
+  const nxJsonPath = join(tree.root, 'nx.json');
+  const nxJson = readNxJson(nxJsonPath);
   const isNx14 = (nxJson as any).targetDefaults !== undefined;
   if (isNx14) {
     return Boolean(

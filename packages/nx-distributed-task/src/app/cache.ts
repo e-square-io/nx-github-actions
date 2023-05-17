@@ -4,7 +4,7 @@ import { debug, group } from '@e-square/utils/logger';
 import { restoreNxCache, saveNxCache } from '@e-square/utils/cache';
 
 import type { Task } from '@e-square/utils/task';
-import type { TaskGraph } from '@nrwl/tao/src/shared/tasks';
+import type { TaskGraph } from '@nrwl/devkit';
 
 export function restoreCache(context: typeof Context, tasks: Task[], taskGraph: TaskGraph): Promise<void> {
   const seenDeps = new Set<string>();

@@ -1,7 +1,6 @@
 import type { context as Context } from '@actions/github';
-import { getPackageManagerCommand, getPackageManagerVersion } from '@nrwl/tao/src/shared/package-manager';
-import { NxArgs } from '@nrwl/workspace/src/command-line/utils';
-import { names } from '@nrwl/devkit/src/utils/names';
+import { getPackageManagerCommand, getPackageManagerVersion, names } from '@nrwl/devkit';
+import { NxArgs } from 'nx/src/utils/command-line-utils';
 
 import { Exec } from '@e-square/utils/exec';
 import { debug, group, logger, warning } from '@e-square/utils/logger';
