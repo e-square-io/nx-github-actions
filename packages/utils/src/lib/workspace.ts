@@ -1,22 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { dirname, join } from 'path';
 
+import { Workspaces as NxWorkspaces, WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import {
   buildWorkspaceConfigurationFromGlobs,
   globForProjectFiles,
   resolveNewFormatWithInlineProjects,
-  resolveOldFormatWithInlineProjects,
   workspaceConfigName,
-  WorkspaceJsonConfiguration,
-  Workspaces as NxWorkspaces,
-} from '@nrwl/tao/src/shared/workspace';
-import { readNxJson } from '@nrwl/workspace/src/core/file-utils';
-import { NxJsonConfiguration } from '@nrwl/tao/src/shared/nx';
-import { mergeNpmScriptsWithTargets } from '@nrwl/workspace/src/utilities/project-graph-utils';
-import { mergePluginTargetsWithNxTargets } from '@nrwl/tao/src/shared/nx-plugin';
+} from 'nx/src/config/workspaces';
+import { mergeNpmScriptsWithTargets } from 'nx/src/utils/project-graph-utils';
+import { mergePluginTargetsWithNxTargets } from 'nx/src/utils/nx-plugin';
 import {
-  getProjects,
-  readJson,
+  readNxJson,
+  NxJsonConfiguration,
   readJsonFile,
   readProjectConfiguration,
   readWorkspaceConfiguration,

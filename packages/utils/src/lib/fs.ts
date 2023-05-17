@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync, chmodSync, renameSync, rmSync } from 'fs';
 import { resolve } from 'path';
 
-import { appRootPath } from '@nrwl/tao/src/utils/app-root';
+import { workspaceRoot } from 'nx/src/utils/app-root';
 
 import type { Tree } from '@nrwl/devkit';
 
@@ -9,7 +9,7 @@ export class GHTree implements Tree {
   readonly root: string;
 
   constructor(root?: string) {
-    this.root = root ?? appRootPath;
+    this.root = root ?? workspaceRoot;
   }
 
   children(dirPath: string): string[] {
