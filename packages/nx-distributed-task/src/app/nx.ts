@@ -10,7 +10,10 @@ export async function assertNxInstalled(exec: Exec) {
 
   debug(`Checking existence of nx`);
 
-  const path = await exec.withCommand(`${command} @nrwl/cli -p --depth 1`).build()();
+  let path = '';
+  path = await exec.withCommand(`${command} @nrwl/cli -p --depth 1`).build()();
+  if (!path) path = await exec.withCommand(`${command} nx -p --depth 1`).build()();
+
   debug(`NX bin path: ${path}`);
 
   if (!path) throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
@@ -41,7 +44,7 @@ export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Pr
     command += ' --no';
   }
   if (isNpx || isYarn) {
-    command += ` -p @nrwl/cli`;
+    command += ` -p${nxMajorVersion >= '16' ? '' : ' @nrwl/cli'}`;
   }
 
   const wrapper = exec
