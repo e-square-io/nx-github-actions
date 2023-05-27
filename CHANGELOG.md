@@ -1,3 +1,9 @@
+# [2.5.0](https://github.com/e-square-io/nx-github-actions/compare/v2.4.12...v2.5.0) (2023-05-27)
+
+### Features
+
+- support nx 16 ([a4aba28](https://github.com/e-square-io/nx-github-actions/commit/a4aba284b75f779edc79ffd8f4c7c0422065704e))
+
 ## [2.4.12](https://github.com/e-square-io/nx-github-actions/compare/v2.4.11...v2.4.12) (2022-12-19)
 
 ### Bug Fixes
