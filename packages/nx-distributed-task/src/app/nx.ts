@@ -1,7 +1,6 @@
 import type { context as Context } from '@actions/github';
-import { getPackageManagerCommand, getPackageManagerVersion } from '@nrwl/tao/src/shared/package-manager';
-import { NxArgs } from '@nrwl/workspace/src/command-line/utils';
-import { names } from '@nrwl/devkit/src/utils/names';
+import { getPackageManagerCommand, getPackageManagerVersion, names } from '@nrwl/devkit';
+import { NxArgs } from 'nx/src/utils/command-line-utils';
 
 import { Exec } from '@e-square/utils/exec';
 import { debug, group, logger, warning } from '@e-square/utils/logger';
@@ -11,7 +10,10 @@ export async function assertNxInstalled(exec: Exec) {
 
   debug(`Checking existence of nx`);
 
-  const path = await exec.withCommand(`${command} @nrwl/cli -p --depth 1`).build()();
+  let path = '';
+  path = await exec.withCommand(`${command} @nrwl/cli -p --depth 1`).build()();
+  if (!path) path = await exec.withCommand(`${command} nx -p --depth 1`).build()();
+
   debug(`NX bin path: ${path}`);
 
   if (!path) throw new Error("Couldn't find Nx binary, Have you run npm/yarn install?");
@@ -42,7 +44,7 @@ export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Pr
     command += ' --no';
   }
   if (isNpx || isYarn) {
-    command += ` -p @nrwl/cli`;
+    command += ` -p${nxMajorVersion >= '16' ? '' : ' @nrwl/cli'}`;
   }
 
   const wrapper = exec

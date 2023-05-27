@@ -1,9 +1,9 @@
 import * as core from '@actions/core';
-import { splitArgsIntoNxArgsAndOverrides } from '@nrwl/workspace/src/command-line/utils';
+import { splitArgsIntoNxArgsAndOverrides } from 'nx/src/utils/command-line-utils';
 
 import { getArgsInput, getMaxDistribution, getStringArrayInput } from './inputs';
 
-jest.mock('@nrwl/workspace/src/command-line/utils');
+jest.mock('nx/src/utils/command-line-utils');
 jest.mock('./fs');
 jest.mock('./logger');
 

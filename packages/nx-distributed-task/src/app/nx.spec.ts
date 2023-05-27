@@ -1,10 +1,10 @@
-import * as pm from '@nrwl/tao/src/shared/package-manager';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import { context } from '@actions/github';
 import { Exec } from '@e-square/utils/exec';
 import { logger } from '@e-square/utils/logger';
 import { assertNxInstalled, nxCommand, nxRunMany } from './nx';
+import { PackageManager } from '@nrwl/devkit';
 
 jest.mock('child_process');
 jest.mock('fs');
@@ -34,15 +34,15 @@ describe('nx', () => {
   });
 
   describe('exec nx', () => {
-    const cases: [pm.PackageManager, string, string][] = [
-      ['npm', '6.8.0', 'npx -p @nrwl/cli'],
-      ['npm', '7.0.0', 'npx --no -p @nrwl/cli'],
-      ['pnpm', '6.12.0', 'pnpx'],
-      ['pnpm', '6.13.0', 'pnpm exec'],
-      ['yarn', '1.22.16', 'yarn -p @nrwl/cli'],
+    const cases: [PackageManager, string, string, string][] = [
+      ['npm', '6.8.0', 'npx -p @nrwl/cli', 'npx -p'],
+      ['npm', '7.0.0', 'npx --no -p @nrwl/cli', 'npx --no -p'],
+      ['pnpm', '6.12.0', 'pnpx', 'pnpx'],
+      ['pnpm', '6.13.0', 'pnpm exec', 'pnpm exec'],
+      ['yarn', '1.22.16', 'yarn -p @nrwl/cli', 'yarn -p'],
     ];
 
-    describe.each(cases)('%s %s', (packageManager, pmVersion, expectedCommand) => {
+    describe.each(cases)('%s %s', (packageManager, pmVersion, expectedCommand, expected16Command) => {
       // pretend lockfile exists for the specific package manager
       beforeEach(() => {
         jest
@@ -60,6 +60,13 @@ describe('nx', () => {
         await expect(nxCommand('test', { target: 'build' }, exec)).resolves.toBe('');
         expect(exec.withCommand).toHaveBeenCalledWith(`${expectedCommand} nx test`);
         expect(exec.withArgs).toHaveBeenCalledWith('--target=build');
+      });
+
+      it('should call nxCommand with nx binary package when nx version is >= 16', async () => {
+        jest.spyOn(exec, 'build').mockReturnValueOnce(() => Promise.resolve('16.0.0'));
+
+        await expect(nxCommand('test', { target: 'build' }, exec)).resolves.toBe('');
+        expect(exec.withCommand).toHaveBeenLastCalledWith(`${expected16Command} nx test`);
       });
 
       it('should not parse withDeps when nx version is >= 14', async () => {

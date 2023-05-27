@@ -34,6 +34,9 @@ yarn-error.log
 testem.log
 /typings
 
+# Nx related
+migrations.json
+
 # System Files
 .DS_Store
 Thumbs.db

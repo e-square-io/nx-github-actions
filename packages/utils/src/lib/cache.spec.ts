@@ -1,4 +1,4 @@
-import { saveCache, restoreCache, ReserveCacheError } from '@actions/cache';
+import { saveCache, restoreCache } from '@actions/cache';
 import * as core from '@actions/core';
 import { context } from '@actions/github';
 

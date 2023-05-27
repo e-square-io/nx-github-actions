@@ -1,15 +1,13 @@
-import { TaskGraphCreator } from '@nrwl/workspace/src/tasks-runner/task-graph-creator';
-import { ProjectGraphProjectNode } from '@nrwl/workspace/src/core/project-graph';
-import { createTasksForProjectToRun } from '@nrwl/workspace/src/tasks-runner/run-command';
-import { getOutputs } from '@nrwl/workspace/src/tasks-runner/utils';
+import { TaskGraphCreator } from 'nx/src/tasks-runner/task-graph-creator';
+import { createTasksForProjectToRun } from 'nx/src/tasks-runner/run-command';
+import { getOutputs } from 'nx/src/tasks-runner/utils';
 
 import { createHasher, hashTask } from './hasher';
 import { Workspaces } from './workspace';
 
-import type { ProjectGraph, TaskGraph } from '@nrwl/devkit';
+import type { ProjectGraphProjectNode, NxJsonConfiguration, ProjectGraph, TaskGraph } from '@nrwl/devkit';
 import type { Task } from './task';
-import type { NxArgs } from '@nrwl/workspace/src/command-line/utils';
-import { NxJsonConfiguration } from '@nrwl/tao/src/shared/nx';
+import type { NxArgs } from 'nx/src/utils/command-line-utils';
 
 export async function createTaskGraph(
   { target, configuration, projects }: NxArgs,
