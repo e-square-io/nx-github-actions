@@ -1,7 +1,7 @@
 # @e-square/nx-distributed-task
 
-[![NPM](https://img.shields.io/github/package-json/v/e-square-io/nx-distributed-task?&logo=npm&style=flat-square)]()
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/e-square-io/nx-github-actions/Main%20Workflow/main?event=push&logo=github&style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
+[![LATEST](https://img.shields.io/github/v/tag/e-square-io/nx-distributed-task?style=flat-square&label=latest)]()
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/e-square-io/nx-github-actions/main.yml?branch=main&event=push&logo=github&style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/e-square-io/nx-github-actions?logo=codecov&style=flat-square&token=PVPVUJAD1X)](https://app.codecov.io/gh/e-square-io/nx-github-actions)
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](https://github.com/e-square-io/nx-github-actions#contributors-)
 [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)](https://github.com/e-square-io/nx-github-actions/blob/main/LICENSE)

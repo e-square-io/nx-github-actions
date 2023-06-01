@@ -1,5 +1,5 @@
 # NX Github Actions
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/e-square-io/nx-github-actions/Main%20Workflow/main?event=push&logo=github&style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/e-square-io/nx-github-actions/main.yml?branch=main&event=push&logo=github&style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/e-square-io/nx-github-actions?logo=codecov&style=flat-square&token=PVPVUJAD1X)](https://app.codecov.io/gh/e-square-io/nx-github-actions)
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](.github/PULL_REQUEST_TEMPLATE.md)
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
@@ -16,10 +16,10 @@
 
 [@e-square/nx-affected-matrix]: https://github.com/e-square-io/nx-affected-matrix
 [nx-affected-matrix-link]: https://github.com/marketplace/actions/nx-affected-matrix
-[nx-affected-matrix-badge]: https://img.shields.io/github/package-json/v/e-square-io/nx-affected-matrix?label=Marketplace&logo=github&style=flat-square
+[nx-affected-matrix-badge]: https://img.shields.io/github/v/tag/e-square-io/nx-affected-matrix?label=Marketplace&logo=github&style=flat-square
 [@e-square/nx-distributed-task]: https://github.com/e-square-io/nx-distributed-task
 [nx-distributed-task-link]: https://github.com/marketplace/actions/nx-distributed-task
-[nx-distributed-task-badge]: https://img.shields.io/github/package-json/v/e-square-io/nx-affected-matrix?label=Marketplace&logo=github&style=flat-square
+[nx-distributed-task-badge]: https://img.shields.io/github/v/tag/e-square-io/nx-distributed-task?label=Marketplace&logo=github&style=flat-square
 
 ## Features
 
