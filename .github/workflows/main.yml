@@ -174,9 +174,6 @@ jobs:
         with:
           token: ${{ secrets.GH_AUTH_SECRET }}
 
-      - name: Fix git permissions
-        run: git config --global --add safe.directory "*"
-
       - name: Publish action ${{ matrix.package }}
         if: ${{ contains(needs.setup.outputs.matrix, matrix.package) }}
         uses: e-square-io/.github/.github/actions/push-to-repo@main
