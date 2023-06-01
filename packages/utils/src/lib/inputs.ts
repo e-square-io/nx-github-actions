@@ -26,6 +26,41 @@ export function getStringArrayInput(
     .map((value) => value.trim());
 }
 
+export function getBaseInputs(
+  core: typeof Core,
+  mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1]
+): BaseInputs {
+  const debug = core.getBooleanInput('debug');
+  const workingDirectory = core.getInput('workingDirectory');
+
+  logger(core).debugMode = debug;
+
+  if (workingDirectory?.length > 0) {
+    log(`🏃 Working in custom directory: ${workingDirectory}`);
+    process.env.NX_WORKSPACE_ROOT_PATH = workingDirectory;
+    process.chdir(workingDirectory);
+  }
+
+  return {
+    args: getArgsInput(core, mode),
+    debug,
+    workingDirectory,
+  };
+}
+
+export function getArgsInput(
+  core: typeof Core,
+  mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1] = 'print-affected',
+  options?: Core.InputOptions
+): NxArgs {
+  const args = getStringArrayInput(core, 'args', /[= ]/g, options);
+  const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
+    printWarnings: false,
+  }) ?? { nxArgs: {}, overrides: {} };
+
+  return parseNxArgs({ ...nxArgs, ...overrides });
+}
+
 export function parseNxArgs(args: Record<string, unknown>): NxArgs {
   const aliasArgs: Record<string, keyof NxArgs> = { c: 'configuration' };
   const arrArgs: (keyof NxArgs)[] = ['exclude', 'projects', 'files'];
@@ -64,19 +99,6 @@ export function shouldRunWithDeps(target: string): boolean {
   }
 }
 
-export function getArgsInput(
-  core: typeof Core,
-  mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1] = 'print-affected',
-  options?: Core.InputOptions
-): NxArgs {
-  const args = getStringArrayInput(core, 'args', /[= ]/g, options);
-  const { nxArgs, overrides } = splitArgsIntoNxArgsAndOverrides({ _: args, $0: '' }, mode, {
-    printWarnings: false,
-  }) ?? { nxArgs: {}, overrides: {} };
-
-  return parseNxArgs({ ...nxArgs, ...overrides });
-}
-
 export function getMaxDistribution(
   core: typeof Core,
   targets: string | string[],
@@ -111,26 +133,4 @@ export function getMaxDistribution(
   }
 
   return reduceTargetsDistribution(maybeNumberValue);
-}
-
-export function getBaseInputs(
-  core: typeof Core,
-  mode: Parameters<typeof splitArgsIntoNxArgsAndOverrides>[1]
-): BaseInputs {
-  const debug = core.getBooleanInput('debug');
-  const workingDirectory = core.getInput('workingDirectory');
-
-  logger(core).debugMode = debug;
-
-  if (workingDirectory?.length > 0) {
-    log(`🏃 Working in custom directory: ${workingDirectory}`);
-    process.env.NX_WORKSPACE_ROOT_PATH = workingDirectory;
-    process.chdir(workingDirectory);
-  }
-
-  return {
-    args: getArgsInput(core, mode),
-    debug,
-    workingDirectory,
-  };
 }
