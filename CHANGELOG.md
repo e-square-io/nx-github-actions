@@ -1,3 +1,9 @@
+## [2.5.1](https://github.com/e-square-io/nx-github-actions/compare/v2.5.0...v2.5.1) (2023-06-01)
+
+### Bug Fixes
+
+- git ownership issue (#72) ([7bb8e09](https://github.com/e-square-io/nx-github-actions/commit/7bb8e094456f9d4cdfafb3721f32e680e1b030f5)), closes [#72](https://github.com/e-square-io/nx-github-actions/issues/72)
+
 # [2.5.0](https://github.com/e-square-io/nx-github-actions/compare/v2.4.12...v2.5.0) (2023-05-27)
 
 ### Features
