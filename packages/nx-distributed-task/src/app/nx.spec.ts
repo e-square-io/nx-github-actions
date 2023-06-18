@@ -35,8 +35,8 @@ describe('nx', () => {
 
   describe('exec nx', () => {
     const cases: [PackageManager, string, string, string][] = [
-      ['npm', '6.8.0', 'npx -p @nrwl/cli', 'npx '],
-      ['npm', '7.0.0', 'npx --no -p @nrwl/cli', 'npx --no '],
+      ['npm', '6.8.0', 'npx -p @nrwl/cli', 'npx'],
+      ['npm', '7.0.0', 'npx --no -p @nrwl/cli', 'npx --no'],
       ['pnpm', '6.12.0', 'pnpx', 'pnpx'],
       ['pnpm', '6.13.0', 'pnpm exec', 'pnpm exec'],
       ['yarn', '1.22.16', 'yarn -p @nrwl/cli', 'yarn -p'],
