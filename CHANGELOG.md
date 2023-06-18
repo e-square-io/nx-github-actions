@@ -1,3 +1,17 @@
+## [2.5.2](https://github.com/e-square-io/nx-github-actions/compare/v2.5.1...v2.5.2) (2023-06-18)
+
+### Bug Fixes
+
+- remove -p from runner command if nx greater than 16 (#76) ([be5a572](https://github.com/e-square-io/nx-github-actions/commit/be5a572cabcad32fde727cc87b6865a8819de8ac)), closes [#76](https://github.com/e-square-io/nx-github-actions/issues/76)
+
+### Continuous Integration
+
+- remove fix git permission step [skip ci] ([ff21507](https://github.com/e-square-io/nx-github-actions/commit/ff2150701413a5ba4646479e82534d726f32c3c6))
+
+### Documentation
+
+- update readme badges [skip ci] ([414c8c5](https://github.com/e-square-io/nx-github-actions/commit/414c8c581ef42906b83b83dd100b6b669408ad90))
+
 ## [2.5.1](https://github.com/e-square-io/nx-github-actions/compare/v2.5.0...v2.5.1) (2023-06-01)
 
 ### Bug Fixes
