@@ -44,7 +44,7 @@ export async function nxCommand(nxCommand: string, args: NxArgs, exec: Exec): Pr
     command += ' --no';
   }
   if (isNpx || isYarn) {
-    command += ` -p${nxMajorVersion >= '16' ? '' : ' @nrwl/cli'}`;
+    command += nxMajorVersion >= '16' ? '' : `-p @nrwl/cli`;
   }
 
   const wrapper = exec
