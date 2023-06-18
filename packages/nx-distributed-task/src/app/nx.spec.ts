@@ -39,7 +39,7 @@ describe('nx', () => {
       ['npm', '7.0.0', 'npx --no -p @nrwl/cli', 'npx --no'],
       ['pnpm', '6.12.0', 'pnpx', 'pnpx'],
       ['pnpm', '6.13.0', 'pnpm exec', 'pnpm exec'],
-      ['yarn', '1.22.16', 'yarn -p @nrwl/cli', 'yarn -p'],
+      ['yarn', '1.22.16', 'yarn -p @nrwl/cli', 'yarn'],
     ];
 
     describe.each(cases)('%s %s', (packageManager, pmVersion, expectedCommand, expected16Command) => {
