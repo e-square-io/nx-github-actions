@@ -40,8 +40,8 @@
     "@actions/artifact": "^1.0.0",
     "@actions/cache": "^1.0.9",
     "@nrwl/devkit": "13.10.6",
-    "@nrwl/workspace": "13.10.6",
-    "nx": "13.10.6",
+    "@nrwl/workspace": "16.0.0",
+    "nx": "17.0.4",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
