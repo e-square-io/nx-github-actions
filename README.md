@@ -1,3 +1,7 @@
+> [!CAUTION]
+> This repo was archive and isn't maintained anymore.  
+> Please consider alternatives such as [nx-aws-cache](https://github.com/bojanbass/nx-aws).
+
 # NX Github Actions
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/e-square-io/nx-github-actions/main.yml?branch=main&event=push&logo=github&style=flat-square)](https://github.com/e-square-io/nx-github-actions/actions/workflows/main.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/e-square-io/nx-github-actions?logo=codecov&style=flat-square&token=PVPVUJAD1X)](https://app.codecov.io/gh/e-square-io/nx-github-actions)
