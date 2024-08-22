@@ -37,7 +37,7 @@
     "url": "https://github.com/e-square-io/nx-github-actions.git"
   },
   "dependencies": {
-    "@actions/artifact": "^1.0.0",
+    "@actions/artifact": "^1.1.1",
     "@actions/cache": "^1.0.9",
     "@nrwl/devkit": "13.10.6",
     "@nrwl/workspace": "13.10.6",
